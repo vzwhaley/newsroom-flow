@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Events\WebhookReceived;
+use SocialiteProviders\Manager\SocialiteWasCalled;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -40,5 +41,11 @@ class AppServiceProvider extends ServiceProvider
         // Grant / revoke Lifetime Pro in response to Stripe webhooks.
         Event::listen(WebhookReceived::class, HandleLifetimeCheckout::class);
         Event::listen(WebhookReceived::class, HandleLifetimeRefund::class);
+
+        // Register the extra Socialite providers (Google is built-in).
+        Event::listen(function (SocialiteWasCalled $event) {
+            $event->extendSocialite('apple', \SocialiteProviders\Apple\Provider::class);
+            $event->extendSocialite('discord', \SocialiteProviders\Discord\Provider::class);
+        });
     }
 }
