@@ -56,6 +56,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Topic::class)->orderBy('position');
     }
 
+    /**
+     * Top-level topics only (categories + standalone topics), ordered.
+     */
+    public function topLevelTopics(): HasMany
+    {
+        return $this->hasMany(Topic::class)->whereNull('parent_id')->orderBy('position');
+    }
+
     public function savedArticles(): HasMany
     {
         return $this->hasMany(SavedArticle::class)->latest();

@@ -20,7 +20,8 @@ class TopicController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:80'],
+            'name'      => ['required', 'string', 'max:80'],
+            'parent_id' => ['nullable', 'integer'],
         ]);
 
         $name = trim($validated['name']);
@@ -31,6 +32,25 @@ class TopicController extends Controller
                 'name' => "Free accounts can follow up to {$user->topicLimit()} topics. "
                     .'Upgrade to Pro for unlimited topics.',
             ]);
+        }
+
+        // Resolve + validate the parent (must be the user's own, top-level
+        // topic — we only allow one level of nesting).
+        $parent = null;
+        if (! empty($validated['parent_id'])) {
+            $parent = $user->topics()->whereKey($validated['parent_id'])->first();
+
+            if (! $parent) {
+                throw ValidationException::withMessages([
+                    'parent_id' => 'That category no longer exists.',
+                ]);
+            }
+
+            if ($parent->isChild()) {
+                throw ValidationException::withMessages([
+                    'parent_id' => 'You can only nest topics one level deep.',
+                ]);
+            }
         }
 
         // Prevent duplicates (case-insensitive) for this user.
@@ -44,9 +64,15 @@ class TopicController extends Controller
             ]);
         }
 
+        // Position within the topic's sibling set (top-level, or under parent).
+        $siblingMax = $user->topics()
+            ->where('parent_id', $parent?->id)
+            ->max('position');
+
         $topic = $user->topics()->create([
-            'name'     => $name,
-            'position' => ($user->topics()->max('position') ?? -1) + 1,
+            'name'      => $name,
+            'parent_id' => $parent?->id,
+            'position'  => ($siblingMax ?? -1) + 1,
         ]);
 
         // Populate the feed straight away so the user sees articles instantly.

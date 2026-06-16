@@ -41,11 +41,15 @@ class DatabaseSeeder extends Seeder
 
         $this->seedTopics($pro, [
             'World News',
-            'Technology',
             'Indianapolis Colts',
-            'Space Exploration',
             'Indiana Jones',
         ], $refresher);
+
+        // A parent category with nested subtopics, to demo the hierarchy.
+        $it = $this->seedTopic($pro, 'Information Technology', $refresher, position: 1);
+        foreach (['Artificial Intelligence', 'OpenAI', 'Anthropic'] as $i => $child) {
+            $this->seedTopic($pro, $child, $refresher, parent: $it, position: $i);
+        }
 
         $this->command->info('Seeded demo users: free@newsflow.test / pro@newsflow.test (password: "password").');
     }
@@ -53,12 +57,20 @@ class DatabaseSeeder extends Seeder
     private function seedTopics(User $user, array $names, TopicRefresher $refresher): void
     {
         foreach (array_values($names) as $i => $name) {
-            $topic = $user->topics()->create([
-                'name'     => $name,
-                'position' => $i,
-            ]);
-
-            $refresher->refresh($topic);
+            $this->seedTopic($user, $name, $refresher, position: $i);
         }
+    }
+
+    private function seedTopic(User $user, string $name, TopicRefresher $refresher, ?Topic $parent = null, int $position = 0): Topic
+    {
+        $topic = $user->topics()->create([
+            'name'      => $name,
+            'parent_id' => $parent?->id,
+            'position'  => $position,
+        ]);
+
+        $refresher->refresh($topic);
+
+        return $topic;
     }
 }

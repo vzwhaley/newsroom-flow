@@ -10,6 +10,7 @@ class Topic extends Model
 {
     protected $fillable = [
         'user_id',
+        'parent_id',
         'name',
         'query',
         'mute_keywords',
@@ -53,6 +54,27 @@ class Topic extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * The parent category this topic is nested under (null = top-level).
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Topic::class, 'parent_id');
+    }
+
+    /**
+     * Subtopics nested under this topic, ordered for display.
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany(Topic::class, 'parent_id')->orderBy('position');
+    }
+
+    public function isChild(): bool
+    {
+        return ! is_null($this->parent_id);
     }
 
     /**

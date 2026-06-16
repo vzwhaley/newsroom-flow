@@ -5,6 +5,7 @@ import { computed, ref } from 'vue';
 
 const props = defineProps({
     topic: { type: Object, required: true },
+    groupName: { type: String, default: null },
     isPro: { type: Boolean, default: false },
     savedFingerprints: { type: Array, default: () => [] },
     canMoveUp: { type: Boolean, default: false },
@@ -67,6 +68,9 @@ function saveMutes() {
         <!-- Topic masthead -->
         <div class="mb-4 flex flex-wrap items-end justify-between gap-2 border-b-2 border-ink pb-2">
             <div>
+                <p v-if="groupName" class="text-xs font-semibold uppercase tracking-wide text-brand-600">
+                    {{ groupName }}
+                </p>
                 <h2 class="font-serif text-2xl font-bold tracking-tight text-ink">
                     {{ topic.name }}
                 </h2>
