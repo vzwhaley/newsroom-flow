@@ -16,6 +16,8 @@ export default {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
                 // Newspaper-style serif for headlines / display type.
                 serif: ['"Source Serif 4"', 'Georgia', ...defaultTheme.fontFamily.serif],
+                // Brand display font for the "by moon whale media, llc" tagline.
+                brand: ['Spantaran', 'Figtree', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 // NewsFlow brand — deep ink + a confident blue accent.

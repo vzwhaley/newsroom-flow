@@ -1,39 +1,20 @@
-<script setup>
-defineProps({
-    withWordmark: { type: Boolean, default: false },
-});
-</script>
-
 <template>
-    <span class="inline-flex items-center gap-2">
-        <!-- Mark: stylised "flowing" news lines -->
-        <svg
-            viewBox="0 0 40 40"
-            class="h-9 w-9 shrink-0"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-        >
-            <rect width="40" height="40" rx="9" fill="#2563eb" />
-            <path
-                d="M9 27c4-6 6-9 11-9s7 3 11 9"
-                stroke="white"
-                stroke-width="2.4"
-                stroke-linecap="round"
-            />
-            <path
-                d="M9 20c4-6 6-9 11-9s7 3 11 9"
-                stroke="#bfdbfe"
-                stroke-width="2.4"
-                stroke-linecap="round"
-            />
-            <circle cx="20" cy="13" r="2" fill="white" />
-        </svg>
-        <span
-            v-if="withWordmark"
-            class="font-serif text-xl font-bold tracking-tight text-ink"
-        >
-            News<span class="text-brand-600">Flow</span>
-        </span>
-    </span>
+    <!--
+        NewsFlow icon — a newspaper. Stroke uses currentColor so it tints with
+        the surrounding text color (brand blue on light headers, light on the
+        dark footer). Size with a height utility, e.g. class="h-11 w-auto".
+    -->
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        focusable="false"
+    >
+        <path d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
+    </svg>
 </template>

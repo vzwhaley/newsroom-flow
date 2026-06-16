@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import BrandLogo from '@/Components/BrandLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
@@ -25,14 +25,12 @@ const tierLabel = computed(() => {
 
 <template>
     <div class="min-h-screen bg-gray-50">
-        <nav class="border-b border-gray-200 bg-white">
+        <nav class="sticky top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex h-16 justify-between">
+                <div class="flex h-20 justify-between">
                     <div class="flex">
                         <div class="flex shrink-0 items-center">
-                            <Link :href="route('dashboard')">
-                                <ApplicationLogo with-wordmark />
-                            </Link>
+                            <BrandLogo :href="route('dashboard')" :icon-class="'h-10 w-auto'" />
                         </div>
 
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">

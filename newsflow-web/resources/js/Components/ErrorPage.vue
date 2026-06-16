@@ -1,5 +1,5 @@
 <script setup>
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import BrandLogo from '@/Components/BrandLogo.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
 defineProps({
@@ -13,9 +13,9 @@ defineProps({
     <div class="flex min-h-screen flex-col items-center justify-center bg-white px-6 text-center">
         <Head :title="`${code} — ${title}`" />
 
-        <Link href="/" class="mb-8">
-            <ApplicationLogo with-wordmark />
-        </Link>
+        <div class="mb-8 flex justify-center">
+            <BrandLogo />
+        </div>
 
         <p class="font-serif text-7xl font-bold text-brand-600">{{ code }}</p>
         <h1 class="mt-4 font-serif text-3xl font-bold text-ink">{{ title }}</h1>
