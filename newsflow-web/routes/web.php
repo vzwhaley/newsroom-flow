@@ -25,6 +25,22 @@ Route::get('/about', fn () => Inertia::render('About'))->name('about');
 Route::get('/privacy', fn () => Inertia::render('Legal/Privacy'))->name('privacy');
 Route::get('/terms', fn () => Inertia::render('Legal/Terms'))->name('terms');
 
+// SEO sitemap of the public pages.
+Route::get('/sitemap.xml', function () {
+    $paths = ['/', '/pricing', '/how-to-use', '/faq', '/about', '/privacy', '/terms'];
+
+    $urls = collect($paths)
+        ->map(fn ($p) => '  <url><loc>'.e(url($p)).'</loc></url>')
+        ->implode("\n");
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n"
+        .'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n"
+        .$urls."\n"
+        .'</urlset>';
+
+    return response($xml, 200, ['Content-Type' => 'application/xml']);
+})->name('sitemap');
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated app
