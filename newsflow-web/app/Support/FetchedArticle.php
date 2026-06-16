@@ -29,7 +29,7 @@ class FetchedArticle
      */
     public function fingerprint(): string
     {
-        $canonical = $this->canonicalUrl();
+        $canonical = self::canonicalize($this->url);
 
         if ($canonical !== '') {
             return hash('sha256', $canonical);
@@ -38,9 +38,25 @@ class FetchedArticle
         return hash('sha256', Str::slug($this->headline));
     }
 
-    private function canonicalUrl(): string
+    /**
+     * Fingerprint for an arbitrary URL — lets popularity signals (HN, Reddit)
+     * match an external story to one of our candidates without constructing a
+     * full FetchedArticle.
+     */
+    public static function fingerprintForUrl(string $url): string
     {
-        $url = trim($this->url);
+        $canonical = self::canonicalize($url);
+
+        return $canonical === '' ? '' : hash('sha256', $canonical);
+    }
+
+    /**
+     * Reduce a URL to host + path (no scheme, www, query, or fragment) so the
+     * same story from different links collapses to one identity.
+     */
+    public static function canonicalize(string $url): string
+    {
+        $url = trim($url);
 
         if ($url === '') {
             return '';
