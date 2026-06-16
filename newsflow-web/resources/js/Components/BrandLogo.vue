@@ -7,7 +7,7 @@ const props = defineProps({
     // 'light' for light backgrounds (header), 'dark' for the footer.
     variant: { type: String, default: 'light' },
     // Icon height utility — larger by default than the old logo.
-    iconClass: { type: String, default: 'h-11 w-auto' },
+    iconClass: { type: String, default: 'h-14 w-auto' },
     // Hide the "by moon whale media, llc" tagline (e.g. tight spaces).
     tagline: { type: Boolean, default: true },
     // Where the logo links to.
@@ -25,12 +25,12 @@ const dark = computed(() => props.variant === 'dark');
         <span class="flex flex-col leading-tight">
             <Link
                 :href="href"
-                class="font-serif text-2xl font-bold tracking-tight"
+                class="font-serif text-3xl font-bold tracking-tight"
                 :class="dark ? 'text-white' : 'text-ink'"
             >
-                News<span class="text-brand-600" :class="{ '!text-brand-400': dark }">Flow</span><span class="align-super text-xs">™</span>
+                News<span class="text-brand-600" :class="{ '!text-brand-400': dark }">Flow</span><span class="align-super text-sm">™</span>
             </Link>
-            <span v-if="tagline" class="text-xs" :class="dark ? 'text-brand-200' : 'text-gray-500'">
+            <span v-if="tagline" class="text-sm" :class="dark ? 'text-brand-200' : 'text-gray-500'">
                 by
                 <a
                     href="https://moonwhale.media"

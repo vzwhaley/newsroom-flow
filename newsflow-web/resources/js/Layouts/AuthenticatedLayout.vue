@@ -27,10 +27,10 @@ const tierLabel = computed(() => {
     <div class="min-h-screen bg-gray-50">
         <nav class="sticky top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex h-20 justify-between">
+                <div class="flex h-24 justify-between">
                     <div class="flex">
                         <div class="flex shrink-0 items-center">
-                            <BrandLogo :href="route('dashboard')" :icon-class="'h-10 w-auto'" />
+                            <BrandLogo :href="route('dashboard')" />
                         </div>
 
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">

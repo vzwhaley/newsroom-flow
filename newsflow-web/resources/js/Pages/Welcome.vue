@@ -163,12 +163,12 @@ const sample = {
         </section>
 
         <!-- CTA -->
-        <section class="bg-ink">
+        <section class="bg-gradient-to-br from-brand-600 to-brand-800">
             <div class="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
                 <h2 class="font-serif text-3xl font-bold text-white sm:text-4xl">
                     Build your newsroom today
                 </h2>
-                <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-300">
+                <p class="mx-auto mt-4 max-w-2xl text-lg text-brand-100">
                     Start free with 2 topics. Go Pro for unlimited topics from
                     {{ '$' + (pricing.monthly ?? '4.99') }}/mo — or own it for life at
                     {{ '$' + (pricing.lifetime ?? '149.99') }}.
@@ -176,13 +176,13 @@ const sample = {
                 <div class="mt-8 flex flex-wrap justify-center gap-4">
                     <Link
                         :href="route('register')"
-                        class="rounded-lg bg-brand-600 px-6 py-3 text-base font-semibold text-white hover:bg-brand-700"
+                        class="rounded-lg bg-white px-6 py-3 text-base font-semibold text-brand-700 shadow-sm hover:bg-brand-50"
                     >
                         Get started free
                     </Link>
                     <Link
                         :href="route('pricing')"
-                        class="rounded-lg bg-white/10 px-6 py-3 text-base font-semibold text-white hover:bg-white/20"
+                        class="rounded-lg bg-white/10 px-6 py-3 text-base font-semibold text-white ring-1 ring-inset ring-white/30 hover:bg-white/20"
                     >
                         Compare plans
                     </Link>
