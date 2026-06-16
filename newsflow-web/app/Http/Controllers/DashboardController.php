@@ -16,6 +16,8 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
+        $savedFingerprints = $user->savedArticles()->pluck('fingerprint')->all();
+
         $topics = $user->topics()
             ->with(['articles' => fn ($q) => $q->orderBy('position')])
             ->orderBy('position')
@@ -24,6 +26,7 @@ class DashboardController extends Controller
                 'id'                => $topic->id,
                 'name'              => $topic->name,
                 'position'          => $topic->position,
+                'mute_keywords'     => $topic->mute_keywords ?? [],
                 'last_refreshed_at' => $topic->last_refreshed_at?->toIso8601String(),
                 'articles'          => $topic->articles->map(fn ($a) => [
                     'id'           => $a->id,
@@ -32,12 +35,14 @@ class DashboardController extends Controller
                     'url'          => $a->url,
                     'source'       => $a->source,
                     'image_url'    => $a->image_url,
+                    'fingerprint'  => $a->fingerprint,
                     'published_at' => $a->published_at?->toIso8601String(),
                 ])->all(),
             ]);
 
         return Inertia::render('Dashboard', [
-            'topics' => $topics,
+            'topics'            => $topics,
+            'savedFingerprints' => $savedFingerprints,
         ]);
     }
 }

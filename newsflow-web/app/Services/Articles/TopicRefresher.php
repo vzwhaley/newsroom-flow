@@ -47,6 +47,12 @@ class TopicRefresher
             $existingFingerprints,
         );
 
+        // Drop anything the user muted for this topic before considering it.
+        $candidates = array_values(array_filter(
+            $candidates,
+            fn ($c) => ! $topic->isMuted($c->headline, $c->description),
+        ));
+
         // Keep only candidates we don't already store, de-duped among
         // themselves, preserving the provider's best-first ordering.
         $newOnes = $this->selectNew($candidates, $existingFingerprints);

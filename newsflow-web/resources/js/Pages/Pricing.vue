@@ -13,10 +13,12 @@ const ctaHref = computed(() => (user.value ? route('billing') : route('register'
 
 const proFeatures = [
     'Unlimited topics',
-    'Daily 6 AM refresh on every topic',
+    'Daily refresh at your chosen time',
     '12 popularity-ranked articles per topic',
+    'Save articles to read later',
+    'Mute keywords per topic',
+    'Daily email digest',
     'Reorder your personal newspaper',
-    'On-demand refresh any time',
     'Web, Android & iOS (same account)',
 ];
 </script>

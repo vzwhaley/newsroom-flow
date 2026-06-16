@@ -12,6 +12,7 @@ class Topic extends Model
         'user_id',
         'name',
         'query',
+        'mute_keywords',
         'position',
         'last_refreshed_at',
         'last_new_articles_at',
@@ -20,9 +21,33 @@ class Topic extends Model
     protected function casts(): array
     {
         return [
+            'mute_keywords'        => 'array',
             'last_refreshed_at'    => 'datetime',
             'last_new_articles_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Does this article text match any of the topic's muted keywords?
+     */
+    public function isMuted(string $headline, ?string $description = null): bool
+    {
+        $keywords = $this->mute_keywords ?: [];
+
+        if (empty($keywords)) {
+            return false;
+        }
+
+        $haystack = mb_strtolower($headline.' '.($description ?? ''));
+
+        foreach ($keywords as $word) {
+            $word = mb_strtolower(trim($word));
+            if ($word !== '' && str_contains($haystack, $word)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function user(): BelongsTo

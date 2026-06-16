@@ -43,6 +43,12 @@ const tierLabel = computed(() => {
                                 My NewsFlow
                             </NavLink>
                             <NavLink
+                                :href="route('saved.index')"
+                                :active="route().current('saved.index')"
+                            >
+                                Saved
+                            </NavLink>
+                            <NavLink
                                 :href="route('billing')"
                                 :active="route().current('billing')"
                             >
@@ -113,6 +119,9 @@ const tierLabel = computed(() => {
                 <div class="space-y-1 pb-3 pt-2">
                     <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                         My NewsFlow
+                    </ResponsiveNavLink>
+                    <ResponsiveNavLink :href="route('saved.index')" :active="route().current('saved.index')">
+                        Saved
                     </ResponsiveNavLink>
                     <ResponsiveNavLink :href="route('billing')" :active="route().current('billing')">
                         Billing

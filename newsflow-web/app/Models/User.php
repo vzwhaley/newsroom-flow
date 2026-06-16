@@ -56,6 +56,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Topic::class)->orderBy('position');
     }
 
+    public function savedArticles(): HasMany
+    {
+        return $this->hasMany(SavedArticle::class)->latest();
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Subscription / tier helpers — single source of truth for "what am I?"

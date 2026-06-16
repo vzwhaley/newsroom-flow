@@ -2,12 +2,22 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import TopicSection from '@/Components/TopicSection.vue';
 import InputError from '@/Components/InputError.vue';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const props = defineProps({
     topics: { type: Array, default: () => [] },
+    savedFingerprints: { type: Array, default: () => [] },
 });
+
+function move({ id, dir }) {
+    const ids = props.topics.map((t) => t.id);
+    const idx = ids.indexOf(id);
+    const swap = idx + dir;
+    if (swap < 0 || swap >= ids.length) return;
+    [ids[idx], ids[swap]] = [ids[swap], ids[idx]];
+    router.post(route('topics.reorder'), { order: ids }, { preserveScroll: true });
+}
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -140,7 +150,16 @@ function quickAdd(name) {
             </div>
 
             <!-- Topic feeds -->
-            <TopicSection v-for="topic in topics" :key="topic.id" :topic="topic" />
+            <TopicSection
+                v-for="(topic, i) in topics"
+                :key="topic.id"
+                :topic="topic"
+                :is-pro="user.is_pro"
+                :saved-fingerprints="savedFingerprints"
+                :can-move-up="i > 0"
+                :can-move-down="i < topics.length - 1"
+                @move="move"
+            />
         </div>
     </AuthenticatedLayout>
 </template>

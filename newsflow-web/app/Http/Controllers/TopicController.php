@@ -82,6 +82,55 @@ class TopicController extends Controller
     }
 
     /**
+     * Update a topic's muted keywords (Pro). Removes any currently-stored
+     * articles that now match, then refills the feed so the mute takes effect
+     * immediately.
+     */
+    public function mutes(Request $request, Topic $topic, TopicRefresher $refresher): RedirectResponse
+    {
+        $this->authorizeTopic($request, $topic);
+
+        if (! $request->user()->isPro()) {
+            return back()->with('error', 'Keyword muting is a Pro feature. Upgrade to filter your topics.');
+        }
+
+        $validated = $request->validate([
+            'mute_keywords'   => ['present', 'array', 'max:50'],
+            'mute_keywords.*' => ['string', 'max:50'],
+        ]);
+
+        // Normalise: trim, drop blanks, lowercase, dedupe.
+        $keywords = collect($validated['mute_keywords'])
+            ->map(fn ($k) => mb_strtolower(trim($k)))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        $topic->forceFill(['mute_keywords' => $keywords])->save();
+
+        // Purge currently-stored articles that now match a mute.
+        $removed = 0;
+        foreach ($topic->articles()->get() as $article) {
+            if ($topic->isMuted($article->headline, $article->description)) {
+                $article->delete();
+                $removed++;
+            }
+        }
+
+        // Refill so the user still has a full feed.
+        if ($removed > 0) {
+            try {
+                $refresher->refresh($topic->fresh());
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return back()->with('success', 'Mute keywords updated.');
+    }
+
+    /**
      * Reorder the user's topics. Expects an ordered array of topic ids.
      */
     public function reorder(Request $request): RedirectResponse
