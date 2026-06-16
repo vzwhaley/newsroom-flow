@@ -91,6 +91,7 @@ const tierLabel = computed(() => {
                                 <template #content>
                                     <DropdownLink :href="route('billing')">Billing</DropdownLink>
                                     <DropdownLink :href="route('profile.edit')">Profile</DropdownLink>
+                                    <DropdownLink :href="route('how-to-use')">How to use</DropdownLink>
                                     <DropdownLink :href="route('logout')" method="post" as="button">
                                         Log Out
                                     </DropdownLink>

@@ -94,6 +94,60 @@ class ArticleSourcingTest extends TestCase
         $this->assertContains('Real Headline Two', $headlines);
     }
 
+    public function test_llm_rewrites_descriptions_when_enabled(): void
+    {
+        config()->set('newsflow.sources.thenewsapi.key', 'test-key');
+        config()->set('newsflow.llm.enabled', true);
+        config()->set('newsflow.llm.api_key', 'sk-test');
+        config()->set('newsflow.signals.hacker_news', false);
+
+        Http::fake([
+            'api.thenewsapi.com/*' => Http::response([
+                'data' => [
+                    ['title' => 'One', 'description' => 'Original long description one.', 'url' => 'https://n.test/1', 'published_at' => '2026-06-15T08:00:00Z'],
+                    ['title' => 'Two', 'description' => 'Original long description two.', 'url' => 'https://n.test/2', 'published_at' => '2026-06-15T09:00:00Z'],
+                ],
+            ]),
+            'api.anthropic.com/*' => Http::response([
+                'content' => [[
+                    'type' => 'text',
+                    'text' => '[{"i":0,"summary":"Crisp summary one."},{"i":1,"summary":"Crisp summary two."}]',
+                ]],
+            ]),
+        ]);
+
+        $articles = $this->hybrid()->fetch('World News', 12);
+
+        // Both descriptions are replaced by the LLM's crisp summaries (applied
+        // by index; exact pairing depends on ranking order, which is fine).
+        $descriptions = collect($articles)->pluck('description')->sort()->values()->all();
+        $this->assertSame(['Crisp summary one.', 'Crisp summary two.'], $descriptions);
+        foreach ($articles as $a) {
+            $this->assertStringNotContainsString('Original', $a->description);
+        }
+    }
+
+    public function test_llm_failure_keeps_original_descriptions(): void
+    {
+        config()->set('newsflow.sources.thenewsapi.key', 'test-key');
+        config()->set('newsflow.llm.enabled', true);
+        config()->set('newsflow.llm.api_key', 'sk-test');
+        config()->set('newsflow.signals.hacker_news', false);
+
+        Http::fake([
+            'api.thenewsapi.com/*' => Http::response([
+                'data' => [
+                    ['title' => 'One', 'description' => 'Keep me.', 'url' => 'https://n.test/1', 'published_at' => '2026-06-15T08:00:00Z'],
+                ],
+            ]),
+            'api.anthropic.com/*' => Http::response('error', 500),
+        ]);
+
+        $articles = $this->hybrid()->fetch('World News', 12);
+
+        $this->assertSame('Keep me.', $articles[0]->description);
+    }
+
     public function test_dedupes_same_story_across_sources(): void
     {
         config()->set('newsflow.sources.thenewsapi.key', 'test-key');

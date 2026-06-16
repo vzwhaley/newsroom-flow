@@ -18,6 +18,9 @@ use Inertia\Inertia;
 Route::get('/', fn () => Inertia::render('Welcome'))->name('home');
 
 Route::get('/pricing', fn () => Inertia::render('Pricing'))->name('pricing');
+Route::get('/how-to-use', fn () => Inertia::render('HowToUse'))->name('how-to-use');
+Route::get('/faq', fn () => Inertia::render('Faq'))->name('faq');
+Route::get('/about', fn () => Inertia::render('About'))->name('about');
 
 Route::get('/privacy', fn () => Inertia::render('Legal/Privacy'))->name('privacy');
 Route::get('/terms', fn () => Inertia::render('Legal/Terms'))->name('terms');

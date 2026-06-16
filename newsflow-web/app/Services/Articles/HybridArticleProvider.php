@@ -71,9 +71,10 @@ class HybridArticleProvider implements ArticleProvider
         }
         $ordered = array_merge($fresh, $seen);
 
-        $ordered = $this->summarizeWithLlm($topic, $ordered);
+        // Summarize only the final set we'll actually return — cheaper.
+        $final = array_slice($ordered, 0, $count);
 
-        return array_slice($ordered, 0, $count);
+        return $this->summarizeWithLlm($topic, $final);
     }
 
     /*
@@ -292,19 +293,86 @@ class HybridArticleProvider implements ArticleProvider
             return $candidates;
         }
 
-        // Best-effort: ask Claude to tighten each description to one or two
-        // crisp sentences. If anything goes wrong we keep the originals — the
+        $apiKey = config('newsflow.llm.api_key');
+        if (! $apiKey) {
+            return $candidates;
+        }
+
+        // Best-effort: ask Claude (Haiku) to tighten each description to one
+        // crisp sentence. If anything goes wrong we keep the originals — the
         // feed must never break because of the summarizer.
         try {
-            // Implementation intentionally deferred to keep the daily refresh
-            // fast and cheap; the source descriptions are already shown. Wire
-            // the Anthropic Messages API here when richer summaries are wanted.
+            $list = [];
+            foreach ($candidates as $i => $c) {
+                $list[] = "[{$i}] ".$c->headline.' — '.mb_substr($c->description, 0, 400);
+            }
+
+            $prompt = "For each numbered news item below on the topic \"{$topic}\", write ONE crisp, "
+                ."neutral sentence (max 30 words) summarizing it for a headline reader. Do NOT add "
+                ."facts not present. Respond ONLY with a JSON array of objects like "
+                .'[{"i":0,"summary":"..."}], one per item, same indices.'."\n\n".implode("\n", $list);
+
+            $response = Http::timeout(30)
+                ->withHeaders([
+                    'x-api-key'         => $apiKey,
+                    'anthropic-version' => config('newsflow.llm.version', '2023-06-01'),
+                    'content-type'      => 'application/json',
+                ])
+                ->post(config('newsflow.llm.endpoint'), [
+                    'model'      => config('newsflow.llm.model'),
+                    'max_tokens' => 1500,
+                    'messages'   => [
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                ]);
+
+            if (! $response->ok()) {
+                return $candidates;
+            }
+
+            $text = $response->json('content.0.text', '');
+            $summaries = $this->parseSummaries($text);
+
+            foreach ($summaries as $i => $summary) {
+                if (isset($candidates[$i]) && is_string($summary) && trim($summary) !== '') {
+                    $candidates[$i]->description = trim($summary);
+                }
+            }
+
             return $candidates;
         } catch (\Throwable $e) {
             Log::warning('LLM summarize failed', ['topic' => $topic, 'error' => $e->getMessage()]);
 
             return $candidates;
         }
+    }
+
+    /**
+     * Parse the model's JSON array of {i, summary} into [index => summary].
+     *
+     * @return array<int, string>
+     */
+    private function parseSummaries(string $text): array
+    {
+        // Be lenient: the model may wrap the JSON in prose or code fences.
+        if (preg_match('/\[.*\]/s', $text, $m)) {
+            $text = $m[0];
+        }
+
+        $decoded = json_decode($text, true);
+
+        if (! is_array($decoded)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($decoded as $row) {
+            if (isset($row['i'], $row['summary'])) {
+                $out[(int) $row['i']] = (string) $row['summary'];
+            }
+        }
+
+        return $out;
     }
 
     /*
