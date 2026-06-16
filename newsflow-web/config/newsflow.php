@@ -36,17 +36,30 @@ return [
     */
 
     'sources' => [
-        'newsapi' => [
-            'key'      => env('NEWSAPI_KEY'),
-            'endpoint' => 'https://newsapi.org/v2/everything',
+        // TheNewsAPI — cheapest real-time COMMERCIAL option ($19-49/mo),
+        // supports sort=relevance_score, returns description + image + time.
+        // Recommended primary source for launch.
+        'thenewsapi' => [
+            'key'      => env('THENEWSAPI_KEY'),
+            'endpoint' => 'https://api.thenewsapi.com/v1/news/all',
         ],
+        // NewsData.io — one of the few APIs whose FREE tier permits commercial
+        // use (200 credits/day, 12h delay). 12h delay is fine for a "yesterday's
+        // most-read" 6 AM batch, making this a genuine zero-cost launch source.
+        'newsdata' => [
+            'key'      => env('NEWSDATA_KEY'),
+            'endpoint' => 'https://newsdata.io/api/1/news',
+        ],
+        // GNews — usable but free tier is non-commercial; paid €49.99/mo.
         'gnews' => [
             'key'      => env('GNEWS_KEY'),
             'endpoint' => 'https://gnews.io/api/v4/search',
         ],
-        'newsdata' => [
-            'key'      => env('NEWSDATA_KEY'),
-            'endpoint' => 'https://newsdata.io/api/1/news',
+        // NewsAPI.org — AVOID for production: free is 24h-delayed, localhost
+        // only, non-commercial; first commercial tier is $449/mo.
+        'newsapi' => [
+            'key'      => env('NEWSAPI_KEY'),
+            'endpoint' => 'https://newsapi.org/v2/everything',
         ],
     ],
 
@@ -62,8 +75,15 @@ return [
     */
 
     'signals' => [
-        'reddit'      => env('NEWSFLOW_SIGNAL_REDDIT', true),
+        // Hacker News (Algolia) — keyless, free, commercial-clean, 10k req/hr.
+        // The primary popularity signal. On by default.
         'hacker_news' => env('NEWSFLOW_SIGNAL_HN', true),
+        // Bluesky firehose — free, commercial-clean secondary signal (count
+        // how many posts link a candidate URL). Off until implemented.
+        'bluesky'     => env('NEWSFLOW_SIGNAL_BLUESKY', false),
+        // Reddit — intentionally OFF: 2025+ terms require a paid licence for
+        // commercial use. Do not enable without a licensed Reddit API app.
+        'reddit'      => env('NEWSFLOW_SIGNAL_REDDIT', false),
     ],
 
     /*
@@ -81,8 +101,11 @@ return [
     'llm' => [
         'enabled' => (bool) env('ANTHROPIC_API_KEY'),
         'api_key' => env('ANTHROPIC_API_KEY'),
-        'model'   => env('NEWSFLOW_LLM_MODEL', 'claude-sonnet-4-6'),
+        // Haiku is plenty for dedupe + one-line summaries and is the cheapest
+        // option (~$5/mo at 1k topics/day via the Batches API).
+        'model'   => env('NEWSFLOW_LLM_MODEL', 'claude-haiku-4-5-20251001'),
         'endpoint' => 'https://api.anthropic.com/v1/messages',
+        'version'  => '2023-06-01',
     ],
 
     /*

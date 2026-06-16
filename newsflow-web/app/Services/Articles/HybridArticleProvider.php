@@ -3,6 +3,7 @@
 namespace App\Services\Articles;
 
 use App\Contracts\ArticleProvider;
+use App\Services\Articles\Signals\HackerNewsSignal;
 use App\Support\FetchedArticle;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
@@ -28,6 +29,7 @@ class HybridArticleProvider implements ArticleProvider
 {
     public function __construct(
         private readonly StubArticleProvider $stub,
+        private readonly HackerNewsSignal $hackerNews,
     ) {
     }
 
@@ -84,16 +86,20 @@ class HybridArticleProvider implements ArticleProvider
     {
         $all = [];
 
-        if ($key = config('newsflow.sources.newsapi.key')) {
-            $all = array_merge($all, $this->fromNewsApi($topic, $pool, $key));
+        if ($key = config('newsflow.sources.thenewsapi.key')) {
+            $all = array_merge($all, $this->fromTheNewsApi($topic, $pool, $key));
+        }
+
+        if ($key = config('newsflow.sources.newsdata.key')) {
+            $all = array_merge($all, $this->fromNewsData($topic, $key));
         }
 
         if ($key = config('newsflow.sources.gnews.key')) {
             $all = array_merge($all, $this->fromGNews($topic, $pool, $key));
         }
 
-        if ($key = config('newsflow.sources.newsdata.key')) {
-            $all = array_merge($all, $this->fromNewsData($topic, $key));
+        if ($key = config('newsflow.sources.newsapi.key')) {
+            $all = array_merge($all, $this->fromNewsApi($topic, $pool, $key));
         }
 
         return $all;
@@ -101,9 +107,46 @@ class HybridArticleProvider implements ArticleProvider
 
     private function anySourceConfigured(): bool
     {
-        return (bool) (config('newsflow.sources.newsapi.key')
+        return (bool) (config('newsflow.sources.thenewsapi.key')
+            || config('newsflow.sources.newsdata.key')
             || config('newsflow.sources.gnews.key')
-            || config('newsflow.sources.newsdata.key'));
+            || config('newsflow.sources.newsapi.key'));
+    }
+
+    private function fromTheNewsApi(string $topic, int $pool, string $key): array
+    {
+        try {
+            $response = Http::timeout(15)->get(config('newsflow.sources.thenewsapi.endpoint'), [
+                'api_token'       => $key,
+                'search'          => $topic,
+                'language'        => 'en',
+                'sort'            => 'relevance_score',
+                'published_after' => Carbon::yesterday()->toDateString(),
+                'limit'           => min($pool, 100),
+            ]);
+
+            if (! $response->ok()) {
+                return [];
+            }
+
+            return collect($response->json('data', []))
+                ->map(fn ($a) => new FetchedArticle(
+                    headline: (string) ($a['title'] ?? ''),
+                    description: (string) ($a['description'] ?? $a['snippet'] ?? ''),
+                    url: (string) ($a['url'] ?? ''),
+                    source: $a['source'] ?? null,
+                    imageUrl: $a['image_url'] ?? null,
+                    publishedAt: isset($a['published_at']) ? Carbon::parse($a['published_at']) : null,
+                    popularityScore: 50.0,
+                ))
+                ->filter(fn (FetchedArticle $a) => $a->headline !== '' && $a->url !== '')
+                ->values()
+                ->all();
+        } catch (\Throwable $e) {
+            Log::warning('TheNewsAPI fetch failed', ['topic' => $topic, 'error' => $e->getMessage()]);
+
+            return [];
+        }
     }
 
     private function fromNewsApi(string $topic, int $pool, string $key): array
@@ -224,13 +267,16 @@ class HybridArticleProvider implements ArticleProvider
 
     private function applyPopularitySignals(string $topic, array $candidates): array
     {
-        if (! config('newsflow.signals.hacker_news') && ! config('newsflow.signals.reddit')) {
-            return $candidates;
+        // Hacker News (keyless, free) — boost candidates that are getting real
+        // engagement. One call per topic; best-effort, never throws.
+        if (config('newsflow.signals.hacker_news')) {
+            $candidates = $this->hackerNews->boost($topic, $candidates);
         }
 
-        // Placeholder hook: in production, query the HN Algolia API / Reddit
-        // search for each candidate's URL and fold the engagement score into
-        // popularityScore. Network-light and best-effort — never throws.
+        // Future: Bluesky firehose link-mention counts as a second free signal
+        // (see config newsflow.signals.bluesky). Reddit is intentionally left
+        // out — its 2025+ terms require a paid licence for commercial use.
+
         return $candidates;
     }
 
