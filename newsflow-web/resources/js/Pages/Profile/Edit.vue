@@ -13,6 +13,10 @@ defineProps({
     status: {
         type: String,
     },
+    topics: {
+        type: Array,
+        default: () => [],
+    },
 });
 </script>
 
@@ -43,7 +47,7 @@ defineProps({
                 <div
                     class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
                 >
-                    <UpdateNewsPreferencesForm class="max-w-xl" />
+                    <UpdateNewsPreferencesForm :topics="topics" class="max-w-xl" />
                 </div>
 
                 <div

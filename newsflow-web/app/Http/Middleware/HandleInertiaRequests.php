@@ -49,6 +49,7 @@ class HandleInertiaRequests extends Middleware
                     'refresh_hour'        => $user->refresh_hour,
                     'timezone'            => $user->timezone,
                     'digest_enabled'      => (bool) $user->digest_enabled,
+                    'digest_new_only'     => (bool) $user->digest_new_only,
                 ] : null,
             ],
 

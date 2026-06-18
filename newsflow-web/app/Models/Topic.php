@@ -14,6 +14,7 @@ class Topic extends Model
         'name',
         'query',
         'mute_keywords',
+        'include_in_digest',
         'position',
         'last_refreshed_at',
         'last_new_articles_at',
@@ -23,6 +24,7 @@ class Topic extends Model
     {
         return [
             'mute_keywords'        => 'array',
+            'include_in_digest'    => 'boolean',
             'last_refreshed_at'    => 'datetime',
             'last_new_articles_at' => 'datetime',
         ];

@@ -41,8 +41,18 @@ class SendDigests extends Command
         $sent = 0;
 
         foreach ($users as $user) {
+            // "New since last digest" cutoff (null on the very first send).
+            $since = $user->digest_new_only ? $user->digest_sent_at : null;
+
             $topics = $user->topics()
-                ->with(['articles' => fn ($q) => $q->orderBy('position')->limit($perTopic)])
+                ->where('include_in_digest', true)        // only chosen topics
+                ->with(['articles' => function ($q) use ($since, $perTopic) {
+                    $q->orderBy('position');
+                    if ($since) {
+                        $q->where('fetched_at', '>', $since); // only fresh stories
+                    }
+                    $q->limit($perTopic);
+                }])
                 ->orderBy('position')
                 ->get()
                 ->filter(fn ($t) => $t->articles->isNotEmpty())
@@ -50,12 +60,14 @@ class SendDigests extends Command
                 ->values()
                 ->all();
 
+            // Nothing to send (no included topics, or new-only and nothing new).
             if (empty($topics)) {
-                continue; // nothing to send yet
+                $this->line("  • {$user->email}: nothing new — skipped");
+                continue;
             }
 
             try {
-                Mail::to($user->email)->send(new DailyDigest($user, $topics));
+                Mail::to($user->email)->send(new DailyDigest($user, $topics, $user->digest_new_only));
                 $user->forceFill(['digest_sent_at' => Carbon::now()])->save();
                 $sent++;
                 $this->line("  • sent to {$user->email}");

@@ -28,6 +28,61 @@ class DailyDigestTest extends TestCase
         return $user;
     }
 
+    public function test_excluded_topics_are_left_out_of_the_digest(): void
+    {
+        Mail::fake();
+        $user = User::factory()->create(['digest_enabled' => true]);
+
+        $inc = $user->topics()->create(['name' => 'World News', 'position' => 0, 'include_in_digest' => true]);
+        $inc->articles()->create(['headline' => 'Kept', 'description' => 'x', 'url' => 'https://e.test/1', 'fingerprint' => '1', 'position' => 0]);
+
+        $exc = $user->topics()->create(['name' => 'Sports', 'position' => 1, 'include_in_digest' => false]);
+        $exc->articles()->create(['headline' => 'Dropped', 'description' => 'x', 'url' => 'https://e.test/2', 'fingerprint' => '2', 'position' => 0]);
+
+        $this->artisan('newsflow:digest', ['--user' => $user->id])->assertSuccessful();
+
+        Mail::assertSent(DailyDigest::class, function ($mail) {
+            $names = collect($mail->topics)->pluck('name')->all();
+            return in_array('World News', $names) && ! in_array('Sports', $names);
+        });
+    }
+
+    public function test_new_only_digest_includes_only_fresh_articles(): void
+    {
+        Mail::fake();
+        $user = User::factory()->create([
+            'digest_enabled'  => true,
+            'digest_new_only' => true,
+            'digest_sent_at'  => Carbon::create(2026, 6, 15, 6, 0, 0),
+        ]);
+        $topic = $user->topics()->create(['name' => 'World News', 'position' => 0]);
+        $topic->articles()->create(['headline' => 'Old', 'description' => 'x', 'url' => 'https://e.test/old', 'fingerprint' => 'old', 'position' => 1, 'fetched_at' => Carbon::create(2026, 6, 14, 6, 0, 0)]);
+        $topic->articles()->create(['headline' => 'Fresh', 'description' => 'x', 'url' => 'https://e.test/new', 'fingerprint' => 'new', 'position' => 0, 'fetched_at' => Carbon::create(2026, 6, 16, 6, 0, 0)]);
+
+        $this->artisan('newsflow:digest', ['--user' => $user->id])->assertSuccessful();
+
+        Mail::assertSent(DailyDigest::class, function ($mail) {
+            $headlines = collect($mail->topics)->flatMap(fn ($t) => collect($t['articles'])->pluck('headline'))->all();
+            return in_array('Fresh', $headlines) && ! in_array('Old', $headlines);
+        });
+    }
+
+    public function test_new_only_digest_skips_user_when_nothing_new(): void
+    {
+        Mail::fake();
+        $user = User::factory()->create([
+            'digest_enabled'  => true,
+            'digest_new_only' => true,
+            'digest_sent_at'  => Carbon::create(2026, 6, 16, 6, 0, 0),
+        ]);
+        $topic = $user->topics()->create(['name' => 'World News', 'position' => 0]);
+        $topic->articles()->create(['headline' => 'Old', 'description' => 'x', 'url' => 'https://e.test/old', 'fingerprint' => 'old', 'position' => 0, 'fetched_at' => Carbon::create(2026, 6, 14, 6, 0, 0)]);
+
+        $this->artisan('newsflow:digest', ['--user' => $user->id])->assertSuccessful();
+
+        Mail::assertNothingSent();
+    }
+
     public function test_digest_mailable_renders_without_errors(): void
     {
         $user = $this->userWithFeed(['digest_enabled' => true]);

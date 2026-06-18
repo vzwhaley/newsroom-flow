@@ -1,7 +1,11 @@
 @component('mail::message')
 # Good morning{{ $user->name ? ', '.$user->name : '' }} 👋
 
-Here are today's top headlines on your topics.
+@if (! empty($newOnly))
+Here’s what’s new since your last digest.
+@else
+Here are today’s top headlines on your topics.
+@endif
 
 @foreach ($topics as $topic)
 ## {{ $topic['name'] }}

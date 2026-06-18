@@ -19,13 +19,14 @@ class DailyDigest extends Mailable
     public function __construct(
         public User $user,
         public array $topics,
+        public bool $newOnly = false,
     ) {
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your NewsFlow is ready 📰',
+            subject: $this->newOnly ? 'What’s new on NewsFlow 📰' : 'Your NewsFlow is ready 📰',
         );
     }
 
@@ -34,9 +35,10 @@ class DailyDigest extends Mailable
         return new Content(
             markdown: 'mail.daily-digest',
             with: [
-                'user'   => $this->user,
-                'topics' => $this->topics,
-                'url'    => route('dashboard'),
+                'user'    => $this->user,
+                'topics'  => $this->topics,
+                'newOnly' => $this->newOnly,
+                'url'     => route('dashboard'),
             ],
         );
     }

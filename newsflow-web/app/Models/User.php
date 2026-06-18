@@ -23,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'refresh_hour',
         'timezone',
         'digest_enabled',
+        'digest_new_only',
         'google_id',
         'apple_id',
         'discord_id',
@@ -41,6 +42,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'lifetime_purchased_at' => 'datetime',
             'lifetime_refunded_at'  => 'datetime',
             'digest_enabled'        => 'boolean',
+            'digest_new_only'       => 'boolean',
             'digest_sent_at'        => 'datetime',
         ];
     }

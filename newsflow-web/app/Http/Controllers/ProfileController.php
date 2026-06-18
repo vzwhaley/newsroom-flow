@@ -18,9 +18,24 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $user = $request->user();
+
+        // Topics for the digest-inclusion checklist (with parent context).
+        $topics = $user->topics()
+            ->with('parent:id,name')
+            ->orderBy('position')
+            ->get()
+            ->map(fn ($t) => [
+                'id'                => $t->id,
+                'name'              => $t->name,
+                'parent_name'       => $t->parent?->name,
+                'include_in_digest' => (bool) $t->include_in_digest,
+            ]);
+
         return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => session('status'),
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
+            'status'          => session('status'),
+            'topics'          => $topics,
         ]);
     }
 
