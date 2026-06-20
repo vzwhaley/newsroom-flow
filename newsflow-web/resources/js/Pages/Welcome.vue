@@ -48,7 +48,7 @@ const sample = {
 
     <PublicLayout>
         <!-- Hero -->
-        <section class="relative overflow-hidden">
+        <section class="relative isolate overflow-hidden">
             <!-- Background hero image + dark overlay for legibility -->
             <div class="absolute inset-0 -z-10">
                 <img
@@ -58,7 +58,7 @@ const sample = {
                 />
                 <div class="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/75 to-ink/50"></div>
             </div>
-            <div class="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
+            <div class="relative z-10 mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
                 <div class="grid items-center gap-12 lg:grid-cols-2">
                     <div>
                         <span
