@@ -49,23 +49,32 @@ const sample = {
     <PublicLayout>
         <!-- Hero -->
         <section class="relative overflow-hidden">
-            <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+            <!-- Background hero image + dark overlay for legibility -->
+            <div class="absolute inset-0 -z-10">
+                <img
+                    src="/images/hero-newspaper.jpg"
+                    alt=""
+                    class="h-full w-full object-cover object-center"
+                />
+                <div class="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/75 to-ink/50"></div>
+            </div>
+            <div class="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
                 <div class="grid items-center gap-12 lg:grid-cols-2">
                     <div>
                         <span
-                            class="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-sm font-medium text-brand-700"
+                            class="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-white ring-1 ring-inset ring-white/20"
                         >
                             A more customizable Google News
                         </span>
                         <h1
-                            class="mt-5 font-serif text-5xl font-bold leading-tight tracking-tight text-ink sm:text-6xl"
+                            class="mt-5 font-serif text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl"
                         >
                             Build Your Own Newsroom
                         </h1>
-                        <p class="mt-4 font-serif text-2xl font-semibold text-brand-600">
+                        <p class="mt-4 font-serif text-2xl font-semibold text-brand-300">
                             Your news. Only the topics you choose.
                         </p>
-                        <p class="mt-6 max-w-xl text-lg text-gray-600">
+                        <p class="mt-6 max-w-xl text-lg text-gray-200">
                             NewsFlow builds you a personal front page. Choose your
                             topics and every morning we deliver the day’s most
                             popular headlines on each one — nothing you didn’t ask for.
@@ -79,12 +88,12 @@ const sample = {
                             </Link>
                             <Link
                                 :href="route('pricing')"
-                                class="rounded-lg px-6 py-3 text-base font-semibold text-ink hover:text-brand-700"
+                                class="rounded-lg px-6 py-3 text-base font-semibold text-white hover:text-brand-200"
                             >
                                 See Pro plans →
                             </Link>
                         </div>
-                        <p class="mt-4 text-sm text-gray-500">
+                        <p class="mt-4 text-sm text-gray-300">
                             Free forever for 2 topics. No credit card required.
                         </p>
                     </div>
@@ -119,7 +128,7 @@ const sample = {
                             </ul>
                         </div>
                         <div
-                            class="absolute -right-4 -top-4 -z-10 h-full w-full rounded-2xl bg-brand-100"
+                            class="absolute -right-4 -top-4 -z-10 h-full w-full rounded-2xl bg-brand-500/30"
                         ></div>
                     </div>
                 </div>
