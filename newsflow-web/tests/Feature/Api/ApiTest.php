@@ -239,6 +239,42 @@ class ApiTest extends TestCase
         $this->assertSame(1, $a->fresh()->position);
     }
 
+    public function test_pro_can_browse_archive_via_api(): void
+    {
+        $user = User::factory()->create(['email_verified_at' => Carbon::now(), 'lifetime_purchased_at' => Carbon::now()]);
+        $user->archivedArticles()->create([
+            'topic_name' => 'Tech', 'headline' => 'Old chip news', 'description' => 'x',
+            'url' => 'https://e.test/old', 'source' => 'Wire', 'fingerprint' => 'o1', 'archived_at' => Carbon::now(),
+        ]);
+        $user->archivedArticles()->create([
+            'topic_name' => 'World', 'headline' => 'Election recap', 'description' => 'x',
+            'url' => 'https://e.test/elec', 'source' => 'Beacon', 'fingerprint' => 'o2', 'archived_at' => Carbon::now(),
+        ]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/archive')->assertOk()
+            ->assertJsonPath('locked', false)
+            ->assertJsonCount(2, 'articles');
+
+        $this->getJson('/api/archive?q=election')->assertOk()
+            ->assertJsonCount(1, 'articles')
+            ->assertJsonPath('articles.0.headline', 'Election recap');
+    }
+
+    public function test_archive_is_locked_for_free_via_api(): void
+    {
+        $user = User::factory()->create(['email_verified_at' => Carbon::now()]);
+        $user->archivedArticles()->create([
+            'topic_name' => 'Tech', 'headline' => 'Old', 'description' => 'x',
+            'url' => 'https://e.test/old', 'fingerprint' => 'o1', 'archived_at' => Carbon::now(),
+        ]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/archive')->assertOk()
+            ->assertJsonPath('locked', true)
+            ->assertJsonCount(0, 'articles');
+    }
+
     public function test_topic_mutes_require_authorization(): void
     {
         $owner = User::factory()->create(['email_verified_at' => Carbon::now(), 'lifetime_purchased_at' => Carbon::now()]);

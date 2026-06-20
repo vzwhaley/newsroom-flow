@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ArchiveController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FeedController;
@@ -25,6 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [FeedController::class, 'me']);
     Route::get('/feed', [FeedController::class, 'index']);
     Route::get('/search', [SearchController::class, 'index']);
+    Route::get('/archive', [ArchiveController::class, 'index']);
     Route::put('/preferences', [PreferencesController::class, 'update']);
 
     // Topics
