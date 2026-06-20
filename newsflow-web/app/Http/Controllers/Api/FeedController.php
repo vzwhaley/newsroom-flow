@@ -53,6 +53,8 @@ class FeedController extends Controller
             'id'                => $topic->id,
             'name'              => $topic->name,
             'parent_id'         => $topic->parent_id,
+            'mute_keywords'     => $topic->mute_keywords ?? [],
+            'include_in_digest' => (bool) $topic->include_in_digest,
             'last_refreshed_at' => $topic->last_refreshed_at?->toIso8601String(),
             'articles'          => $topic->articles->map(fn ($a) => $this->article($a))->all(),
         ];

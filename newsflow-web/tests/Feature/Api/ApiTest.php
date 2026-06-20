@@ -150,4 +150,103 @@ class ApiTest extends TestCase
         // The token row is revoked (so it can't authenticate future requests).
         $this->assertCount(0, $user->fresh()->tokens);
     }
+
+    public function test_watchlist_and_blocked_sources_persist_via_preferences(): void
+    {
+        $user = User::factory()->create(['email_verified_at' => Carbon::now(), 'lifetime_purchased_at' => Carbon::now()]);
+        Sanctum::actingAs($user);
+
+        $this->putJson('/api/preferences', [
+            'refresh_hour' => 6, 'timezone' => 'UTC', 'digest_enabled' => false, 'digest_new_only' => false,
+            'watch_keywords' => ['Tesla', ' Tesla ', 'SpaceX'],
+            'blocked_sources' => ['tabloid.example'],
+        ])->assertOk()
+            ->assertJsonPath('user.watch_keywords', ['Tesla', 'SpaceX']) // trimmed + de-duped
+            ->assertJsonPath('user.blocked_sources', ['tabloid.example']);
+
+        // /me reflects the saved lists.
+        $this->getJson('/api/me')
+            ->assertJsonPath('user.watch_keywords', ['Tesla', 'SpaceX'])
+            ->assertJsonPath('user.blocked_sources', ['tabloid.example']);
+    }
+
+    public function test_preferences_without_power_lists_does_not_wipe_them(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => Carbon::now(),
+            'watch_keywords' => ['Tesla'],
+            'blocked_sources' => ['tabloid.example'],
+        ]);
+        Sanctum::actingAs($user);
+
+        $this->putJson('/api/preferences', [
+            'refresh_hour' => 9, 'timezone' => 'UTC', 'digest_enabled' => false, 'digest_new_only' => false,
+        ])->assertOk();
+
+        $user->refresh();
+        $this->assertSame(['Tesla'], $user->watch_keywords);
+        $this->assertSame(['tabloid.example'], $user->blocked_sources);
+    }
+
+    public function test_pro_can_set_topic_mutes_via_api(): void
+    {
+        $user = User::factory()->create(['email_verified_at' => Carbon::now(), 'lifetime_purchased_at' => Carbon::now()]);
+        $topic = $user->topics()->create(['name' => 'Tech', 'position' => 0]);
+        $topic->articles()->create(['headline' => 'Crypto soars', 'description' => 'bitcoin', 'url' => 'https://e.test/c', 'fingerprint' => 'c', 'position' => 0]);
+        $topic->articles()->create(['headline' => 'New laptop', 'description' => 'x', 'url' => 'https://e.test/l', 'fingerprint' => 'l', 'position' => 1]);
+        Sanctum::actingAs($user);
+
+        $this->patchJson("/api/topics/{$topic->id}/mutes", ['mute_keywords' => ['crypto']])
+            ->assertOk()
+            ->assertJsonPath('topic.mute_keywords', ['crypto']);
+
+        // The matching article was purged.
+        $this->assertSame(['crypto'], $topic->fresh()->mute_keywords);
+        $this->assertNull($topic->articles()->where('fingerprint', 'c')->first());
+    }
+
+    public function test_free_user_cannot_set_topic_mutes_via_api(): void
+    {
+        $user = User::factory()->create(['email_verified_at' => Carbon::now()]);
+        $topic = $user->topics()->create(['name' => 'Tech', 'position' => 0]);
+        Sanctum::actingAs($user);
+
+        $this->patchJson("/api/topics/{$topic->id}/mutes", ['mute_keywords' => ['crypto']])->assertStatus(403);
+    }
+
+    public function test_mark_all_read_via_api(): void
+    {
+        $user = User::factory()->create(['email_verified_at' => Carbon::now()]);
+        $topic = $user->topics()->create(['name' => 'World', 'position' => 0]);
+        $topic->articles()->create(['headline' => 'A', 'description' => 'x', 'url' => 'https://e.test/a', 'fingerprint' => 'a', 'position' => 0]);
+        $topic->articles()->create(['headline' => 'B', 'description' => 'x', 'url' => 'https://e.test/b', 'fingerprint' => 'b', 'position' => 1]);
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/topics/{$topic->id}/read-all")->assertOk()->assertJsonPath('marked', 2);
+        $this->assertSame(0, $topic->articles()->whereNull('read_at')->count());
+    }
+
+    public function test_reorder_topics_via_api(): void
+    {
+        $user = User::factory()->create(['email_verified_at' => Carbon::now()]);
+        $a = $user->topics()->create(['name' => 'A', 'position' => 0]);
+        $b = $user->topics()->create(['name' => 'B', 'position' => 1]);
+        Sanctum::actingAs($user);
+
+        $this->postJson('/api/topics/reorder', ['order' => [$b->id, $a->id]])->assertOk();
+
+        $this->assertSame(0, $b->fresh()->position);
+        $this->assertSame(1, $a->fresh()->position);
+    }
+
+    public function test_topic_mutes_require_authorization(): void
+    {
+        $owner = User::factory()->create(['email_verified_at' => Carbon::now(), 'lifetime_purchased_at' => Carbon::now()]);
+        $topic = $owner->topics()->create(['name' => 'Tech', 'position' => 0]);
+
+        $intruder = User::factory()->create(['email_verified_at' => Carbon::now(), 'lifetime_purchased_at' => Carbon::now()]);
+        Sanctum::actingAs($intruder);
+
+        $this->patchJson("/api/topics/{$topic->id}/mutes", ['mute_keywords' => ['x']])->assertStatus(403);
+    }
 }

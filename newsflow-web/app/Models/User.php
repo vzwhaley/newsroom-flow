@@ -205,6 +205,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'timezone'          => $this->timezone,
             'digest_enabled'    => (bool) $this->digest_enabled,
             'digest_new_only'   => (bool) $this->digest_new_only,
+            'watch_keywords'    => $this->watch_keywords ?? [],
+            'blocked_sources'   => $this->blocked_sources ?? [],
         ];
     }
 

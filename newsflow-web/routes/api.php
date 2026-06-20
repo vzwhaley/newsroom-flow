@@ -29,7 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Topics
     Route::post('/topics', [TopicController::class, 'store']);
+    Route::post('/topics/reorder', [TopicController::class, 'reorder']);
     Route::post('/topics/{topic}/refresh', [TopicController::class, 'refresh']);
+    Route::patch('/topics/{topic}/mutes', [TopicController::class, 'mutes']);
+    Route::post('/topics/{topic}/read-all', [TopicController::class, 'markAllRead']);
     Route::delete('/topics/{topic}', [TopicController::class, 'destroy']);
 
     // Article actions

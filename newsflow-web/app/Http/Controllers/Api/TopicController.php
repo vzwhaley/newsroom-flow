@@ -81,6 +81,83 @@ class TopicController extends Controller
     }
 
     /**
+     * PATCH /api/topics/{topic}/mutes — set the topic's muted keywords (Pro).
+     * Purges currently-stored articles that now match, then refills the feed
+     * so the mute takes effect immediately.
+     */
+    public function mutes(Request $request, Topic $topic, TopicRefresher $refresher): JsonResponse
+    {
+        $this->authorizeTopic($request, $topic);
+
+        if (! $request->user()->isPro()) {
+            return response()->json(['message' => 'Keyword muting is a Pro feature.'], 403);
+        }
+
+        $data = $request->validate([
+            'mute_keywords'   => ['present', 'array', 'max:50'],
+            'mute_keywords.*' => ['string', 'max:50'],
+        ]);
+
+        $keywords = collect($data['mute_keywords'])
+            ->map(fn ($k) => mb_strtolower(trim($k)))
+            ->filter()->unique()->values()->all();
+
+        $topic->forceFill(['mute_keywords' => $keywords])->save();
+
+        // Purge stored articles that now match a mute, then refill.
+        $removed = 0;
+        foreach ($topic->articles()->get() as $article) {
+            if ($topic->isMuted($article->headline, $article->description)) {
+                $article->delete();
+                $removed++;
+            }
+        }
+        if ($removed > 0) {
+            try {
+                $refresher->refresh($topic->fresh());
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return response()->json(['topic' => $this->topicWithArticles($topic->fresh())]);
+    }
+
+    /**
+     * POST /api/topics/{topic}/read-all — mark every article in a topic read.
+     */
+    public function markAllRead(Request $request, Topic $topic): JsonResponse
+    {
+        $this->authorizeTopic($request, $topic);
+
+        $count = $topic->articles()->whereNull('read_at')->update(['read_at' => now()]);
+
+        return response()->json(['marked' => $count]);
+    }
+
+    /**
+     * POST /api/topics/reorder — persist a new top-to-bottom topic order.
+     * Expects an ordered array of the user's topic ids.
+     */
+    public function reorder(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'order'   => ['required', 'array'],
+            'order.*' => ['integer'],
+        ]);
+
+        $ids = $request->user()->topics()->pluck('id')->all();
+
+        foreach ($data['order'] as $position => $id) {
+            if (in_array($id, $ids, true)) {
+                Topic::whereKey($id)->update(['position' => $position]);
+            }
+        }
+
+        return response()->json(['message' => 'Order saved.']);
+    }
+
+    /**
      * DELETE /api/topics/{topic}
      */
     public function destroy(Request $request, Topic $topic): JsonResponse
@@ -94,10 +171,12 @@ class TopicController extends Controller
     private function topicWithArticles(Topic $topic): array
     {
         return [
-            'id'        => $topic->id,
-            'name'      => $topic->name,
-            'parent_id' => $topic->parent_id,
-            'articles'  => $topic->articles()->orderBy('position')->get()->map(fn ($a) => [
+            'id'                => $topic->id,
+            'name'              => $topic->name,
+            'parent_id'         => $topic->parent_id,
+            'mute_keywords'     => $topic->mute_keywords ?? [],
+            'include_in_digest' => (bool) $topic->include_in_digest,
+            'articles'          => $topic->articles()->orderBy('position')->get()->map(fn ($a) => [
                 'id'           => $a->id,
                 'headline'     => $a->headline,
                 'description'  => $a->description,
