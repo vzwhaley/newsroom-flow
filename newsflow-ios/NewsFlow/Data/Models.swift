@@ -34,6 +34,16 @@ struct PreferencesRequest: Encodable {
     let timezone: String
     let digestEnabled: Bool
     let digestNewOnly: Bool
+    let watchKeywords: [String]
+    let blockedSources: [String]
+}
+
+struct MuteRequest: Encodable {
+    let muteKeywords: [String]
+}
+
+struct ReorderRequest: Encodable {
+    let order: [Int]
 }
 
 // MARK: - Responses (decoded with .convertFromSnakeCase)
@@ -61,6 +71,8 @@ struct User: Decodable, Identifiable {
     let timezone: String
     let digestEnabled: Bool
     let digestNewOnly: Bool
+    let watchKeywords: [String]
+    let blockedSources: [String]
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -77,6 +89,8 @@ struct User: Decodable, Identifiable {
         timezone = try c.decodeIfPresent(String.self, forKey: .timezone) ?? "UTC"
         digestEnabled = try c.decodeIfPresent(Bool.self, forKey: .digestEnabled) ?? false
         digestNewOnly = try c.decodeIfPresent(Bool.self, forKey: .digestNewOnly) ?? false
+        watchKeywords = try c.decodeIfPresent([String].self, forKey: .watchKeywords) ?? []
+        blockedSources = try c.decodeIfPresent([String].self, forKey: .blockedSources) ?? []
     }
 }
 
@@ -116,6 +130,8 @@ struct Topic: Decodable, Identifiable {
     let id: Int
     let name: String
     let parentId: Int?
+    let muteKeywords: [String]
+    let includeInDigest: Bool
     let lastRefreshedAt: String?
     let articles: [Article]
     let children: [Topic]
@@ -125,6 +141,8 @@ struct Topic: Decodable, Identifiable {
         id = try c.decode(Int.self, forKey: .id)
         name = try c.decode(String.self, forKey: .name)
         parentId = try c.decodeIfPresent(Int.self, forKey: .parentId)
+        muteKeywords = try c.decodeIfPresent([String].self, forKey: .muteKeywords) ?? []
+        includeInDigest = try c.decodeIfPresent(Bool.self, forKey: .includeInDigest) ?? false
         lastRefreshedAt = try c.decodeIfPresent(String.self, forKey: .lastRefreshedAt)
         articles = try c.decodeIfPresent([Article].self, forKey: .articles) ?? []
         children = try c.decodeIfPresent([Topic].self, forKey: .children) ?? []
@@ -152,6 +170,10 @@ struct TopicResponse: Decodable {
 
 struct ReadResponse: Decodable {
     let isRead: Bool
+}
+
+struct MarkedResponse: Decodable {
+    let marked: Int
 }
 
 struct TldrResponse: Decodable {

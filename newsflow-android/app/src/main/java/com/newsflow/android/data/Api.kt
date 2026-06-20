@@ -12,6 +12,7 @@ import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -39,6 +40,15 @@ interface NewsFlowApi {
 
     @POST("api/topics/{id}/refresh")
     suspend fun refreshTopic(@Path("id") id: Long): Response<TopicResponse>
+
+    @PATCH("api/topics/{id}/mutes")
+    suspend fun setMutes(@Path("id") id: Long, @Body body: MuteRequest): Response<TopicResponse>
+
+    @POST("api/topics/{id}/read-all")
+    suspend fun markAllRead(@Path("id") id: Long): Response<MarkedResponse>
+
+    @POST("api/topics/reorder")
+    suspend fun reorderTopics(@Body body: ReorderRequest): Response<MessageResponse>
 
     @DELETE("api/topics/{id}")
     suspend fun deleteTopic(@Path("id") id: Long): Response<MessageResponse>

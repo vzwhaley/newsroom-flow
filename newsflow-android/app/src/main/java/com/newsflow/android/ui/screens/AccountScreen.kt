@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
@@ -54,6 +55,8 @@ class AccountViewModel : ViewModel() {
         val refreshHour: Int = 6,
         val digestEnabled: Boolean = false,
         val digestNewOnly: Boolean = false,
+        val watchKeywords: List<String> = emptyList(),
+        val blockedSources: List<String> = emptyList(),
         val saving: Boolean = false,
         val saved: Boolean = false,
     )
@@ -67,6 +70,7 @@ class AccountViewModel : ViewModel() {
                 _state.value = State(
                     user = u, refreshHour = u.refreshHour,
                     digestEnabled = u.digestEnabled, digestNewOnly = u.digestNewOnly,
+                    watchKeywords = u.watchKeywords, blockedSources = u.blockedSources,
                 )
             }
         }
@@ -76,13 +80,35 @@ class AccountViewModel : ViewModel() {
     fun setDigest(b: Boolean) { _state.value = _state.value.copy(digestEnabled = b, saved = false) }
     fun setNewOnly(b: Boolean) { _state.value = _state.value.copy(digestNewOnly = b, saved = false) }
 
+    fun addWatch(k: String) {
+        if (k in _state.value.watchKeywords) return
+        _state.value = _state.value.copy(watchKeywords = _state.value.watchKeywords + k, saved = false)
+    }
+    fun removeWatch(k: String) {
+        _state.value = _state.value.copy(watchKeywords = _state.value.watchKeywords - k, saved = false)
+    }
+    fun addBlocked(s: String) {
+        if (s in _state.value.blockedSources) return
+        _state.value = _state.value.copy(blockedSources = _state.value.blockedSources + s, saved = false)
+    }
+    fun removeBlocked(s: String) {
+        _state.value = _state.value.copy(blockedSources = _state.value.blockedSources - s, saved = false)
+    }
+
     fun save() {
         val s = _state.value
         viewModelScope.launch {
             _state.value = s.copy(saving = true)
             runCatching {
                 ServiceLocator.api.updatePreferences(
-                    PreferencesRequest(s.refreshHour, TimeZone.getDefault().id, s.digestEnabled, s.digestNewOnly),
+                    PreferencesRequest(
+                        refreshHour = s.refreshHour,
+                        timezone = TimeZone.getDefault().id,
+                        digestEnabled = s.digestEnabled,
+                        digestNewOnly = s.digestNewOnly,
+                        watchKeywords = s.watchKeywords,
+                        blockedSources = s.blockedSources,
+                    ),
                 )
             }
             _state.value = _state.value.copy(saving = false, saved = true)
@@ -151,15 +177,51 @@ fun AccountTab(onSignOut: () -> Unit) {
                         Switch(checked = state.digestNewOnly, onCheckedChange = { vm.setNewOnly(it) })
                     }
                 }
+            }
+        }
 
-                Spacer(Modifier.height(12.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Button(onClick = { vm.save() }, enabled = !state.saving) { Text("Save") }
-                    if (state.saved) {
-                        Spacer(Modifier.height(0.dp))
-                        Text("  Saved.", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
+        // Pro power features
+        if (user?.isPro == true) {
+            Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+                Column(Modifier.padding(18.dp)) {
+                    Text("Pro power features", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                    Spacer(Modifier.height(14.dp))
+
+                    KeywordEditor(
+                        title = "Watchlist keywords",
+                        placeholder = "e.g. Tesla",
+                        items = state.watchKeywords,
+                        onAdd = { vm.addWatch(it) },
+                        onRemove = { vm.removeWatch(it) },
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text("Stories matching these are pinned to the top of your feed.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                    Spacer(Modifier.height(14.dp))
+                    Divider()
+                    Spacer(Modifier.height(14.dp))
+
+                    KeywordEditor(
+                        title = "Blocked publishers",
+                        placeholder = "e.g. tabloid.com",
+                        items = state.blockedSources,
+                        onAdd = { vm.addBlocked(it) },
+                        onRemove = { vm.removeBlocked(it) },
+                        lowercased = true,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text("Articles from these sources are hidden from every feed.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
+            }
+        }
+
+        // Save (persists everything above)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Button(onClick = { vm.save() }, enabled = !state.saving) {
+                Text(if (state.saving) "Saving…" else "Save changes")
+            }
+            if (state.saved) {
+                Text("  Saved.", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
 

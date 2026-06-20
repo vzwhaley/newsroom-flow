@@ -3,6 +3,7 @@ package com.newsflow.android.ui.screens
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,15 +15,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -114,6 +119,18 @@ class FeedViewModel : ViewModel() {
         load()
     }
 
+    fun markAllRead(topic: Topic) {
+        _state.value = _state.value.copy(readIds = _state.value.readIds + topic.articles.map { it.id })
+        viewModelScope.launch { runCatching { ServiceLocator.api.markAllRead(topic.id) } }
+    }
+
+    fun setMutes(id: Long, keywords: List<String>) = viewModelScope.launch {
+        _state.value = _state.value.copy(busy = true)
+        runCatching { ServiceLocator.api.setMutes(id, com.newsflow.android.data.MuteRequest(keywords)) }
+        _state.value = _state.value.copy(busy = false)
+        load()
+    }
+
     fun markRead(article: Article) {
         if (article.id in _state.value.readIds) return
         _state.value = _state.value.copy(readIds = _state.value.readIds + article.id)
@@ -145,6 +162,7 @@ fun FeedTab() {
     val state by vm.state.collectAsState()
     val context = LocalContext.current
     var newTopic by remember { mutableStateOf("") }
+    var muteTarget by remember { mutableStateOf<Topic?>(null) }
 
     fun open(article: Article) {
         vm.markRead(article)
@@ -165,6 +183,7 @@ fun FeedTab() {
         return
     }
 
+    Box(Modifier.fillMaxSize()) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
@@ -197,7 +216,15 @@ fun FeedTab() {
         rows.forEach { row ->
             item(key = "t" + row.topic.id) {
                 Spacer(Modifier.height(6.dp))
-                TopicHeader(row.topic, row.parentName, { vm.refreshTopic(row.topic.id) }, { vm.deleteTopic(row.topic.id) })
+                TopicHeader(
+                    topic = row.topic,
+                    parentName = row.parentName,
+                    isPro = state.isPro,
+                    onRefresh = { vm.refreshTopic(row.topic.id) },
+                    onMarkAllRead = { vm.markAllRead(row.topic) },
+                    onMute = { muteTarget = row.topic },
+                    onDelete = { vm.deleteTopic(row.topic.id) },
+                )
             }
             if (row.topic.articles.isEmpty()) {
                 item(key = "e" + row.topic.id) {
@@ -222,6 +249,15 @@ fun FeedTab() {
             }
         }
     }
+
+    muteTarget?.let { topic ->
+        MuteDialog(
+            topic = topic,
+            onDismiss = { muteTarget = null },
+            onSave = { keywords -> vm.setMutes(topic.id, keywords); muteTarget = null },
+        )
+    }
+    }
 }
 
 @Composable
@@ -230,7 +266,17 @@ fun SectionLabel(text: String) {
 }
 
 @Composable
-private fun TopicHeader(topic: Topic, parentName: String?, onRefresh: () -> Unit, onDelete: () -> Unit) {
+private fun TopicHeader(
+    topic: Topic,
+    parentName: String?,
+    isPro: Boolean,
+    onRefresh: () -> Unit,
+    onMarkAllRead: () -> Unit,
+    onMute: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    var menuOpen by remember { mutableStateOf(false) }
+
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.weight(1f)) {
             if (parentName != null) {
@@ -238,7 +284,49 @@ private fun TopicHeader(topic: Topic, parentName: String?, onRefresh: () -> Unit
             }
             Text(topic.name, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
         }
+        if (topic.muteKeywords.isNotEmpty()) {
+            Text("muted", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.width(6.dp))
+        }
         IconButton(onClick = onRefresh) { Icon(Icons.Filled.Refresh, contentDescription = "Refresh") }
-        IconButton(onClick = onDelete) { Icon(Icons.Filled.Delete, contentDescription = "Remove topic") }
+        Box {
+            IconButton(onClick = { menuOpen = true }) { Icon(Icons.Filled.MoreVert, contentDescription = "Topic options") }
+            DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                DropdownMenuItem(text = { Text("Mark all read") }, onClick = { menuOpen = false; onMarkAllRead() })
+                if (isPro) {
+                    DropdownMenuItem(text = { Text("Mute keywords…") }, onClick = { menuOpen = false; onMute() })
+                }
+                DropdownMenuItem(text = { Text("Remove topic") }, onClick = { menuOpen = false; onDelete() })
+            }
+        }
     }
+}
+
+@Composable
+private fun MuteDialog(topic: Topic, onDismiss: () -> Unit, onSave: (List<String>) -> Unit) {
+    var keywords by remember(topic.id) { mutableStateOf(topic.muteKeywords) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Mute keywords") },
+        text = {
+            Column {
+                Text(
+                    "Hide stories in \"${topic.name}\" that mention any of these words.",
+                    fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(12.dp))
+                KeywordEditor(
+                    title = "Muted keywords",
+                    placeholder = "e.g. crypto",
+                    items = keywords,
+                    onAdd = { if (it !in keywords) keywords = keywords + it },
+                    onRemove = { keywords = keywords - it },
+                    lowercased = true,
+                )
+            }
+        },
+        confirmButton = { TextButton(onClick = { onSave(keywords) }) { Text("Save") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+    )
 }

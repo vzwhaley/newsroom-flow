@@ -39,6 +39,8 @@ data class User(
     val timezone: String = "UTC",
     @SerialName("digest_enabled") val digestEnabled: Boolean = false,
     @SerialName("digest_new_only") val digestNewOnly: Boolean = false,
+    @SerialName("watch_keywords") val watchKeywords: List<String> = emptyList(),
+    @SerialName("blocked_sources") val blockedSources: List<String> = emptyList(),
 )
 
 @Serializable
@@ -66,6 +68,8 @@ data class Topic(
     val id: Long,
     val name: String,
     @SerialName("parent_id") val parentId: Long? = null,
+    @SerialName("mute_keywords") val muteKeywords: List<String> = emptyList(),
+    @SerialName("include_in_digest") val includeInDigest: Boolean = false,
     @SerialName("last_refreshed_at") val lastRefreshedAt: String? = null,
     val articles: List<Article> = emptyList(),
     val children: List<Topic> = emptyList(),
@@ -90,6 +94,15 @@ data class TopicResponse(val topic: Topic)
 
 @Serializable
 data class ReadResponse(@SerialName("is_read") val isRead: Boolean)
+
+@Serializable
+data class MarkedResponse(val marked: Int = 0)
+
+@Serializable
+data class MuteRequest(@SerialName("mute_keywords") val muteKeywords: List<String>)
+
+@Serializable
+data class ReorderRequest(val order: List<Long>)
 
 @Serializable
 data class TldrResponse(val tldr: String? = null, val cached: Boolean = false)
@@ -150,4 +163,6 @@ data class PreferencesRequest(
     val timezone: String,
     @SerialName("digest_enabled") val digestEnabled: Boolean,
     @SerialName("digest_new_only") val digestNewOnly: Boolean,
+    @SerialName("watch_keywords") val watchKeywords: List<String> = emptyList(),
+    @SerialName("blocked_sources") val blockedSources: List<String> = emptyList(),
 )

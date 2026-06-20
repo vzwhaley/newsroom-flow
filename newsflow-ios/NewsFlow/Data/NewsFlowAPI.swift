@@ -88,6 +88,20 @@ final class NewsFlowAPI {
         try await send("api/topics/\(id)/refresh", method: "POST")
     }
 
+    func setMutes(_ id: Int, keywords: [String]) async throws -> TopicResponse {
+        try await send("api/topics/\(id)/mutes", method: "PATCH", body: MuteRequest(muteKeywords: keywords))
+    }
+
+    @discardableResult
+    func markAllRead(_ id: Int) async throws -> MarkedResponse {
+        try await send("api/topics/\(id)/read-all", method: "POST")
+    }
+
+    @discardableResult
+    func reorderTopics(_ order: [Int]) async throws -> MessageResponse {
+        try await send("api/topics/reorder", method: "POST", body: ReorderRequest(order: order))
+    }
+
     @discardableResult
     func deleteTopic(_ id: Int) async throws -> MessageResponse {
         try await send("api/topics/\(id)", method: "DELETE")

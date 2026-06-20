@@ -44,6 +44,38 @@ final class ModelDecodingTests: XCTestCase {
         XCTAssertEqual(user.timezone, "UTC")
     }
 
+    func testUserPowerFeatureListsDecode() throws {
+        let json = """
+        {
+          "id": 1, "name": "Ada", "email": "a@b.com", "is_pro": true,
+          "watch_keywords": ["Tesla", "SpaceX"],
+          "blocked_sources": ["tabloid.com"]
+        }
+        """.data(using: .utf8)!
+        let user = try makeDecoder().decode(User.self, from: json)
+        XCTAssertEqual(user.watchKeywords, ["Tesla", "SpaceX"])
+        XCTAssertEqual(user.blockedSources, ["tabloid.com"])
+
+        // Absent lists default to empty (free users / older payloads).
+        let bare = try makeDecoder().decode(User.self, from: """
+        { "id": 2, "name": "B", "email": "b@c.com" }
+        """.data(using: .utf8)!)
+        XCTAssertTrue(bare.watchKeywords.isEmpty)
+        XCTAssertTrue(bare.blockedSources.isEmpty)
+    }
+
+    func testTopicMuteKeywordsDecode() throws {
+        let json = """
+        {
+          "id": 1, "name": "Tech", "mute_keywords": ["crypto"],
+          "include_in_digest": true, "articles": []
+        }
+        """.data(using: .utf8)!
+        let topic = try makeDecoder().decode(Topic.self, from: json)
+        XCTAssertEqual(topic.muteKeywords, ["crypto"])
+        XCTAssertTrue(topic.includeInDigest)
+    }
+
     func testArticleDecodesAndDefaults() throws {
         let json = """
         {

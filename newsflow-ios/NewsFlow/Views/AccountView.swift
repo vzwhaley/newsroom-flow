@@ -6,6 +6,8 @@ final class AccountViewModel: ObservableObject {
     @Published var refreshHour = 6
     @Published var digestEnabled = false
     @Published var digestNewOnly = false
+    @Published var watchKeywords: [String] = []
+    @Published var blockedSources: [String] = []
     @Published var saving = false
     @Published var saved = false
 
@@ -18,6 +20,8 @@ final class AccountViewModel: ObservableObject {
                 refreshHour = u.refreshHour
                 digestEnabled = u.digestEnabled
                 digestNewOnly = u.digestNewOnly
+                watchKeywords = u.watchKeywords
+                blockedSources = u.blockedSources
             }
         }
     }
@@ -30,7 +34,9 @@ final class AccountViewModel: ObservableObject {
                     refreshHour: refreshHour,
                     timezone: TimeZone.current.identifier,
                     digestEnabled: digestEnabled,
-                    digestNewOnly: digestNewOnly
+                    digestNewOnly: digestNewOnly,
+                    watchKeywords: watchKeywords,
+                    blockedSources: blockedSources
                 )
             )
             saving = false
@@ -72,6 +78,12 @@ struct AccountView: View {
                     .buttonStyle(.borderedProminent)
                 }
                 preferencesCard
+
+                if vm.user?.isPro == true {
+                    powerFeaturesCard
+                }
+
+                saveRow
 
                 Button(action: onSignOut) {
                     Text("Sign out").frame(maxWidth: .infinity)
@@ -142,34 +154,80 @@ struct AccountView: View {
                         .foregroundColor(Brand.ink)
                 }
             }
-
-            HStack {
-                Button("Save") { vm.save() }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(vm.saving)
-                if vm.saved {
-                    Text("Saved.")
-                        .font(.system(size: 13))
-                        .foregroundColor(Brand.gray500)
-                }
-            }
-            .padding(.top, 4)
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14).stroke(Brand.gray100, lineWidth: 1)
-        )
+        .cardSurface()
         .onChange(of: vm.refreshHour) { _ in vm.saved = false }
         .onChange(of: vm.digestEnabled) { _ in vm.saved = false }
         .onChange(of: vm.digestNewOnly) { _ in vm.saved = false }
+    }
+
+    private var powerFeaturesCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Pro power features")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(Brand.ink)
+
+            KeywordEditor(
+                title: "Watchlist keywords",
+                placeholder: "e.g. Tesla",
+                items: $vm.watchKeywords
+            )
+            Text("Stories matching these are pinned to the top of your feed.")
+                .font(.system(size: 12))
+                .foregroundColor(Brand.gray500)
+
+            Divider()
+
+            KeywordEditor(
+                title: "Blocked publishers",
+                placeholder: "e.g. tabloid.com",
+                items: $vm.blockedSources,
+                lowercased: true
+            )
+            Text("Articles from these sources are hidden from every feed.")
+                .font(.system(size: 12))
+                .foregroundColor(Brand.gray500)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardSurface()
+        .onChange(of: vm.watchKeywords) { _ in vm.saved = false }
+        .onChange(of: vm.blockedSources) { _ in vm.saved = false }
+    }
+
+    private var saveRow: some View {
+        HStack {
+            Button { vm.save() } label: {
+                Text(vm.saving ? "Saving…" : "Save changes").fontWeight(.semibold)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(vm.saving)
+            if vm.saved {
+                Text("Saved.")
+                    .font(.system(size: 13))
+                    .foregroundColor(Brand.gray500)
+            }
+            Spacer()
+        }
     }
 
     private func hourLabel(_ h: Int) -> String {
         let ampm = h < 12 ? "AM" : "PM"
         let hr = h % 12 == 0 ? 12 : h % 12
         return "\(hr):00 \(ampm)"
+    }
+}
+
+extension View {
+    /// White card surface with the standard border used across the app.
+    func cardSurface() -> some View {
+        self
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14).stroke(Brand.gray100, lineWidth: 1)
+            )
     }
 }

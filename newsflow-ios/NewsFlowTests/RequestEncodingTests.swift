@@ -43,12 +43,29 @@ final class RequestEncodingTests: XCTestCase {
 
     func testPreferencesRequestSnakeCase() throws {
         let dict = try object(
-            PreferencesRequest(refreshHour: 6, timezone: "America/New_York", digestEnabled: true, digestNewOnly: false)
+            PreferencesRequest(
+                refreshHour: 6,
+                timezone: "America/New_York",
+                digestEnabled: true,
+                digestNewOnly: false,
+                watchKeywords: ["Tesla"],
+                blockedSources: ["tabloid.com"]
+            )
         )
         XCTAssertEqual(dict["refresh_hour"] as? Int, 6)
         XCTAssertEqual(dict["timezone"] as? String, "America/New_York")
         XCTAssertEqual(dict["digest_enabled"] as? Bool, true)
         XCTAssertEqual(dict["digest_new_only"] as? Bool, false)
+        XCTAssertEqual(dict["watch_keywords"] as? [String], ["Tesla"])
+        XCTAssertEqual(dict["blocked_sources"] as? [String], ["tabloid.com"])
+    }
+
+    func testMuteAndReorderRequestsSnakeCase() throws {
+        let mute = try object(MuteRequest(muteKeywords: ["crypto", "nft"]))
+        XCTAssertEqual(mute["mute_keywords"] as? [String], ["crypto", "nft"])
+
+        let reorder = try object(ReorderRequest(order: [3, 1, 2]))
+        XCTAssertEqual(reorder["order"] as? [Int], [3, 1, 2])
     }
 
     func testSaveRequestSnakeCase() throws {

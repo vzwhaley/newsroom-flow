@@ -87,6 +87,20 @@ final class FeedViewModel: ObservableObject {
         }
     }
 
+    func markAllRead(_ topic: Topic) {
+        readIds.formUnion(topic.articles.map { $0.id })
+        Task { _ = try? await api.markAllRead(topic.id) }
+    }
+
+    func setMutes(_ topicId: Int, keywords: [String]) {
+        Task {
+            busy = true
+            _ = try? await api.setMutes(topicId, keywords: keywords)
+            busy = false
+            load()
+        }
+    }
+
     func markRead(_ article: Article) {
         guard !readIds.contains(article.id) else { return }
         readIds.insert(article.id)
@@ -119,6 +133,7 @@ struct FeedView: View {
     @StateObject private var vm = FeedViewModel()
     @State private var newTopic = ""
     @State private var didLoad = false
+    @State private var muteTarget: Topic?
     @Environment(\.openURL) private var openURL
 
     var body: some View {
@@ -164,6 +179,11 @@ struct FeedView: View {
         .onAppear {
             if !didLoad { didLoad = true; vm.load() }
         }
+        .sheet(item: $muteTarget) { topic in
+            MuteSheet(topic: topic) { keywords in
+                vm.setMutes(topic.id, keywords: keywords)
+            }
+        }
     }
 
     private var addTopicRow: some View {
@@ -202,11 +222,29 @@ struct FeedView: View {
                     .foregroundColor(Brand.ink)
             }
             Spacer()
+            if !row.topic.muteKeywords.isEmpty {
+                Image(systemName: "speaker.slash.fill")
+                    .font(.system(size: 12))
+                    .foregroundColor(Brand.gray500)
+            }
             Button { vm.refreshTopic(row.topic.id) } label: {
                 Image(systemName: "arrow.clockwise").foregroundColor(Brand.gray500)
             }
-            Button { vm.deleteTopic(row.topic.id) } label: {
-                Image(systemName: "trash").foregroundColor(Brand.gray500)
+            Menu {
+                Button { vm.markAllRead(row.topic) } label: {
+                    Label("Mark all read", systemImage: "checkmark.circle")
+                }
+                if vm.isPro {
+                    Button { muteTarget = row.topic } label: {
+                        Label("Mute keywords…", systemImage: "speaker.slash")
+                    }
+                }
+                Divider()
+                Button(role: .destructive) { vm.deleteTopic(row.topic.id) } label: {
+                    Label("Remove topic", systemImage: "trash")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle").foregroundColor(Brand.gray500)
             }
         }
     }
@@ -229,5 +267,49 @@ struct FeedView: View {
     private func open(_ a: Article) {
         vm.markRead(a)
         if let url = URL(string: a.url) { openURL(url) }
+    }
+}
+
+/// Modal editor for a topic's muted keywords (Pro).
+struct MuteSheet: View {
+    let topic: Topic
+    let onSave: ([String]) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var keywords: [String]
+
+    init(topic: Topic, onSave: @escaping ([String]) -> Void) {
+        self.topic = topic
+        self.onSave = onSave
+        _keywords = State(initialValue: topic.muteKeywords)
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Hide stories in “\(topic.name)” that mention any of these words.")
+                        .font(.system(size: 14))
+                        .foregroundColor(Brand.gray500)
+                    KeywordEditor(
+                        title: "Muted keywords",
+                        placeholder: "e.g. crypto",
+                        items: $keywords,
+                        lowercased: true
+                    )
+                }
+                .padding(20)
+            }
+            .navigationTitle("Mute keywords")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") { onSave(keywords); dismiss() }
+                }
+            }
+        }
     }
 }

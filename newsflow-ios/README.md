@@ -91,11 +91,13 @@ project.yml                  XcodeGen spec (Xcode 15 fallback)
 All endpoints under `auth:sanctum` (plus the public register/login):
 
 `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`,
-`GET /api/me`, `GET /api/feed`, `GET /api/search?q=`, `PUT /api/preferences`,
-`POST /api/topics`, `POST /api/topics/{id}/refresh`, `DELETE /api/topics/{id}`,
-`POST /api/articles/{id}/read`, `DELETE /api/articles/{id}/read`,
-`POST /api/articles/{id}/summary`, `GET /api/saved`, `POST /api/saved`,
-`DELETE /api/saved/{id}`.
+`GET /api/me`, `GET /api/feed`, `GET /api/search?q=`, `PUT /api/preferences`
+(incl. watch_keywords + blocked_sources), `POST /api/topics`,
+`POST /api/topics/reorder`, `POST /api/topics/{id}/refresh`,
+`PATCH /api/topics/{id}/mutes`, `POST /api/topics/{id}/read-all`,
+`DELETE /api/topics/{id}`, `POST /api/articles/{id}/read`,
+`DELETE /api/articles/{id}/read`, `POST /api/articles/{id}/summary`,
+`GET /api/saved`, `POST /api/saved`, `DELETE /api/saved/{id}`.
 
 ## Tests
 
