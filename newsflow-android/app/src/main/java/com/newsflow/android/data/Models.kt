@@ -94,3 +94,31 @@ data class TldrResponse(val tldr: String? = null, val cached: Boolean = false)
 
 @Serializable
 data class MessageResponse(val message: String? = null)
+
+@Serializable
+data class SavedItem(
+    val id: Long,
+    val headline: String,
+    val description: String = "",
+    val url: String,
+    val source: String? = null,
+    @SerialName("image_url") val imageUrl: String? = null,
+    @SerialName("topic_name") val topicName: String? = null,
+    @SerialName("saved_at") val savedAt: String? = null,
+)
+
+@Serializable
+data class SavedListResponse(val saved: List<SavedItem> = emptyList())
+
+@Serializable
+data class SaveRequest(
+    val headline: String,
+    val description: String? = null,
+    val url: String,
+    val source: String? = null,
+    @SerialName("image_url") val imageUrl: String? = null,
+    @SerialName("topic_name") val topicName: String? = null,
+)
+
+@Serializable
+data class SaveResponse(val saved: SavedItem)

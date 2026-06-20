@@ -49,6 +49,15 @@ interface NewsFlowApi {
 
     @POST("api/articles/{id}/summary")
     suspend fun summary(@Path("id") id: Long): Response<TldrResponse>
+
+    @GET("api/saved")
+    suspend fun saved(): Response<SavedListResponse>
+
+    @POST("api/saved")
+    suspend fun save(@Body body: SaveRequest): Response<SaveResponse>
+
+    @DELETE("api/saved/{id}")
+    suspend fun unsave(@Path("id") id: Long): Response<MessageResponse>
 }
 
 /** Attaches the bearer token (when present) + a JSON Accept header. */

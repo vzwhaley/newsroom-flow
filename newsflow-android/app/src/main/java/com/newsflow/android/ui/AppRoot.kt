@@ -16,8 +16,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.newsflow.android.data.ServiceLocator
-import com.newsflow.android.ui.screens.FeedScreen
 import com.newsflow.android.ui.screens.LoginScreen
+import com.newsflow.android.ui.screens.MainScreen
 import com.newsflow.android.ui.screens.RegisterScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -84,7 +84,7 @@ fun AppRoot() {
                 }
             }
 
-            AppPhase.SignedIn -> FeedScreen(onSignOut = { authVm.signOut() })
+            AppPhase.SignedIn -> MainScreen(onSignOut = { authVm.signOut() })
         }
     }
 }

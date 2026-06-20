@@ -62,10 +62,18 @@ The debug APK lands in `app/build/outputs/apk/debug/`.
 
 ## What's implemented (v0.1)
 
-- Register / login / logout (Sanctum token, stored encrypted)
-- The feed: top-level topics + nested subtopics, each with its articles
-- Add a topic (free 2-topic cap enforced by the server), refresh, remove
-- Tap an article to open it in the browser (marks it read)
-- Pro keyword watchlist surfaced at the top
+Bottom-nav shell with three tabs:
 
-Planned next: saved/read-later, TL;DR summaries, search, push notifications.
+- **My NewsFlow** — the feed: top-level topics + nested subtopics with their
+  articles; add a topic (free 2-topic cap enforced by the server), refresh,
+  remove; tap to open in the browser (marks read); **Save** (bookmark) and
+  **TL;DR this** (Pro AI summary) on each card; Pro keyword watchlist on top.
+- **Saved** — your bookmarked articles; open or remove.
+- **Account** — name, email, plan badge (Free/Pro · tier), Upgrade to Pro
+  (free users), and Sign out.
+
+Auth: register / login / logout with a Sanctum token stored in
+EncryptedSharedPreferences (persists across restarts).
+
+Planned next: search, settings (refresh time / digest), sign-in-with-Google,
+push notifications.
