@@ -34,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/topics/reorder', [TopicController::class, 'reorder']);
     Route::post('/topics/{topic}/refresh', [TopicController::class, 'refresh']);
     Route::patch('/topics/{topic}/mutes', [TopicController::class, 'mutes']);
+    Route::patch('/topics/{topic}/digest', [TopicController::class, 'digest']);
     Route::post('/topics/{topic}/read-all', [TopicController::class, 'markAllRead']);
     Route::delete('/topics/{topic}', [TopicController::class, 'destroy']);
 

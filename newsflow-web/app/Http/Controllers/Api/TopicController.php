@@ -124,6 +124,23 @@ class TopicController extends Controller
     }
 
     /**
+     * PATCH /api/topics/{topic}/digest — include/exclude a topic from the
+     * user's daily email digest.
+     */
+    public function digest(Request $request, Topic $topic): JsonResponse
+    {
+        $this->authorizeTopic($request, $topic);
+
+        $data = $request->validate([
+            'include_in_digest' => ['required', 'boolean'],
+        ]);
+
+        $topic->forceFill(['include_in_digest' => $data['include_in_digest']])->save();
+
+        return response()->json(['topic' => $this->topicWithArticles($topic->fresh())]);
+    }
+
+    /**
      * POST /api/topics/{topic}/read-all — mark every article in a topic read.
      */
     public function markAllRead(Request $request, Topic $topic): JsonResponse

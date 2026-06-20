@@ -214,6 +214,19 @@ class ApiTest extends TestCase
         $this->patchJson("/api/topics/{$topic->id}/mutes", ['mute_keywords' => ['crypto']])->assertStatus(403);
     }
 
+    public function test_toggle_topic_digest_inclusion_via_api(): void
+    {
+        $user = User::factory()->create(['email_verified_at' => Carbon::now()]);
+        $topic = $user->topics()->create(['name' => 'World', 'position' => 0, 'include_in_digest' => true]);
+        Sanctum::actingAs($user);
+
+        $this->patchJson("/api/topics/{$topic->id}/digest", ['include_in_digest' => false])
+            ->assertOk()
+            ->assertJsonPath('topic.include_in_digest', false);
+
+        $this->assertFalse((bool) $topic->fresh()->include_in_digest);
+    }
+
     public function test_mark_all_read_via_api(): void
     {
         $user = User::factory()->create(['email_verified_at' => Carbon::now()]);
