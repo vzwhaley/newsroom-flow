@@ -101,13 +101,13 @@ const sample = {
                     <!-- Sample paper -->
                     <div class="relative">
                         <div
-                            class="rounded-3xl border border-white/60 bg-white/95 p-5 shadow-2xl ring-1 ring-black/5 backdrop-blur"
+                            class="rounded-3xl bg-gradient-to-br from-brand-50 via-indigo-50 to-brand-100/80 p-5 shadow-2xl ring-1 ring-black/5"
                         >
                             <div class="mb-4 flex items-center justify-between">
                                 <h3 class="font-serif text-xl font-bold text-ink">
                                     {{ sample.topic }}
                                 </h3>
-                                <span class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-brand-700">
+                                <span class="rounded-full bg-white px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-brand-700 ring-1 ring-brand-100">
                                     Today · 12 stories
                                 </span>
                             </div>
@@ -115,7 +115,7 @@ const sample = {
                                 <div
                                     v-for="(a, i) in sample.articles"
                                     :key="i"
-                                    class="group/card rounded-2xl border border-gray-100 bg-gradient-to-br from-white to-brand-50/70 p-4 transition duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-md"
+                                    class="group/card rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:ring-brand-200"
                                 >
                                     <p class="font-serif text-base font-semibold leading-snug text-ink">
                                         {{ a[0] }}
