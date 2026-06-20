@@ -186,6 +186,26 @@ class User extends Authenticatable implements MustVerifyEmail
         return max(0, $limit - $this->topics()->count());
     }
 
+    /**
+     * Compact representation for the native apps' JSON API.
+     */
+    public function toApiArray(): array
+    {
+        return [
+            'id'                => $this->id,
+            'name'              => $this->name,
+            'email'             => $this->email,
+            'email_verified'    => ! is_null($this->email_verified_at),
+            'plan'              => $this->plan(),
+            'is_pro'            => $this->isPro(),
+            'tier'              => $this->subscriptionTier(),
+            'topic_limit'       => $this->topicLimit(),
+            'topic_count'       => $this->topics()->count(),
+            'refresh_hour'      => $this->refresh_hour,
+            'timezone'          => $this->timezone,
+        ];
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Pro power features — blocked sources & keyword watchlist
