@@ -58,4 +58,27 @@ return [
         'redirect'      => env('DISCORD_REDIRECT_URI', '/auth/discord/callback'),
     ],
 
+    /*
+    | Push notifications. Each platform activates only when configured; until
+    | then a NullPushSender is used so the rest of the system works offline.
+    |
+    | FCM (Android): point FCM_CREDENTIALS at the service-account JSON file
+    | downloaded from the Firebase console; FCM_PROJECT_ID is its project_id.
+    | APNs (iOS): create an APNs Auth Key (.p8) in the Apple Developer portal;
+    | set APNS_KEY_ID, APNS_TEAM_ID, APNS_BUNDLE_ID, and APNS_KEY_PATH (the .p8).
+    */
+
+    'fcm' => [
+        'project_id'  => env('FCM_PROJECT_ID'),
+        'credentials' => env('FCM_CREDENTIALS'), // path to service-account JSON
+    ],
+
+    'apns' => [
+        'key_id'     => env('APNS_KEY_ID'),
+        'team_id'    => env('APNS_TEAM_ID'),
+        'bundle_id'  => env('APNS_BUNDLE_ID', 'com.newsflow.ios'),
+        'key_path'   => env('APNS_KEY_PATH'),    // path to AuthKey_XXXX.p8
+        'production' => env('APNS_PRODUCTION', false),
+    ],
+
 ];

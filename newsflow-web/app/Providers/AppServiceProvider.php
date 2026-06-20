@@ -7,6 +7,10 @@ use App\Listeners\HandleLifetimeCheckout;
 use App\Listeners\HandleLifetimeRefund;
 use App\Services\Articles\HybridArticleProvider;
 use App\Services\Articles\StubArticleProvider;
+use App\Services\Push\ApnsPushSender;
+use App\Services\Push\FcmPushSender;
+use App\Services\Push\NullPushSender;
+use App\Services\Push\PushNotifier;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -29,6 +33,49 @@ class AppServiceProvider extends ServiceProvider
                 default => $app->make(HybridArticleProvider::class),
             };
         });
+
+        // Push notifications: real senders when configured, else no-op senders
+        // so token registration + the daily push command run without creds.
+        $this->app->singleton(PushNotifier::class, function () {
+            return new PushNotifier([
+                'android' => $this->makeFcmSender(),
+                'ios'     => $this->makeApnsSender(),
+            ]);
+        });
+    }
+
+    private function makeFcmSender(): \App\Contracts\PushSender
+    {
+        $projectId = config('services.fcm.project_id');
+        $path = config('services.fcm.credentials');
+
+        if ($projectId && $path && is_string($path) && is_file($path)) {
+            $json = json_decode((string) file_get_contents($path), true);
+            if (is_array($json)) {
+                return new FcmPushSender($projectId, $json);
+            }
+        }
+
+        return new NullPushSender('android');
+    }
+
+    private function makeApnsSender(): \App\Contracts\PushSender
+    {
+        $keyId = config('services.apns.key_id');
+        $teamId = config('services.apns.team_id');
+        $keyPath = config('services.apns.key_path');
+
+        if ($keyId && $teamId && $keyPath && is_string($keyPath) && is_file($keyPath)) {
+            return new ApnsPushSender(
+                $keyId,
+                $teamId,
+                config('services.apns.bundle_id', 'com.newsflow.ios'),
+                (string) file_get_contents($keyPath),
+                (bool) config('services.apns.production', false),
+            );
+        }
+
+        return new NullPushSender('ios');
     }
 
     /**

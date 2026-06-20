@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ArchiveController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FeedController;
 use App\Http\Controllers\Api\PreferencesController;
 use App\Http\Controllers\Api\SavedController;
@@ -28,6 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/search', [SearchController::class, 'index']);
     Route::get('/archive', [ArchiveController::class, 'index']);
     Route::put('/preferences', [PreferencesController::class, 'update']);
+
+    // Push notification device tokens (APNs / FCM)
+    Route::post('/device-tokens', [DeviceTokenController::class, 'store']);
+    Route::delete('/device-tokens', [DeviceTokenController::class, 'destroy']);
 
     // Topics
     Route::post('/topics', [TopicController::class, 'store']);

@@ -24,6 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'timezone',
         'digest_enabled',
         'digest_new_only',
+        'push_enabled',
         'blocked_sources',
         'watch_keywords',
         'google_id',
@@ -46,6 +47,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'digest_enabled'        => 'boolean',
             'digest_new_only'       => 'boolean',
             'digest_sent_at'        => 'datetime',
+            'push_enabled'          => 'boolean',
+            'push_sent_at'          => 'datetime',
             'blocked_sources'       => 'array',
             'watch_keywords'        => 'array',
         ];
@@ -78,6 +81,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function archivedArticles(): HasMany
     {
         return $this->hasMany(ArticleArchive::class)->latest('archived_at');
+    }
+
+    public function deviceTokens(): HasMany
+    {
+        return $this->hasMany(DeviceToken::class);
     }
 
     /*
@@ -205,6 +213,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'timezone'          => $this->timezone,
             'digest_enabled'    => (bool) $this->digest_enabled,
             'digest_new_only'   => (bool) $this->digest_new_only,
+            'push_enabled'      => (bool) $this->push_enabled,
             'watch_keywords'    => $this->watch_keywords ?? [],
             'blocked_sources'   => $this->blocked_sources ?? [],
         ];

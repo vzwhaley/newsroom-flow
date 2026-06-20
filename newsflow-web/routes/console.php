@@ -37,3 +37,13 @@ Schedule::command('newsflow:digest --due')
     ->withoutOverlapping()
     ->runInBackground()
     ->description('Hourly "Your NewsFlow is ready" digest for due, opted-in users.');
+
+/*
+| Daily push notification — runs a few minutes after the refresh, alongside the
+| email digest, for users who opted into push and have a registered device.
+*/
+Schedule::command('newsflow:push --due')
+    ->hourlyAt(7)
+    ->withoutOverlapping()
+    ->runInBackground()
+    ->description('Hourly "Your NewsFlow is ready" push for due, opted-in users.');

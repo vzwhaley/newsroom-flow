@@ -46,6 +46,7 @@ at a chosen hour/timezone · read/unread tracking · collapsible categories.
 - **Save / read-later** bookmarking
 - **Mute keywords** per topic + **block publishers** account-wide
 - **Daily email digest** with per-topic selection + "new headlines only"
+- **Daily push notification** (native apps) — opt-in, featuring watchlist hits
 - Topic reordering
 
 ## The article engine
@@ -124,7 +125,13 @@ Code-complete. Remaining steps are configuration:
 - [ ] **Social login** (optional) — set Google/Apple/Discord client IDs to
       show those buttons.
 - [ ] **Scheduler** — ensure `php artisan schedule:run` runs every minute
-      (cron / Windows Task Scheduler) so the daily refresh + digest fire.
+      (cron / Windows Task Scheduler) so the daily refresh + digest + push fire.
+- [ ] **Push notifications** (native apps) — optional. **Android/FCM:** set
+      `FCM_PROJECT_ID` + `FCM_CREDENTIALS` (path to the service-account JSON).
+      **iOS/APNs:** set `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_BUNDLE_ID`,
+      `APNS_KEY_PATH` (the `.p8`), and `APNS_PRODUCTION=true` for the App Store
+      build. Until configured, push runs through a no-op sender (token
+      registration + `newsflow:push` still work, nothing is delivered).
 - [ ] `php artisan migrate --force && npm run build` on the server.
 
 Everything is covered by the test suite (`php artisan test`, 100+ tests).
