@@ -36,9 +36,9 @@ const features = [
 const sample = {
     topic: 'World News',
     articles: [
-        ['Markets steady as central banks signal a pause', 'Global Wire'],
-        ['Historic climate accord reached after marathon talks', 'The Beacon'],
-        ['What the new trade deal means for everyday prices', 'The Daily Dispatch'],
+        ['Markets steady as central banks signal a pause', 'Global Wire', 'Stocks held firm after policymakers hinted that rate hikes may be over for now.'],
+        ['Historic climate accord reached after marathon talks', 'The Beacon', 'Nearly 200 nations agreed to a phased shift away from fossil fuels.'],
+        ['What the new trade deal means for everyday prices', 'The Daily Dispatch', 'Tariff cuts could ease costs on electronics, cars, and groceries within months.'],
     ],
 };
 </script>
@@ -119,6 +119,9 @@ const sample = {
                                 >
                                     <p class="font-serif text-base font-semibold leading-snug text-ink">
                                         {{ a[0] }}
+                                    </p>
+                                    <p class="mt-1.5 line-clamp-2 text-sm text-gray-500">
+                                        {{ a[2] }}
                                     </p>
                                     <div class="mt-3 flex items-center justify-between">
                                         <span class="text-xs font-medium text-gray-400">{{ a[1] }}</span>
