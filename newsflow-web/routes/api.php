@@ -3,7 +3,9 @@
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FeedController;
+use App\Http\Controllers\Api\PreferencesController;
 use App\Http\Controllers\Api\SavedController;
+use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\TopicController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +24,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/me', [FeedController::class, 'me']);
     Route::get('/feed', [FeedController::class, 'index']);
+    Route::get('/search', [SearchController::class, 'index']);
+    Route::put('/preferences', [PreferencesController::class, 'update']);
 
     // Topics
     Route::post('/topics', [TopicController::class, 'store']);

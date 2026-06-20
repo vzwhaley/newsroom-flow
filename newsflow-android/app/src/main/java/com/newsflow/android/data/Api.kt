@@ -13,7 +13,9 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
 interface NewsFlowApi {
@@ -58,6 +60,12 @@ interface NewsFlowApi {
 
     @DELETE("api/saved/{id}")
     suspend fun unsave(@Path("id") id: Long): Response<MessageResponse>
+
+    @GET("api/search")
+    suspend fun search(@Query("q") q: String): Response<SearchResponse>
+
+    @PUT("api/preferences")
+    suspend fun updatePreferences(@Body body: PreferencesRequest): Response<MeResponse>
 }
 
 /** Attaches the bearer token (when present) + a JSON Accept header. */

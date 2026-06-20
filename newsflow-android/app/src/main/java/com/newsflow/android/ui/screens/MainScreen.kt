@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +28,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 
 private enum class MainTab(val label: String, val icon: ImageVector) {
-    Feed("My NewsFlow", Icons.AutoMirrored.Filled.Article),
+    Feed("Feed", Icons.AutoMirrored.Filled.Article),
+    Search("Search", Icons.Filled.Search),
     Saved("Saved", Icons.Filled.Bookmark),
     Account("Account", Icons.Filled.Person),
 }
@@ -55,6 +57,7 @@ fun MainScreen(onSignOut: () -> Unit) {
         Box(Modifier.fillMaxSize().padding(padding)) {
             when (tab) {
                 MainTab.Feed -> FeedTab()
+                MainTab.Search -> SearchTab()
                 MainTab.Saved -> SavedTab()
                 MainTab.Account -> AccountTab(onSignOut)
             }

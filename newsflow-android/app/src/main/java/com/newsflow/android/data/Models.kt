@@ -37,6 +37,8 @@ data class User(
     @SerialName("topic_count") val topicCount: Int = 0,
     @SerialName("refresh_hour") val refreshHour: Int = 6,
     val timezone: String = "UTC",
+    @SerialName("digest_enabled") val digestEnabled: Boolean = false,
+    @SerialName("digest_new_only") val digestNewOnly: Boolean = false,
 )
 
 @Serializable
@@ -122,3 +124,30 @@ data class SaveRequest(
 
 @Serializable
 data class SaveResponse(val saved: SavedItem)
+
+@Serializable
+data class SearchItem(
+    val id: Long,
+    val headline: String,
+    val description: String = "",
+    val url: String,
+    val source: String? = null,
+    @SerialName("topic_name") val topicName: String? = null,
+    @SerialName("is_read") val isRead: Boolean = false,
+)
+
+@Serializable
+data class SearchResponse(
+    val locked: Boolean = false,
+    val q: String = "",
+    val feed: List<SearchItem> = emptyList(),
+    val saved: List<SearchItem> = emptyList(),
+)
+
+@Serializable
+data class PreferencesRequest(
+    @SerialName("refresh_hour") val refreshHour: Int,
+    val timezone: String,
+    @SerialName("digest_enabled") val digestEnabled: Boolean,
+    @SerialName("digest_new_only") val digestNewOnly: Boolean,
+)

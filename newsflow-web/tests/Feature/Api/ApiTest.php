@@ -106,6 +106,38 @@ class ApiTest extends TestCase
         $this->assertNotNull($article->fresh()->read_at);
     }
 
+    public function test_pro_user_can_search_via_api(): void
+    {
+        $user = User::factory()->create(['email_verified_at' => Carbon::now(), 'lifetime_purchased_at' => Carbon::now()]);
+        $topic = $user->topics()->create(['name' => 'Tech', 'position' => 0]);
+        $topic->articles()->create(['headline' => 'Apple ships a chip', 'description' => 'x', 'url' => 'https://e.test/a', 'fingerprint' => 'a', 'position' => 0]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/search?q=apple')->assertOk()
+            ->assertJsonPath('locked', false)
+            ->assertJsonPath('feed.0.headline', 'Apple ships a chip');
+    }
+
+    public function test_search_is_locked_for_free_via_api(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['email_verified_at' => Carbon::now()]));
+        $this->getJson('/api/search?q=apple')->assertOk()->assertJsonPath('locked', true);
+    }
+
+    public function test_can_update_preferences_via_api(): void
+    {
+        $user = User::factory()->create(['email_verified_at' => Carbon::now()]);
+        Sanctum::actingAs($user);
+
+        $this->putJson('/api/preferences', [
+            'refresh_hour' => 8, 'timezone' => 'America/Chicago', 'digest_enabled' => true, 'digest_new_only' => true,
+        ])->assertOk()->assertJsonPath('user.refresh_hour', 8);
+
+        $user->refresh();
+        $this->assertSame(8, $user->refresh_hour);
+        $this->assertTrue($user->digest_enabled);
+    }
+
     public function test_logout_revokes_token(): void
     {
         $user = User::factory()->create();

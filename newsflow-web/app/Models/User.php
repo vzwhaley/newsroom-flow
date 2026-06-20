@@ -203,6 +203,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'topic_count'       => $this->topics()->count(),
             'refresh_hour'      => $this->refresh_hour,
             'timezone'          => $this->timezone,
+            'digest_enabled'    => (bool) $this->digest_enabled,
+            'digest_new_only'   => (bool) $this->digest_new_only,
         ];
     }
 
