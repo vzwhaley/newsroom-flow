@@ -72,7 +72,7 @@ const sample = {
                             Build Your Own Newsroom
                         </h1>
                         <p class="mt-4 font-serif text-2xl font-semibold text-brand-300">
-                            Your news. Only the topics you choose.
+                            Your own customized news topics, every day.
                         </p>
                         <p class="mt-6 max-w-xl text-lg text-gray-200">
                             NewsFlow builds you a personal front page. Choose your
