@@ -18,7 +18,12 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import com.newsflow.android.push.PushRegistrar
 
 private enum class MainTab(val label: String, val icon: ImageVector) {
     Feed("Feed", Icons.AutoMirrored.Filled.Article),
@@ -40,6 +46,18 @@ private enum class MainTab(val label: String, val icon: ImageVector) {
 @Composable
 fun MainScreen(onSignOut: () -> Unit) {
     var tab by remember { mutableStateOf(MainTab.Feed) }
+
+    // Register this device for push on first entry; request the Android 13+
+    // notification permission so alerts can be shown.
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { /* token registration is independent of display permission */ }
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        PushRegistrar.register()
+    }
 
     Scaffold(
         topBar = { TopAppBar(title = { BrandTitle() }) },

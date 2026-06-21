@@ -28,6 +28,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.newsflow.ios
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: Info.plist
+        CODE_SIGN_ENTITLEMENTS: NewsFlow.entitlements
         ENABLE_PREVIEWS: YES
   NewsFlowTests:
     type: bundle.unit-test

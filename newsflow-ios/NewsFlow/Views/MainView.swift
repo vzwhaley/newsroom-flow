@@ -23,6 +23,7 @@ struct MainView: View {
                 Label("Account", systemImage: "person.fill")
             }
         }
+        .onAppear { PushManager.shared.requestAuthorizationAndRegister() }
     }
 
     /// Wraps each tab in a NavigationStack carrying the brand wordmark title.

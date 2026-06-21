@@ -39,6 +39,7 @@ data class User(
     val timezone: String = "UTC",
     @SerialName("digest_enabled") val digestEnabled: Boolean = false,
     @SerialName("digest_new_only") val digestNewOnly: Boolean = false,
+    @SerialName("push_enabled") val pushEnabled: Boolean = false,
     @SerialName("watch_keywords") val watchKeywords: List<String> = emptyList(),
     @SerialName("blocked_sources") val blockedSources: List<String> = emptyList(),
 )
@@ -184,6 +185,10 @@ data class PreferencesRequest(
     val timezone: String,
     @SerialName("digest_enabled") val digestEnabled: Boolean,
     @SerialName("digest_new_only") val digestNewOnly: Boolean,
+    @SerialName("push_enabled") val pushEnabled: Boolean = false,
     @SerialName("watch_keywords") val watchKeywords: List<String> = emptyList(),
     @SerialName("blocked_sources") val blockedSources: List<String> = emptyList(),
 )
+
+@Serializable
+data class DeviceTokenRequest(val platform: String, val token: String)

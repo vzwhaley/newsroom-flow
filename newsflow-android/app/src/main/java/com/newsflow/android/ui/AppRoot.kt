@@ -51,6 +51,7 @@ class AuthViewModel : ViewModel() {
 
     fun signOut() {
         viewModelScope.launch {
+            com.newsflow.android.push.PushRegistrar.unregister()
             runCatching { ServiceLocator.api.logout() }
             ServiceLocator.authStore.clear()
             _phase.value = AppPhase.NeedsLogin

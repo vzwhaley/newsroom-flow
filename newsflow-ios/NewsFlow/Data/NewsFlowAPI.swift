@@ -83,6 +83,17 @@ final class NewsFlowAPI {
         try await send("api/preferences", method: "PUT", body: body)
     }
 
+    @discardableResult
+    func registerDeviceToken(_ token: String) async throws -> MessageResponse {
+        try await send("api/device-tokens", method: "POST", body: DeviceTokenRequest(platform: "ios", token: token))
+    }
+
+    @discardableResult
+    func deleteDeviceToken(_ token: String) async throws -> MessageResponse {
+        let escaped = token.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? token
+        return try await send("api/device-tokens?token=\(escaped)", method: "DELETE")
+    }
+
     // MARK: - Topics
 
     func addTopic(_ body: AddTopicRequest) async throws -> TopicResponse {

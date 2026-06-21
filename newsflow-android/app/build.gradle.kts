@@ -6,6 +6,15 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    // Firebase config plugin — applied below only when google-services.json is
+    // present, so the app still builds without push credentials.
+    alias(libs.plugins.google.services) apply false
+}
+
+// Drop the Firebase service-account file at app/google-services.json (from the
+// Firebase console) to activate FCM. Without it, push registration no-ops.
+if (file("google-services.json").exists()) {
+    apply(plugin = libs.plugins.google.services.get().pluginId)
 }
 
 // Release-signing credentials live OUTSIDE git (keystore.properties). When
@@ -106,4 +115,7 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.security.crypto)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 }

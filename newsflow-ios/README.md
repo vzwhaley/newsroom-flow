@@ -98,7 +98,21 @@ All endpoints under `auth:sanctum` (plus the public register/login):
 `PATCH /api/topics/{id}/mutes`, `POST /api/topics/{id}/read-all`,
 `DELETE /api/topics/{id}`, `POST /api/articles/{id}/read`,
 `DELETE /api/articles/{id}/read`, `POST /api/articles/{id}/summary`,
-`GET /api/saved`, `POST /api/saved`, `DELETE /api/saved/{id}`.
+`GET /api/saved`, `POST /api/saved`, `DELETE /api/saved/{id}`,
+`POST /api/device-tokens`, `DELETE /api/device-tokens?token=`.
+
+## Push notifications (APNs)
+
+The app registers for remote notifications on sign-in and posts its APNs token
+to `POST /api/device-tokens`; the Account screen has a "Push notifications"
+toggle. To actually deliver pushes you need an Apple Developer account:
+
+1. Enable the **Push Notifications** capability for the `com.newsflow.ios` App
+   ID. `NewsFlow.entitlements` already declares `aps-environment`.
+2. Create an **APNs Auth Key (.p8)** and configure the backend (`APNS_KEY_ID`,
+   `APNS_TEAM_ID`, `APNS_BUNDLE_ID`, `APNS_KEY_PATH`) — see the web README.
+
+A real device is required to obtain an APNs token (the simulator can't).
 
 ## Tests
 

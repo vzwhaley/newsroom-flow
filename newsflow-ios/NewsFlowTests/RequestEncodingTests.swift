@@ -48,6 +48,7 @@ final class RequestEncodingTests: XCTestCase {
                 timezone: "America/New_York",
                 digestEnabled: true,
                 digestNewOnly: false,
+                pushEnabled: true,
                 watchKeywords: ["Tesla"],
                 blockedSources: ["tabloid.com"]
             )
@@ -56,8 +57,15 @@ final class RequestEncodingTests: XCTestCase {
         XCTAssertEqual(dict["timezone"] as? String, "America/New_York")
         XCTAssertEqual(dict["digest_enabled"] as? Bool, true)
         XCTAssertEqual(dict["digest_new_only"] as? Bool, false)
+        XCTAssertEqual(dict["push_enabled"] as? Bool, true)
         XCTAssertEqual(dict["watch_keywords"] as? [String], ["Tesla"])
         XCTAssertEqual(dict["blocked_sources"] as? [String], ["tabloid.com"])
+    }
+
+    func testDeviceTokenRequestSnakeCase() throws {
+        let dict = try object(DeviceTokenRequest(platform: "ios", token: "apns-abc"))
+        XCTAssertEqual(dict["platform"] as? String, "ios")
+        XCTAssertEqual(dict["token"] as? String, "apns-abc")
     }
 
     func testMuteAndReorderRequestsSnakeCase() throws {

@@ -82,6 +82,12 @@ interface NewsFlowApi {
 
     @PUT("api/preferences")
     suspend fun updatePreferences(@Body body: PreferencesRequest): Response<MeResponse>
+
+    @POST("api/device-tokens")
+    suspend fun registerDeviceToken(@Body body: DeviceTokenRequest): Response<MessageResponse>
+
+    @DELETE("api/device-tokens")
+    suspend fun deleteDeviceToken(@Query("token") token: String): Response<MessageResponse>
 }
 
 /** Attaches the bearer token (when present) + a JSON Accept header. */

@@ -55,6 +55,7 @@ class AccountViewModel : ViewModel() {
         val refreshHour: Int = 6,
         val digestEnabled: Boolean = false,
         val digestNewOnly: Boolean = false,
+        val pushEnabled: Boolean = false,
         val watchKeywords: List<String> = emptyList(),
         val blockedSources: List<String> = emptyList(),
         val saving: Boolean = false,
@@ -70,6 +71,7 @@ class AccountViewModel : ViewModel() {
                 _state.value = State(
                     user = u, refreshHour = u.refreshHour,
                     digestEnabled = u.digestEnabled, digestNewOnly = u.digestNewOnly,
+                    pushEnabled = u.pushEnabled,
                     watchKeywords = u.watchKeywords, blockedSources = u.blockedSources,
                 )
             }
@@ -79,6 +81,7 @@ class AccountViewModel : ViewModel() {
     fun setHour(h: Int) { _state.value = _state.value.copy(refreshHour = h, saved = false) }
     fun setDigest(b: Boolean) { _state.value = _state.value.copy(digestEnabled = b, saved = false) }
     fun setNewOnly(b: Boolean) { _state.value = _state.value.copy(digestNewOnly = b, saved = false) }
+    fun setPush(b: Boolean) { _state.value = _state.value.copy(pushEnabled = b, saved = false) }
 
     fun addWatch(k: String) {
         if (k in _state.value.watchKeywords) return
@@ -106,6 +109,7 @@ class AccountViewModel : ViewModel() {
                         timezone = TimeZone.getDefault().id,
                         digestEnabled = s.digestEnabled,
                         digestNewOnly = s.digestNewOnly,
+                        pushEnabled = s.pushEnabled,
                         watchKeywords = s.watchKeywords,
                         blockedSources = s.blockedSources,
                     ),
@@ -176,6 +180,12 @@ fun AccountTab(onSignOut: () -> Unit) {
                         Text("Only new headlines", fontSize = 14.sp, modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface)
                         Switch(checked = state.digestNewOnly, onCheckedChange = { vm.setNewOnly(it) })
                     }
+                }
+
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Push notifications", fontSize = 14.sp, modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface)
+                    Switch(checked = state.pushEnabled, onCheckedChange = { vm.setPush(it) })
                 }
             }
         }

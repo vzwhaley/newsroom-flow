@@ -34,8 +34,14 @@ struct PreferencesRequest: Encodable {
     let timezone: String
     let digestEnabled: Bool
     let digestNewOnly: Bool
+    let pushEnabled: Bool
     let watchKeywords: [String]
     let blockedSources: [String]
+}
+
+struct DeviceTokenRequest: Encodable {
+    let platform: String
+    let token: String
 }
 
 struct MuteRequest: Encodable {
@@ -75,6 +81,7 @@ struct User: Decodable, Identifiable {
     let timezone: String
     let digestEnabled: Bool
     let digestNewOnly: Bool
+    let pushEnabled: Bool
     let watchKeywords: [String]
     let blockedSources: [String]
 
@@ -93,6 +100,7 @@ struct User: Decodable, Identifiable {
         timezone = try c.decodeIfPresent(String.self, forKey: .timezone) ?? "UTC"
         digestEnabled = try c.decodeIfPresent(Bool.self, forKey: .digestEnabled) ?? false
         digestNewOnly = try c.decodeIfPresent(Bool.self, forKey: .digestNewOnly) ?? false
+        pushEnabled = try c.decodeIfPresent(Bool.self, forKey: .pushEnabled) ?? false
         watchKeywords = try c.decodeIfPresent([String].self, forKey: .watchKeywords) ?? []
         blockedSources = try c.decodeIfPresent([String].self, forKey: .blockedSources) ?? []
     }

@@ -6,6 +6,7 @@ final class AccountViewModel: ObservableObject {
     @Published var refreshHour = 6
     @Published var digestEnabled = false
     @Published var digestNewOnly = false
+    @Published var pushEnabled = false
     @Published var watchKeywords: [String] = []
     @Published var blockedSources: [String] = []
     @Published var saving = false
@@ -20,6 +21,7 @@ final class AccountViewModel: ObservableObject {
                 refreshHour = u.refreshHour
                 digestEnabled = u.digestEnabled
                 digestNewOnly = u.digestNewOnly
+                pushEnabled = u.pushEnabled
                 watchKeywords = u.watchKeywords
                 blockedSources = u.blockedSources
             }
@@ -35,6 +37,7 @@ final class AccountViewModel: ObservableObject {
                     timezone: TimeZone.current.identifier,
                     digestEnabled: digestEnabled,
                     digestNewOnly: digestNewOnly,
+                    pushEnabled: pushEnabled,
                     watchKeywords: watchKeywords,
                     blockedSources: blockedSources
                 )
@@ -154,6 +157,12 @@ struct AccountView: View {
                         .foregroundColor(Brand.ink)
                 }
             }
+
+            Toggle(isOn: $vm.pushEnabled) {
+                Text("Push notifications")
+                    .font(.system(size: 14))
+                    .foregroundColor(Brand.ink)
+            }
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -161,6 +170,10 @@ struct AccountView: View {
         .onChange(of: vm.refreshHour) { _ in vm.saved = false }
         .onChange(of: vm.digestEnabled) { _ in vm.saved = false }
         .onChange(of: vm.digestNewOnly) { _ in vm.saved = false }
+        .onChange(of: vm.pushEnabled) { enabled in
+            vm.saved = false
+            if enabled { PushManager.shared.requestAuthorizationAndRegister() }
+        }
     }
 
     private var powerFeaturesCard: some View {

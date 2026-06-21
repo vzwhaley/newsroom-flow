@@ -31,6 +31,7 @@ final class AuthViewModel: ObservableObject {
 
     func signOut() {
         Task {
+            await PushManager.shared.unregister()
             _ = try? await api.logout()
             authStore.clear()
             phase = .needsLogin
