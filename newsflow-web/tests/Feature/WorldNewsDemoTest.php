@@ -2,18 +2,43 @@
 
 namespace Tests\Feature;
 
-use App\Contracts\ArticleProvider;
+use App\Services\Demo\WorldNewsFeed;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Support\FakeArticleProvider;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class WorldNewsDemoTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function fakeFeed(int $count): WorldNewsFeed
+    {
+        return new class($count) extends WorldNewsFeed {
+            public function __construct(private int $count)
+            {
+            }
+
+            public function fetch(int $limit): array
+            {
+                $out = [];
+                for ($i = 1; $i <= $this->count; $i++) {
+                    $out[] = [
+                        'headline'     => "World story {$i}",
+                        'description'  => "Description {$i}",
+                        'url'          => "https://news.example/world/{$i}",
+                        'source'       => 'BBC News',
+                        'published_at' => Carbon::now()->subMinutes($i)->toIso8601String(),
+                    ];
+                }
+
+                return $out;
+            }
+        };
+    }
+
     public function test_world_news_demo_is_public_and_lists_articles(): void
     {
-        $this->app->instance(ArticleProvider::class, new FakeArticleProvider(12));
+        $this->app->instance(WorldNewsFeed::class, $this->fakeFeed(12));
 
         $this->get('/world-news')
             ->assertOk()
@@ -32,18 +57,15 @@ class WorldNewsDemoTest extends TestCase
 
     public function test_world_news_demo_caches_the_feed(): void
     {
-        // First request populates the cache; a subsequent request must not hit
-        // the provider again (so the marketing page can't hammer the API).
-        $provider = new FakeArticleProvider(12);
-        $this->app->instance(ArticleProvider::class, $provider);
-
+        // First request populates the cache.
+        $this->app->instance(WorldNewsFeed::class, $this->fakeFeed(12));
         $this->get('/world-news')->assertOk()->assertInertia(fn ($page) => $page->has('articles', 12));
 
-        // Swap in a provider that would throw if called — the cache should serve.
-        $this->app->instance(ArticleProvider::class, new class implements ArticleProvider {
-            public function fetch(string $topic, int $count, array $excludeFingerprints = []): array
+        // A subsequent request must be served from cache, not re-fetch.
+        $this->app->instance(WorldNewsFeed::class, new class extends WorldNewsFeed {
+            public function fetch(int $limit): array
             {
-                throw new \RuntimeException('provider should not be called when cached');
+                throw new \RuntimeException('feed should not be called when cached');
             }
         });
 
