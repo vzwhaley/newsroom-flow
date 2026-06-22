@@ -42,11 +42,13 @@ class AuthViewModel : ViewModel() {
             // Validate the stored token.
             val ok = runCatching { ServiceLocator.api.me().isSuccessful }.getOrDefault(false)
             _phase.value = if (ok) AppPhase.SignedIn else AppPhase.NeedsLogin
+            if (ok) com.newsflow.android.data.AdConfigStore.refresh()
         }
     }
 
     fun onAuthenticated() {
         _phase.value = AppPhase.SignedIn
+        viewModelScope.launch { com.newsflow.android.data.AdConfigStore.refresh() }
     }
 
     fun signOut() {
@@ -54,6 +56,7 @@ class AuthViewModel : ViewModel() {
             com.newsflow.android.push.PushRegistrar.unregister()
             runCatching { ServiceLocator.api.logout() }
             ServiceLocator.authStore.clear()
+            com.newsflow.android.data.AdConfigStore.clear()
             _phase.value = AppPhase.NeedsLogin
         }
     }

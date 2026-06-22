@@ -91,8 +91,8 @@ project.yml                  XcodeGen spec (Xcode 15 fallback)
 All endpoints under `auth:sanctum` (plus the public register/login):
 
 `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`,
-`GET /api/me`, `GET /api/feed`, `GET /api/search?q=`, `GET /api/archive?q=`,
-`PUT /api/preferences`
+`GET /api/me`, `GET /api/config`, `GET /api/feed`, `GET /api/search?q=`,
+`GET /api/archive?q=`, `PUT /api/preferences`
 (incl. watch_keywords + blocked_sources), `POST /api/topics`,
 `POST /api/topics/reorder`, `POST /api/topics/{id}/refresh`,
 `PATCH /api/topics/{id}/mutes`, `POST /api/topics/{id}/read-all`,
@@ -132,6 +132,21 @@ Run with **⌘U** in Xcode, or:
 ```bash
 xcodebuild test -scheme NewsFlow -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
+
+## Ads (AdMob — Free tier; Pro removes them)
+
+A banner runs at the bottom of the Feed for Free users; Pro never sees it (the
+server omits the ad unit from `/api/config` for Pro, and `AdBanner` skips
+rendering). `AdBanner.swift` is wrapped in `#if canImport(GoogleMobileAds)`, so
+the app **builds without the SDK** (the banner just renders nothing). To enable
+real ads on a Mac:
+
+1. **File → Add Package Dependencies** →
+   `https://github.com/googleads/swift-package-manager-google-mobile-ads.git`,
+   add the `GoogleMobileAds` product to the NewsFlow target.
+2. `Info.plist` already has `GADApplicationIdentifier` (Google's TEST app ID —
+   replace with the real `ca-app-pub-…~…` for the App Store).
+3. Configure the backend: `ADMOB_APP_ID_IOS` + `ADMOB_UNIT_FEED_TAB`.
 
 ## Not yet included
 

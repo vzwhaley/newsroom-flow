@@ -44,6 +44,39 @@ struct DeviceTokenRequest: Encodable {
     let token: String
 }
 
+struct ConfigResponse: Decodable {
+    let data: ConfigData
+}
+
+struct ConfigData: Decodable {
+    let plan: String
+    let subscriptionTier: String?
+    let ads: AdsConfig
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        plan = try c.decodeIfPresent(String.self, forKey: .plan) ?? "free"
+        subscriptionTier = try c.decodeIfPresent(String.self, forKey: .subscriptionTier)
+        ads = try c.decodeIfPresent(AdsConfig.self, forKey: .ads) ?? AdsConfig(show: false, units: nil)
+    }
+}
+
+struct AdsConfig: Decodable {
+    let show: Bool
+    let units: [String: String]?
+
+    init(show: Bool, units: [String: String]?) {
+        self.show = show
+        self.units = units
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        show = try c.decodeIfPresent(Bool.self, forKey: .show) ?? false
+        units = try c.decodeIfPresent([String: String].self, forKey: .units)
+    }
+}
+
 struct MuteRequest: Encodable {
     let muteKeywords: [String]
 }

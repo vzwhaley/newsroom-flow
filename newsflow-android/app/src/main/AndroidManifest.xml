@@ -43,5 +43,12 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="newsflow_default" />
+
+        <!-- AdMob application ID. Google's TEST app ID (dev-safe); replace with
+             the real ca-app-pub-…~… for the release build. Required by the
+             Mobile Ads SDK or the app crashes on init. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
     </application>
 </manifest>

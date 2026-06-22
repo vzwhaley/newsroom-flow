@@ -285,6 +285,9 @@ fun FeedTab() {
                 Text("Add your first topic above — World News, your team, a company, a hobby — and we'll pull today's top stories.", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
+
+        // Free-tier ad banner (Pro removes it).
+        item { AdBanner(isPro = state.isPro) }
     }
 
     muteTarget?.let { topic ->

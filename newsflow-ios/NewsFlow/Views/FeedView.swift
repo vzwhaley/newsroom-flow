@@ -201,6 +201,10 @@ struct FeedView: View {
                                 .foregroundColor(Brand.gray500)
                                 .padding(.top, 24)
                         }
+
+                        // Free-tier ad banner (Pro removes it).
+                        AdBanner(isPro: vm.isPro)
+                            .frame(maxWidth: .infinity)
                     }
                     .padding(16)
                 }

@@ -112,6 +112,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Whether this user should be served ads. Pro (incl. lifetime) is ad-free.
+     */
+    public function showsAds(): bool
+    {
+        return ! $this->isPro();
+    }
+
+    /**
      * 'pro' or 'free'.
      */
     public function plan(): string

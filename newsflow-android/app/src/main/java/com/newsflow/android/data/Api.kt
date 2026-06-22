@@ -32,6 +32,9 @@ interface NewsFlowApi {
     @GET("api/me")
     suspend fun me(): Response<MeResponse>
 
+    @GET("api/config")
+    suspend fun config(): Response<ConfigResponse>
+
     @GET("api/feed")
     suspend fun feed(): Response<FeedResponse>
 

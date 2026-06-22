@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class AdsTest extends TestCase
@@ -79,5 +80,33 @@ class AdsTest extends TestCase
         $this->get('/app-ads.txt')
             ->assertOk()
             ->assertSee('google.com, pub-9876543210987654, DIRECT, f08c47fec0942fa0', false);
+    }
+
+    public function test_api_config_serves_admob_units_for_free(): void
+    {
+        config([
+            'admob.units'  => ['feed_tab' => 'ca-app-pub-111/222'],
+            'admob.app_id' => ['android' => 'ca-app-pub-111~333', 'ios' => null],
+        ]);
+        $user = User::factory()->create(['email_verified_at' => Carbon::now()]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/config')->assertOk()
+            ->assertJsonPath('data.ads.show', true)
+            ->assertJsonPath('data.ads.units.feed_tab', 'ca-app-pub-111/222');
+    }
+
+    public function test_api_config_hides_admob_units_for_pro(): void
+    {
+        config(['admob.units' => ['feed_tab' => 'ca-app-pub-111/222']]);
+        $pro = User::factory()->create([
+            'email_verified_at' => Carbon::now(),
+            'lifetime_purchased_at' => Carbon::now(),
+        ]);
+        Sanctum::actingAs($pro);
+
+        $this->getJson('/api/config')->assertOk()
+            ->assertJsonPath('data.ads.show', false)
+            ->assertJsonPath('data.ads.units', null);
     }
 }

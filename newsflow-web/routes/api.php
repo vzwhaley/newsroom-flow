@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ArchiveController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ConfigController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FeedController;
 use App\Http\Controllers\Api\PreferencesController;
@@ -25,6 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
     Route::get('/me', [FeedController::class, 'me']);
+    Route::get('/config', [ConfigController::class, 'show']);
     Route::get('/feed', [FeedController::class, 'index']);
     Route::get('/search', [SearchController::class, 'index']);
     Route::get('/archive', [ArchiveController::class, 'index']);

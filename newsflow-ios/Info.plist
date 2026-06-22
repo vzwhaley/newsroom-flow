@@ -42,6 +42,10 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
+    <!-- AdMob application ID. Google's TEST app ID (dev-safe); replace with the
+         real ca-app-pub-…~… for the App Store build. -->
+    <key>GADApplicationIdentifier</key>
+    <string>ca-app-pub-3940256099942544~1458002511</string>
     <key>NSAppTransportSecurity</key>
     <dict>
         <!-- Permits the cleartext http://localhost:8000 dev API in DEBUG.

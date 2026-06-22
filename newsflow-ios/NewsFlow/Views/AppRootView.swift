@@ -22,11 +22,13 @@ final class AuthViewModel: ObservableObject {
             // Validate the stored token against /me.
             let ok = (try? await api.me()) != nil
             phase = ok ? .signedIn : .needsLogin
+            if ok { await AdConfigStore.shared.refresh() }
         }
     }
 
     func onAuthenticated() {
         phase = .signedIn
+        Task { await AdConfigStore.shared.refresh() }
     }
 
     func signOut() {
@@ -34,6 +36,7 @@ final class AuthViewModel: ObservableObject {
             await PushManager.shared.unregister()
             _ = try? await api.logout()
             authStore.clear()
+            AdConfigStore.shared.clear()
             phase = .needsLogin
         }
     }

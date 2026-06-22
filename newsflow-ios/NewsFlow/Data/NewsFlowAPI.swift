@@ -65,6 +65,10 @@ final class NewsFlowAPI {
         try await send("api/me", method: "GET")
     }
 
+    func config() async throws -> ConfigResponse {
+        try await send("api/config", method: "GET")
+    }
+
     func feed() async throws -> FeedResponse {
         try await send("api/feed", method: "GET")
     }

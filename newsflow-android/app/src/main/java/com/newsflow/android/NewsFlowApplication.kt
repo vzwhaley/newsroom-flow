@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import com.google.android.gms.ads.MobileAds
 import com.newsflow.android.data.ServiceLocator
 
 class NewsFlowApplication : Application() {
@@ -11,6 +12,8 @@ class NewsFlowApplication : Application() {
         super.onCreate()
         ServiceLocator.init(this)
         createNotificationChannel()
+        // Initialize AdMob (no-op cost for Pro users — banners are gated in UI).
+        runCatching { MobileAds.initialize(this) }
     }
 
     /** Channel referenced by the FCM default-channel meta-data + our notifications. */

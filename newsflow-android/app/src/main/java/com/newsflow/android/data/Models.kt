@@ -192,3 +192,20 @@ data class PreferencesRequest(
 
 @Serializable
 data class DeviceTokenRequest(val platform: String, val token: String)
+
+@Serializable
+data class ConfigResponse(val data: ConfigData)
+
+@Serializable
+data class ConfigData(
+    val plan: String = "free",
+    @SerialName("subscription_tier") val subscriptionTier: String? = null,
+    val ads: AdsConfig = AdsConfig(),
+)
+
+@Serializable
+data class AdsConfig(
+    val show: Boolean = false,
+    val units: Map<String, String>? = null,
+    @SerialName("app_id") val appId: Map<String, String?>? = null,
+)
