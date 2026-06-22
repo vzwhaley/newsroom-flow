@@ -193,7 +193,7 @@ class TopicController extends Controller
             'parent_id'         => $topic->parent_id,
             'mute_keywords'     => $topic->mute_keywords ?? [],
             'include_in_digest' => (bool) $topic->include_in_digest,
-            'articles'          => $topic->articles()->orderBy('position')->get()->map(fn ($a) => [
+            'articles'          => \App\Support\Region::order($topic->articles()->orderBy('position')->get())->map(fn ($a) => [
                 'id'           => $a->id,
                 'headline'     => $a->headline,
                 'description'  => $a->description,

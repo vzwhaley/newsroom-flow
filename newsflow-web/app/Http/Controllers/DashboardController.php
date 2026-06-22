@@ -99,7 +99,7 @@ class DashboardController extends Controller
             'position'          => $topic->position,
             'mute_keywords'     => $topic->mute_keywords ?? [],
             'last_refreshed_at' => $topic->last_refreshed_at?->toIso8601String(),
-            'articles'          => $topic->articles->map(fn ($a) => $this->articleArray($a))->all(),
+            'articles'          => \App\Support\Region::order($topic->articles)->map(fn ($a) => $this->articleArray($a))->all(),
         ];
 
         if ($withChildren) {
