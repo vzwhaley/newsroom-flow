@@ -14,28 +14,37 @@ use Illuminate\Support\Str;
  * genuine headlines and links even before any paid news API key is configured.
  *
  * To keep the demo varied, it takes just the single newest story from EACH
- * publisher, so every card is a different source (rather than one busy outlet's
- * live blog dominating). Feeds are fetched concurrently; failures are skipped.
+ * publisher (so every card is a different source), then orders them by region —
+ * American outlets first, then European, then Asian — newest-first within each.
+ * Feeds are fetched concurrently; failures are skipped.
  */
 class WorldNewsFeed
 {
-    /** @var array<int, array{url: string, source: string}> */
+    /** @var array<int, array{url: string, source: string, region: string}> */
     private const FEEDS = [
-        ['url' => 'https://feeds.bbci.co.uk/news/world/rss.xml',         'source' => 'BBC News'],
-        ['url' => 'https://www.theguardian.com/world/rss',              'source' => 'The Guardian'],
-        ['url' => 'https://feeds.npr.org/1004/rss.xml',                 'source' => 'NPR'],
-        ['url' => 'https://www.aljazeera.com/xml/rss/all.xml',          'source' => 'Al Jazeera'],
-        ['url' => 'https://feeds.skynews.com/feeds/rss/world.xml',      'source' => 'Sky News'],
-        ['url' => 'https://www.independent.co.uk/news/world/rss',       'source' => 'The Independent'],
-        ['url' => 'https://www.cbc.ca/webfeed/rss/rss-world',           'source' => 'CBC'],
-        ['url' => 'https://rss.dw.com/xml/rss-en-world',                'source' => 'Deutsche Welle'],
-        ['url' => 'https://www.france24.com/en/rss',                    'source' => 'France 24'],
-        ['url' => 'https://timesofindia.indiatimes.com/rssfeeds/296589292.cms', 'source' => 'Times of India'],
-        ['url' => 'https://www.cbsnews.com/latest/rss/world',           'source' => 'CBS News'],
-        ['url' => 'https://moxie.foxnews.com/google-publisher/world.xml', 'source' => 'Fox News'],
-        ['url' => 'https://www.pbs.org/newshour/feeds/rss/world',       'source' => 'PBS NewsHour'],
-        ['url' => 'https://www.timesofisrael.com/feed/',               'source' => 'The Times of Israel'],
+        // American
+        ['url' => 'https://feeds.npr.org/1004/rss.xml',                 'source' => 'NPR',                 'region' => 'american'],
+        ['url' => 'https://www.cbsnews.com/latest/rss/world',           'source' => 'CBS News',            'region' => 'american'],
+        ['url' => 'https://moxie.foxnews.com/google-publisher/world.xml', 'source' => 'Fox News',          'region' => 'american'],
+        ['url' => 'https://www.pbs.org/newshour/feeds/rss/world',       'source' => 'PBS NewsHour',        'region' => 'american'],
+        ['url' => 'https://www.cbc.ca/webfeed/rss/rss-world',           'source' => 'CBC',                 'region' => 'american'],
+
+        // European
+        ['url' => 'https://feeds.bbci.co.uk/news/world/rss.xml',        'source' => 'BBC News',            'region' => 'european'],
+        ['url' => 'https://www.theguardian.com/world/rss',             'source' => 'The Guardian',        'region' => 'european'],
+        ['url' => 'https://www.independent.co.uk/news/world/rss',      'source' => 'The Independent',     'region' => 'european'],
+        ['url' => 'https://feeds.skynews.com/feeds/rss/world.xml',     'source' => 'Sky News',            'region' => 'european'],
+        ['url' => 'https://rss.dw.com/xml/rss-en-world',               'source' => 'Deutsche Welle',      'region' => 'european'],
+        ['url' => 'https://www.france24.com/en/rss',                   'source' => 'France 24',           'region' => 'european'],
+
+        // Asian (incl. Middle East)
+        ['url' => 'https://timesofindia.indiatimes.com/rssfeeds/296589292.cms', 'source' => 'Times of India', 'region' => 'asian'],
+        ['url' => 'https://www.aljazeera.com/xml/rss/all.xml',         'source' => 'Al Jazeera',          'region' => 'asian'],
+        ['url' => 'https://www.timesofisrael.com/feed/',              'source' => 'The Times of Israel', 'region' => 'asian'],
     ];
+
+    /** Region display order: lower = shown first. */
+    private const REGION_PRIORITY = ['american' => 0, 'european' => 1, 'asian' => 2];
 
     /**
      * @return array<int, array{headline: string, description: string, url: string, source: string, published_at: ?string}>
@@ -60,13 +69,27 @@ class WorldNewsFeed
 
             // Newest story from this publisher only — one per source.
             usort($items, fn ($a, $b) => ($b['published_at'] ?? '') <=> ($a['published_at'] ?? ''));
-            $picked[] = $items[0];
+            $article = $items[0];
+            $article['region'] = $feed['region'];
+            $picked[] = $article;
         }
 
-        // Order the one-per-publisher set newest-first and cap.
-        usort($picked, fn ($a, $b) => ($b['published_at'] ?? '') <=> ($a['published_at'] ?? ''));
+        // Order by region (American → European → Asian), newest-first within each.
+        usort($picked, function ($a, $b) {
+            $pa = self::REGION_PRIORITY[$a['region']] ?? 9;
+            $pb = self::REGION_PRIORITY[$b['region']] ?? 9;
 
-        return array_slice($picked, 0, $limit);
+            return $pa !== $pb
+                ? $pa <=> $pb
+                : (($b['published_at'] ?? '') <=> ($a['published_at'] ?? ''));
+        });
+
+        // Cap, then drop the internal region key from the payload.
+        return array_map(function ($a) {
+            unset($a['region']);
+
+            return $a;
+        }, array_slice($picked, 0, $limit));
     }
 
     /**
