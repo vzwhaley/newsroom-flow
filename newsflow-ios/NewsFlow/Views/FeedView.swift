@@ -9,13 +9,22 @@ struct FeedRow: Identifiable {
 @MainActor
 final class FeedViewModel: ObservableObject {
     @Published var loading = true
+    @Published var loadFailed = false
     @Published var isPro = false
+    @Published var topicLimit: Int?   // nil = unlimited (Pro) or unknown
+    @Published var topicCount = 0
     @Published var topics: [Topic] = []
     @Published var watchlist: [Article] = []
     @Published var readIds: Set<Int> = []
     @Published var savedFps: Set<String> = []
     @Published var busy = false
     @Published var error: String?
+
+    /// Free user sitting at their topic cap right now.
+    var atTopicLimit: Bool {
+        guard let limit = topicLimit else { return false }
+        return topicCount >= limit
+    }
 
     private var api: NewsFlowAPI { ServiceLocator.shared.api }
 
@@ -32,23 +41,31 @@ final class FeedViewModel: ObservableObject {
     }
 
     func load() {
-        Task {
-            loading = true
-            error = nil
-            let me = try? await api.me()
-            guard let feed = try? await api.feed() else {
-                loading = false
-                error = "Couldn't load your feed."
-                return
-            }
-            let read = feed.topics.flatMap { collectArticles($0) }.filter { $0.isRead }.map { $0.id }
-            isPro = me?.user.isPro ?? false
-            topics = feed.topics
-            watchlist = feed.watchlist
-            readIds = Set(read)
-            savedFps = Set(feed.savedFingerprints)
+        Task { await loadAsync() }
+    }
+
+    func loadAsync() async {
+        // Only blank the screen on the initial load — pull-to-refresh and
+        // background reloads keep the current list visible.
+        if topics.isEmpty { loading = true }
+        error = nil
+        loadFailed = false
+        let me = try? await api.me()
+        guard let feed = try? await api.feed() else {
             loading = false
+            loadFailed = topics.isEmpty
+            error = "Couldn't load your feed."
+            return
         }
+        let read = feed.topics.flatMap { collectArticles($0) }.filter { $0.isRead }.map { $0.id }
+        isPro = me?.user.isPro ?? false
+        topicLimit = me?.user.topicLimit
+        topicCount = me?.user.topicCount ?? feed.topics.count
+        topics = feed.topics
+        watchlist = feed.watchlist
+        readIds = Set(read)
+        savedFps = Set(feed.savedFingerprints)
+        loading = false
     }
 
     func addTopic(_ name: String, parentId: Int? = nil) {
@@ -63,7 +80,7 @@ final class FeedViewModel: ObservableObject {
                 load()
             } catch APIError.http(422) {
                 busy = false
-                error = "Free accounts can follow up to 2 topics. Upgrade to Pro for unlimited."
+                error = "Free accounts can follow up to \(topicLimit ?? 2) topics. Upgrade to Pro for unlimited."
             } catch {
                 busy = false
                 self.error = "Couldn't add that topic."
@@ -138,16 +155,21 @@ final class FeedViewModel: ObservableObject {
         guard !savedFps.contains(article.fingerprint) else { return }
         savedFps.insert(article.fingerprint)
         Task {
-            _ = try? await api.save(
-                SaveRequest(
-                    headline: article.headline,
-                    description: article.description,
-                    url: article.url,
-                    source: article.source,
-                    imageUrl: article.imageUrl,
-                    topicName: article.topicName
+            do {
+                _ = try await api.save(
+                    SaveRequest(
+                        headline: article.headline,
+                        description: article.description,
+                        url: article.url,
+                        source: article.source,
+                        imageUrl: article.imageUrl,
+                        topicName: article.topicName
+                    )
                 )
-            )
+            } catch {
+                // Roll back the optimistic bookmark so the UI matches reality.
+                savedFps.remove(article.fingerprint)
+            }
         }
     }
 
@@ -170,6 +192,17 @@ struct FeedView: View {
         Group {
             if vm.loading {
                 ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if vm.loadFailed {
+                VStack(spacing: 12) {
+                    Image(systemName: "wifi.exclamationmark")
+                        .font(.system(size: 32))
+                        .foregroundColor(Brand.gray500)
+                    Text("Couldn't load your feed.")
+                        .foregroundColor(Brand.gray500)
+                    Button("Try Again") { vm.load() }
+                        .buttonStyle(.borderedProminent)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 10) {
@@ -208,6 +241,7 @@ struct FeedView: View {
                     }
                     .padding(16)
                 }
+                .refreshable { await vm.loadAsync() }
             }
         }
         .onAppear {
@@ -238,7 +272,14 @@ struct FeedView: View {
                     .onSubmit(submitTopic)
                 Button("Add", action: submitTopic)
                     .buttonStyle(.borderedProminent)
-                    .disabled(vm.busy || newTopic.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .disabled(vm.busy || newTopic.trimmingCharacters(in: .whitespaces).isEmpty || vm.atTopicLimit)
+            }
+            if let limit = vm.topicLimit {
+                Text(vm.atTopicLimit
+                     ? "You've used all \(limit) free topics — upgrade to Pro for unlimited."
+                     : "\(vm.topicCount) of \(limit) topics used")
+                    .font(.system(size: 12))
+                    .foregroundColor(vm.atTopicLimit ? .orange : Brand.gray500)
             }
             if let error = vm.error {
                 Text(error)

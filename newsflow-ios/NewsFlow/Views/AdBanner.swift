@@ -33,7 +33,14 @@ struct AdBanner: View {
         // Trust the server's explicit show=false once config has loaded.
         if config.payload != nil, !config.showAds { return AnyView(EmptyView()) }
 
+        // Dev builds fall back to Google's official test unit; release builds
+        // only ever load a real unit ID delivered by the server — never the
+        // test one.
+        #if DEBUG
         let unitID = config.unitId(for: placement) ?? fallbackUnitID
+        #else
+        guard let unitID = config.unitId(for: placement) else { return AnyView(EmptyView()) }
+        #endif
 
         #if canImport(GoogleMobileAds)
         return AnyView(

@@ -19,10 +19,19 @@ final class AuthViewModel: ObservableObject {
                 phase = .needsLogin
                 return
             }
-            // Validate the stored token against /me.
-            let ok = (try? await api.me()) != nil
-            phase = ok ? .signedIn : .needsLogin
-            if ok { await AdConfigStore.shared.refresh() }
+            // Validate the stored token against /me. Only an explicit
+            // unauthorized response signs the user out — a network failure
+            // (offline launch, flaky connection) keeps the session alive.
+            do {
+                _ = try await api.me()
+                phase = .signedIn
+                await AdConfigStore.shared.refresh()
+            } catch APIError.http(401), APIError.http(403) {
+                authStore.clear()
+                phase = .needsLogin
+            } catch {
+                phase = .signedIn
+            }
         }
     }
 
@@ -45,6 +54,7 @@ final class AuthViewModel: ObservableObject {
 struct AppRootView: View {
     @StateObject private var auth = AuthViewModel()
     @State private var showRegister = false
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         Group {
@@ -71,5 +81,12 @@ struct AppRootView: View {
             }
         }
         .onAppear { auth.refreshSession() }
+        .onChange(of: scenePhase) { newPhase in
+            // Re-validate the token when returning from the background so a
+            // session revoked server-side is caught without a cold launch.
+            if newPhase == .active && auth.phase == .signedIn {
+                auth.refreshSession()
+            }
+        }
     }
 }

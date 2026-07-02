@@ -11,8 +11,10 @@ final class AccountViewModel: ObservableObject {
     @Published var blockedSources: [String] = []
     @Published var saving = false
     @Published var saved = false
+    @Published var saveError: String?
 
     private var api: NewsFlowAPI { ServiceLocator.shared.api }
+    private var savedClearTask: Task<Void, Never>?
 
     func load() {
         Task {
@@ -28,22 +30,46 @@ final class AccountViewModel: ObservableObject {
         }
     }
 
+    /// Re-fetch just the identity/plan (e.g. returning to the tab after an
+    /// upgrade) without clobbering in-progress edits to the form fields.
+    func refreshUser() {
+        Task {
+            if let u = try? await api.me().user { user = u }
+        }
+    }
+
     func save() {
         Task {
             saving = true
-            _ = try? await api.updatePreferences(
-                PreferencesRequest(
-                    refreshHour: refreshHour,
-                    timezone: TimeZone.current.identifier,
-                    digestEnabled: digestEnabled,
-                    digestNewOnly: digestNewOnly,
-                    pushEnabled: pushEnabled,
-                    watchKeywords: watchKeywords,
-                    blockedSources: blockedSources
+            saveError = nil
+            do {
+                _ = try await api.updatePreferences(
+                    PreferencesRequest(
+                        refreshHour: refreshHour,
+                        timezone: TimeZone.current.identifier,
+                        digestEnabled: digestEnabled,
+                        digestNewOnly: digestNewOnly,
+                        pushEnabled: pushEnabled,
+                        watchKeywords: watchKeywords,
+                        blockedSources: blockedSources
+                    )
                 )
-            )
+                // Keep the backend token registry in sync with the toggle.
+                if pushEnabled {
+                    await PushManager.shared.registerWithBackend()
+                } else {
+                    await PushManager.shared.unregister()
+                }
+                saved = true
+                savedClearTask?.cancel()
+                savedClearTask = Task {
+                    try? await Task.sleep(nanoseconds: 2_500_000_000)
+                    if !Task.isCancelled { saved = false }
+                }
+            } catch {
+                saveError = "Couldn't save your changes. Please try again."
+            }
             saving = false
-            saved = true
         }
     }
 }
@@ -102,6 +128,7 @@ struct AccountView: View {
         }
         .onAppear {
             if !didLoad { didLoad = true; vm.load() }
+            else { vm.refreshUser() }
         }
     }
 
@@ -221,6 +248,11 @@ struct AccountView: View {
                 Text("Saved.")
                     .font(.system(size: 13))
                     .foregroundColor(Brand.gray500)
+            }
+            if let saveError = vm.saveError {
+                Text(saveError)
+                    .font(.system(size: 13))
+                    .foregroundColor(.red)
             }
             Spacer()
         }
