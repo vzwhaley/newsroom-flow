@@ -5,6 +5,7 @@ use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DigestUnsubscribeController;
 use App\Http\Controllers\PreferencesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SavedArticleController;
@@ -55,6 +56,16 @@ Route::get('/sitemap.xml', function () {
     return response($xml, 200, ['Content-Type' => 'application/xml']);
 })->name('sitemap');
 
+// One-click digest unsubscribe from the daily email (signed URL — no login).
+// GET serves the human clicking the footer link; POST serves RFC 8058
+// List-Unsubscribe-Post requests sent automatically by mailbox providers.
+Route::get('/digest/unsubscribe/{user}', DigestUnsubscribeController::class)
+    ->middleware(['signed', 'throttle:12,1'])
+    ->name('digest.unsubscribe');
+Route::post('/digest/unsubscribe/{user}', DigestUnsubscribeController::class)
+    ->middleware(['signed', 'throttle:12,1'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated app
@@ -64,16 +75,16 @@ Route::get('/sitemap.xml', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Topics
-    Route::post('/topics', [TopicController::class, 'store'])->name('topics.store');
+    // Topics (store/refresh throttled — refresh fans out to the news API)
+    Route::post('/topics', [TopicController::class, 'store'])->middleware('throttle:30,1')->name('topics.store');
     Route::post('/topics/reorder', [TopicController::class, 'reorder'])->name('topics.reorder');
-    Route::post('/topics/{topic}/refresh', [TopicController::class, 'refresh'])->name('topics.refresh');
+    Route::post('/topics/{topic}/refresh', [TopicController::class, 'refresh'])->middleware('throttle:15,1')->name('topics.refresh');
     Route::patch('/topics/{topic}/mutes', [TopicController::class, 'mutes'])->name('topics.mutes');
     Route::post('/topics/{topic}/read-all', [TopicController::class, 'markAllRead'])->name('topics.read-all');
     Route::delete('/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
 
-    // Per-article actions (XHR/JSON)
-    Route::post('/articles/{article}/summary', [ArticleController::class, 'summary'])->name('articles.summary');
+    // Per-article actions (XHR/JSON; summary throttled — it calls the LLM)
+    Route::post('/articles/{article}/summary', [ArticleController::class, 'summary'])->middleware('throttle:30,1')->name('articles.summary');
     Route::post('/articles/{article}/read', [ArticleController::class, 'markRead'])->name('articles.read');
     Route::delete('/articles/{article}/read', [ArticleController::class, 'markUnread'])->name('articles.unread');
 

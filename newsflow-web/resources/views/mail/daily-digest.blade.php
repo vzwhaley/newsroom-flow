@@ -21,8 +21,9 @@ Here are today’s top headlines on your topics.
 Open my NewsFlow
 @endcomponent
 
-You're receiving this because you turned on the daily digest. You can turn it
-off any time from your [profile]({{ route('profile.edit') }}).
+You're receiving this because you turned on the daily digest.
+[Unsubscribe with one click]({{ $unsubscribeUrl }}) or manage it from your
+[profile]({{ route('profile.edit') }}).
 
 Thanks,<br>
 {{ config('app.name') }}

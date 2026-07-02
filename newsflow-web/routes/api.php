@@ -36,19 +36,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/device-tokens', [DeviceTokenController::class, 'store']);
     Route::delete('/device-tokens', [DeviceTokenController::class, 'destroy']);
 
-    // Topics
-    Route::post('/topics', [TopicController::class, 'store']);
+    // Topics (store/refresh throttled — refresh fans out to the news API)
+    Route::post('/topics', [TopicController::class, 'store'])->middleware('throttle:30,1');
     Route::post('/topics/reorder', [TopicController::class, 'reorder']);
-    Route::post('/topics/{topic}/refresh', [TopicController::class, 'refresh']);
+    Route::post('/topics/{topic}/refresh', [TopicController::class, 'refresh'])->middleware('throttle:15,1');
     Route::patch('/topics/{topic}/mutes', [TopicController::class, 'mutes']);
     Route::patch('/topics/{topic}/digest', [TopicController::class, 'digest']);
     Route::post('/topics/{topic}/read-all', [TopicController::class, 'markAllRead']);
     Route::delete('/topics/{topic}', [TopicController::class, 'destroy']);
 
-    // Article actions
+    // Article actions (summary throttled — it calls the LLM)
     Route::post('/articles/{article}/read', [ArticleController::class, 'markRead']);
     Route::delete('/articles/{article}/read', [ArticleController::class, 'markUnread']);
-    Route::post('/articles/{article}/summary', [ArticleController::class, 'summary']);
+    Route::post('/articles/{article}/summary', [ArticleController::class, 'summary'])->middleware('throttle:30,1');
 
     // Saved
     Route::get('/saved', [SavedController::class, 'index']);
