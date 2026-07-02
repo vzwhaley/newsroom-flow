@@ -71,6 +71,24 @@ class AuthController extends Controller
         return response()->json(['message' => 'Signed out.']);
     }
 
+    /**
+     * POST /api/auth/resend-verification — re-send the verify-email link for
+     * accounts that haven't confirmed their address yet. The apps surface a
+     * banner with a "Resend" button backed by this endpoint.
+     */
+    public function resendVerification(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email already verified.', 'verified' => true]);
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        return response()->json(['message' => 'Verification email sent.', 'verified' => false]);
+    }
+
     private function tokenResponse(User $user, string $deviceName, int $status = 200): JsonResponse
     {
         $token = $user->createToken($deviceName)->plainTextToken;

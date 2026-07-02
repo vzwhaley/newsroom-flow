@@ -24,6 +24,7 @@ Route::post('/auth/login', [AuthController::class, 'login'])->middleware('thrott
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/resend-verification', [AuthController::class, 'resendVerification'])->middleware('throttle:3,1');
 
     Route::get('/me', [FeedController::class, 'me']);
     Route::get('/config', [ConfigController::class, 'show']);
