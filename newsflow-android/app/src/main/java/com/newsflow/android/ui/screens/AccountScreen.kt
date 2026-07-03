@@ -59,6 +59,7 @@ class AccountViewModel : ViewModel() {
         val digestEnabled: Boolean = false,
         val digestNewOnly: Boolean = false,
         val pushEnabled: Boolean = false,
+        val watchlistPushEnabled: Boolean = true,
         val watchKeywords: List<String> = emptyList(),
         val blockedSources: List<String> = emptyList(),
         val saving: Boolean = false,
@@ -76,6 +77,7 @@ class AccountViewModel : ViewModel() {
                     user = u, refreshHour = u.refreshHour,
                     digestEnabled = u.digestEnabled, digestNewOnly = u.digestNewOnly,
                     pushEnabled = u.pushEnabled,
+                    watchlistPushEnabled = u.watchlistPushEnabled,
                     watchKeywords = u.watchKeywords, blockedSources = u.blockedSources,
                 )
             }
@@ -98,6 +100,7 @@ class AccountViewModel : ViewModel() {
     fun setDigest(b: Boolean) { _state.value = _state.value.copy(digestEnabled = b, saved = false) }
     fun setNewOnly(b: Boolean) { _state.value = _state.value.copy(digestNewOnly = b, saved = false) }
     fun setPush(b: Boolean) { _state.value = _state.value.copy(pushEnabled = b, saved = false) }
+    fun setWatchlistPush(b: Boolean) { _state.value = _state.value.copy(watchlistPushEnabled = b, saved = false) }
 
     fun addWatch(k: String) {
         if (k in _state.value.watchKeywords) return
@@ -126,6 +129,7 @@ class AccountViewModel : ViewModel() {
                         digestEnabled = s.digestEnabled,
                         digestNewOnly = s.digestNewOnly,
                         pushEnabled = s.pushEnabled,
+                        watchlistPushEnabled = s.watchlistPushEnabled,
                         watchKeywords = s.watchKeywords,
                         blockedSources = s.blockedSources,
                     ),
@@ -217,6 +221,18 @@ fun AccountTab(onSignOut: () -> Unit) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Push notifications", fontSize = 14.sp, modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface)
                     Switch(checked = state.pushEnabled, onCheckedChange = { vm.setPush(it) })
+                }
+                if (user?.isPro == true && state.pushEnabled) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text("Priority watchlist push", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+                            Text(
+                                "Push the moment a fresh story matches a watch keyword.",
+                                fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Switch(checked = state.watchlistPushEnabled, onCheckedChange = { vm.setWatchlistPush(it) })
+                    }
                 }
             }
         }

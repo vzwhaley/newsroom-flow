@@ -1,5 +1,6 @@
 package com.newsflow.android.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -63,7 +66,26 @@ fun ArticleCard(
     var tldr by remember { mutableStateOf<String?>(null) }
     var tldrLoading by remember { mutableStateOf(false) }
     var tldrShown by remember { mutableStateOf(false) }
+    var sharing by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    // Mint the branded share link, then hand it to the system share sheet.
+    fun share() {
+        if (articleId == null || sharing) return
+        scope.launch {
+            sharing = true
+            val res = runCatching { ServiceLocator.api.shareArticle(articleId) }.getOrNull()
+            sharing = false
+            val url = res?.takeIf { it.isSuccessful }?.body()?.url ?: return@launch
+            val send = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_SUBJECT, headline)
+                putExtra(Intent.EXTRA_TEXT, url)
+            }
+            runCatching { context.startActivity(Intent.createChooser(send, "Share article")) }
+        }
+    }
 
     fun toggleTldr() {
         if (tldr != null) { tldrShown = !tldrShown; return }
@@ -113,6 +135,16 @@ fun ArticleCard(
                     }
                 }
                 Spacer(Modifier.weight(1f))
+                if (articleId != null) {
+                    IconButton(onClick = { share() }, enabled = !sharing, modifier = Modifier.size(28.dp)) {
+                        Icon(
+                            Icons.Filled.Share,
+                            contentDescription = "Share article",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                }
                 if (onToggleRead != null) {
                     IconButton(onClick = onToggleRead, modifier = Modifier.size(28.dp)) {
                         Icon(

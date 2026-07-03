@@ -40,8 +40,17 @@ data class User(
     @SerialName("digest_enabled") val digestEnabled: Boolean = false,
     @SerialName("digest_new_only") val digestNewOnly: Boolean = false,
     @SerialName("push_enabled") val pushEnabled: Boolean = false,
+    @SerialName("watchlist_push_enabled") val watchlistPushEnabled: Boolean = true,
     @SerialName("watch_keywords") val watchKeywords: List<String> = emptyList(),
     @SerialName("blocked_sources") val blockedSources: List<String> = emptyList(),
+    val reading: ReadingStats = ReadingStats(),
+)
+
+@Serializable
+data class ReadingStats(
+    val streak: Int = 0,
+    @SerialName("read_today") val readToday: Boolean = false,
+    @SerialName("total_reads") val totalReads: Int = 0,
 )
 
 @Serializable
@@ -110,6 +119,17 @@ data class DigestRequest(@SerialName("include_in_digest") val includeInDigest: B
 
 @Serializable
 data class TldrResponse(val tldr: String? = null, val cached: Boolean = false)
+
+@Serializable
+data class ShareResponse(val code: String, val url: String)
+
+@Serializable
+data class BriefingResponse(
+    val briefing: String = "",
+    val ai: Boolean = false,
+    val date: String = "",
+    val cached: Boolean = false,
+)
 
 @Serializable
 data class MessageResponse(val message: String? = null)
@@ -186,6 +206,7 @@ data class PreferencesRequest(
     @SerialName("digest_enabled") val digestEnabled: Boolean,
     @SerialName("digest_new_only") val digestNewOnly: Boolean,
     @SerialName("push_enabled") val pushEnabled: Boolean = false,
+    @SerialName("watchlist_push_enabled") val watchlistPushEnabled: Boolean = true,
     @SerialName("watch_keywords") val watchKeywords: List<String> = emptyList(),
     @SerialName("blocked_sources") val blockedSources: List<String> = emptyList(),
 )

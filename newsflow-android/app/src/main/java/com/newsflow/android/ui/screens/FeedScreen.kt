@@ -40,6 +40,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,6 +51,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.newsflow.android.data.AddTopicRequest
 import com.newsflow.android.data.Article
+import com.newsflow.android.data.BriefingResponse
+import com.newsflow.android.data.ReadingStats
 import com.newsflow.android.data.SaveRequest
 import com.newsflow.android.data.ServiceLocator
 import com.newsflow.android.data.Topic
@@ -69,6 +73,8 @@ data class FeedUiState(
     val watchlist: List<Article> = emptyList(),
     val readIds: Set<Long> = emptySet(),
     val savedFps: Set<String> = emptySet(),
+    val reading: ReadingStats = ReadingStats(),
+    val briefing: BriefingResponse? = null,
     val busy: Boolean = false,
     val error: String? = null,
 ) {
@@ -107,6 +113,15 @@ class FeedViewModel : ViewModel() {
         }
         val user = me?.body()?.user
         val read = body.topics.flatMap { collectArticles(it) }.filter { it.isRead }.map { it.id }.toSet()
+
+        // Pro: today's AI briefing (server caches it, so this is cheap).
+        val briefing = if (user?.isPro == true && body.topics.isNotEmpty()) {
+            runCatching { ServiceLocator.api.briefing() }.getOrNull()
+                ?.takeIf { it.isSuccessful }?.body()
+        } else {
+            null
+        }
+
         _state.value = FeedUiState(
             loading = false,
             isPro = user?.isPro == true,
@@ -118,6 +133,8 @@ class FeedViewModel : ViewModel() {
             watchlist = body.watchlist,
             readIds = read,
             savedFps = body.savedFingerprints.toSet(),
+            reading = user?.reading ?: ReadingStats(),
+            briefing = briefing,
         )
     }
 
@@ -290,6 +307,45 @@ fun FeedTab() {
                     TextButton(onClick = { vm.resendVerification() }, enabled = !state.verificationSent) {
                         Text(if (state.verificationSent) "Sent — check your inbox" else "Resend email", fontSize = 13.sp)
                     }
+                }
+            }
+        }
+
+        if (state.reading.streak > 0) {
+            item {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(Color(0xFFFFF7ED))
+                        .padding(horizontal = 12.dp, vertical = 5.dp),
+                ) {
+                    Text(
+                        "🔥 ${state.reading.streak}-day reading streak" +
+                            if (state.reading.readToday) "" else " — read a story to keep it!",
+                        fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFFC2410C),
+                    )
+                }
+            }
+        }
+
+        state.briefing?.let { b ->
+            item {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(16.dp))
+                        .padding(14.dp),
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Your Daily Briefing", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                        if (!b.ai) {
+                            Spacer(Modifier.width(6.dp))
+                            Text("PREVIEW", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f))
+                        }
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Text(b.briefing, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSecondaryContainer)
                 }
             }
         }

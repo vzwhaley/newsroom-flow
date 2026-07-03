@@ -71,6 +71,12 @@ interface NewsFlowApi {
     @POST("api/articles/{id}/summary")
     suspend fun summary(@Path("id") id: Long): Response<TldrResponse>
 
+    @POST("api/articles/{id}/share")
+    suspend fun shareArticle(@Path("id") id: Long): Response<ShareResponse>
+
+    @GET("api/briefing")
+    suspend fun briefing(): Response<BriefingResponse>
+
     @GET("api/saved")
     suspend fun saved(): Response<SavedListResponse>
 
