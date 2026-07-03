@@ -64,12 +64,12 @@ const proFeatures = [
                     </p>
                     <ul class="mt-6 flex-1 space-y-3 text-sm text-gray-700">
                         <li class="flex gap-2">
-                            <span class="text-brand-600">✓</span>
+                            <span class="text-brand-600" aria-hidden="true">✓</span>
                             Up to {{ freeTopics }} topics
                         </li>
-                        <li class="flex gap-2"><span class="text-brand-600">✓</span> Daily 6 AM refresh</li>
-                        <li class="flex gap-2"><span class="text-brand-600">✓</span> 12 articles per topic</li>
-                        <li class="flex gap-2"><span class="text-brand-600">✓</span> Web, Android & iOS</li>
+                        <li class="flex gap-2"><span class="text-brand-600" aria-hidden="true">✓</span> Daily 6 AM refresh</li>
+                        <li class="flex gap-2"><span class="text-brand-600" aria-hidden="true">✓</span> 12 articles per topic</li>
+                        <li class="flex gap-2"><span class="text-brand-600" aria-hidden="true">✓</span> Web, Android & iOS</li>
                     </ul>
                     <Link
                         :href="user ? route('dashboard') : route('register')"
@@ -89,7 +89,7 @@ const proFeatures = [
                     <p class="mt-3 text-sm text-gray-600">Unlimited topics, billed monthly.</p>
                     <ul class="mt-6 flex-1 space-y-3 text-sm text-gray-700">
                         <li v-for="f in proFeatures" :key="f" class="flex gap-2">
-                            <span class="text-brand-600">✓</span> {{ f }}
+                            <span class="text-brand-600" aria-hidden="true">✓</span> {{ f }}
                         </li>
                     </ul>
                     <Link
@@ -115,7 +115,7 @@ const proFeatures = [
                     </p>
                     <ul class="mt-6 flex-1 space-y-3 text-sm text-gray-700">
                         <li v-for="f in proFeatures" :key="f" class="flex gap-2">
-                            <span class="text-brand-600">✓</span> {{ f }}
+                            <span class="text-brand-600" aria-hidden="true">✓</span> {{ f }}
                         </li>
                     </ul>
                     <Link
@@ -138,9 +138,9 @@ const proFeatures = [
                     </p>
                     <ul class="mt-6 flex-1 space-y-3 text-sm text-gray-200">
                         <li v-for="f in proFeatures" :key="f" class="flex gap-2">
-                            <span class="text-brand-300">✓</span> {{ f }}
+                            <span class="text-brand-300" aria-hidden="true">✓</span> {{ f }}
                         </li>
-                        <li class="flex gap-2"><span class="text-brand-300">✓</span> One-time payment</li>
+                        <li class="flex gap-2"><span class="text-brand-300" aria-hidden="true">✓</span> One-time payment</li>
                     </ul>
                     <Link
                         :href="ctaHref"

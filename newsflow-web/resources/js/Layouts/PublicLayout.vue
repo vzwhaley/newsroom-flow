@@ -33,6 +33,13 @@ function openCookieSettings() {
 
 <template>
     <div class="flex min-h-screen flex-col bg-white text-ink">
+        <!-- Skip link for keyboard/screen-reader users (WCAG 2.4.1) -->
+        <a
+            href="#main-content"
+            class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-brand-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+        >
+            Skip to content
+        </a>
         <!-- Sticky nav -->
         <header class="sticky top-0 z-40 border-b border-gray-100 bg-white/80 backdrop-blur">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -103,7 +110,7 @@ function openCookieSettings() {
         </header>
 
         <!-- Page content -->
-        <main class="flex-1">
+        <main id="main-content" class="flex-1">
             <slot />
         </main>
 

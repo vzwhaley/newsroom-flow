@@ -26,7 +26,7 @@ function remove(tag) {
         <div v-if="modelValue.length" class="mb-2 flex flex-wrap gap-2">
             <span v-for="tag in modelValue" :key="tag" class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-700">
                 {{ tag }}
-                <button type="button" @click="remove(tag)" class="text-gray-400 hover:text-red-600">×</button>
+                <button type="button" @click="remove(tag)" :aria-label="`Remove ${tag}`" class="text-gray-400 hover:text-red-600"><span aria-hidden="true">×</span></button>
             </span>
         </div>
         <div class="flex gap-2">

@@ -44,8 +44,11 @@ Route::get('/app-ads.txt', [AdsTxtController::class, 'appAds']);
 Route::get('/sitemap.xml', function () {
     $paths = ['/', '/pricing', '/world-news', '/how-to-use', '/faq', '/about', '/privacy', '/terms'];
 
+    // Bump when the public pages meaningfully change (helps crawl budget).
+    $lastmod = '2026-07-03';
+
     $urls = collect($paths)
-        ->map(fn ($p) => '  <url><loc>'.e(url($p)).'</loc></url>')
+        ->map(fn ($p) => '  <url><loc>'.e(url($p)).'</loc><lastmod>'.$lastmod.'</lastmod></url>')
         ->implode("\n");
 
     $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n"

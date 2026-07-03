@@ -105,10 +105,12 @@ async function toggleTldr() {
                 <button
                     @click="emit('toggle-read', article.id)"
                     :title="isRead ? 'Mark as unread' : 'Mark as read'"
+                    :aria-label="isRead ? 'Mark as unread' : 'Mark as read'"
+                    :aria-pressed="isRead"
                     class="rounded p-1 hover:bg-gray-100"
                     :class="isRead ? 'text-green-600' : 'text-gray-300 hover:text-gray-500'"
                 >
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </button>
@@ -119,10 +121,12 @@ async function toggleTldr() {
                     @click="save"
                     :disabled="saving || isSaved"
                     :title="isSaved ? 'Saved' : 'Save to read later'"
+                    :aria-label="isSaved ? 'Saved' : 'Save to read later'"
+                    :aria-pressed="isSaved"
                     class="rounded p-1 hover:bg-gray-100"
                     :class="isSaved ? 'text-brand-600' : 'text-gray-400 hover:text-brand-600'"
                 >
-                    <svg class="h-4 w-4" :fill="isSaved ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg class="h-4 w-4" aria-hidden="true" :fill="isSaved ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                 </button>
@@ -130,9 +134,10 @@ async function toggleTldr() {
                     v-else
                     :href="route('billing')"
                     title="Saving articles is a Pro feature"
+                    aria-label="Saving articles is a Pro feature — see billing"
                     class="rounded p-1 text-gray-300 hover:bg-gray-100 hover:text-gray-400"
                 >
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                 </Link>

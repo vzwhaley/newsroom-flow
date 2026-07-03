@@ -20,6 +20,15 @@ function when(iso) {
     if (!iso) return '';
     return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
+
+// Laravel paginator labels arrive as HTML entities ("&laquo; Previous").
+// Render plain, screen-reader-friendly text instead of v-html.
+function pageLabel(label) {
+    return label
+        .replace(/&laquo;\s*/g, '')
+        .replace(/\s*&raquo;/g, '')
+        .replace(/&hellip;/g, '…');
+}
 </script>
 
 <template>
@@ -50,7 +59,8 @@ function when(iso) {
                 </p>
 
                 <form @submit.prevent="search" class="mt-4 flex gap-2">
-                    <input v-model="query" type="search" placeholder="Search your archive…"
+                    <label for="archive-search" class="sr-only">Search your archive</label>
+                    <input id="archive-search" v-model="query" type="search" placeholder="Search your archive…"
                         class="w-full rounded-lg border-gray-300 text-sm focus:border-brand-500 focus:ring-brand-500" />
                     <button type="submit" class="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">Search</button>
                 </form>
@@ -81,19 +91,19 @@ function when(iso) {
                     </ul>
 
                     <!-- Pagination -->
-                    <div v-if="articles.links.length > 3" class="mt-6 flex flex-wrap justify-center gap-1">
+                    <nav v-if="articles.links.length > 3" aria-label="Archive pagination" class="mt-6 flex flex-wrap justify-center gap-1">
                         <template v-for="(link, i) in articles.links" :key="i">
                             <Link
                                 v-if="link.url"
                                 :href="link.url"
-                                v-html="link.label"
                                 class="rounded-md px-3 py-1.5 text-sm"
                                 :class="link.active ? 'bg-brand-600 text-white' : 'text-gray-600 hover:bg-gray-100'"
+                                :aria-current="link.active ? 'page' : undefined"
                                 preserve-scroll
-                            />
-                            <span v-else v-html="link.label" class="rounded-md px-3 py-1.5 text-sm text-gray-300" />
+                            >{{ pageLabel(link.label) }}</Link>
+                            <span v-else class="rounded-md px-3 py-1.5 text-sm text-gray-300">{{ pageLabel(link.label) }}</span>
                         </template>
-                    </div>
+                    </nav>
                 </div>
 
                 <div v-else class="mt-6 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">

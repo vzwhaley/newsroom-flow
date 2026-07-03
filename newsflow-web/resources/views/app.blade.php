@@ -36,6 +36,16 @@
         <meta name="twitter:image" content="https://newsflow.app/img/og-default.png">
         <meta name="theme-color" content="#2563eb">
 
+        {{-- Defense-in-depth: robots.txt already disallows private routes, but
+             belt-and-suspenders noindex any page that isn't a public marketing
+             page (dashboard, auth, billing, profile, search, saved, archive…). --}}
+        @php
+            $publicPaths = ['/', '/pricing', '/world-news', '/how-to-use', '/faq', '/about', '/privacy', '/terms'];
+        @endphp
+        @unless (in_array(request()->getPathInfo(), $publicPaths, true))
+            <meta name="robots" content="noindex">
+        @endunless
+
         <!-- Favicons — the logo's newspaper mark on a brand-blue tile -->
         <link rel="icon" type="image/svg+xml" href="/favicon.svg">
         <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">

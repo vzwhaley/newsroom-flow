@@ -44,7 +44,9 @@ const hasResults = () => props.feed.length || props.saved.length;
 
             <template v-else>
                 <form @submit.prevent="search" class="flex gap-2">
+                    <label for="feed-search" class="sr-only">Search your feeds and saved articles</label>
                     <input
+                        id="feed-search"
                         v-model="query"
                         type="search"
                         autofocus

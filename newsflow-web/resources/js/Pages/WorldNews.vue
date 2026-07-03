@@ -43,7 +43,7 @@ function when(iso) {
                     </div>
                     <span v-if="articles.length" class="hidden items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide ring-1 ring-inset ring-white/25 sm:inline-flex">
                         <span class="relative flex h-1.5 w-1.5">
-                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-300 opacity-75"></span>
+                            <span class="absolute inline-flex h-full w-full motion-safe:animate-ping rounded-full bg-green-300 opacity-75"></span>
                             <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-400"></span>
                         </span>
                         Today · {{ articles.length }} Stories

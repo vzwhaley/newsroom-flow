@@ -52,8 +52,7 @@ onBeforeUnmount(() => window.removeEventListener('nf:open-cookie-settings', open
         <div
             v-if="visible"
             class="fixed inset-x-0 bottom-0 z-50 px-3 pb-3 sm:px-4 sm:pb-4"
-            role="dialog"
-            aria-modal="false"
+            role="region"
             aria-label="Cookie consent"
         >
             <div class="mx-auto max-w-4xl rounded-2xl border border-gray-200 bg-white/95 p-5 shadow-2xl ring-1 ring-black/5 backdrop-blur sm:p-6">

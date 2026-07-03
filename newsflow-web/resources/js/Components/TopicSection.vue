@@ -118,12 +118,14 @@ function saveMutes() {
             <div class="flex items-center gap-1">
                 <!-- Reorder -->
                 <button v-if="canMoveUp" @click="emit('move', { id: topic.id, dir: -1 })" title="Move up"
+                    :aria-label="`Move ${topic.name} up`"
                     class="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-ink">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
+                    <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
                 </button>
                 <button v-if="canMoveDown" @click="emit('move', { id: topic.id, dir: 1 })" title="Move down"
+                    :aria-label="`Move ${topic.name} down`"
                     class="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-ink">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                    <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
 
                 <!-- Mark all read -->
@@ -135,8 +137,10 @@ function saveMutes() {
 
                 <!-- Mute keywords (Pro) -->
                 <button v-if="isPro" @click="showMutes = !showMutes" title="Mute keywords"
+                    :aria-label="`Mute keywords for ${topic.name}`"
+                    :aria-expanded="showMutes"
                     class="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M17 9l4 4m0-4l-4 4" /></svg>
+                    <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M17 9l4 4m0-4l-4 4" /></svg>
                     <span v-if="keywords.length" class="rounded-full bg-brand-100 px-1.5 text-brand-700">{{ keywords.length }}</span>
                 </button>
 
@@ -146,8 +150,9 @@ function saveMutes() {
                     {{ refreshing ? 'Refreshing…' : 'Refresh' }}
                 </button>
                 <button @click="remove" :disabled="removing" title="Stop following"
+                    :aria-label="`Stop following ${topic.name}`"
                     class="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-50">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
         </div>
@@ -159,12 +164,13 @@ function saveMutes() {
             <div class="mt-3 flex flex-wrap gap-2">
                 <span v-for="w in keywords" :key="w" class="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs text-gray-700 ring-1 ring-gray-200">
                     {{ w }}
-                    <button @click="removeWord(w)" class="text-gray-400 hover:text-red-600">×</button>
+                    <button @click="removeWord(w)" :aria-label="`Remove muted word ${w}`" class="text-gray-400 hover:text-red-600"><span aria-hidden="true">×</span></button>
                 </span>
                 <span v-if="!keywords.length" class="text-xs text-gray-400">No muted words yet.</span>
             </div>
             <div class="mt-3 flex gap-2">
                 <input v-model="newWord" @keydown.enter.prevent="addWord" type="text" placeholder="e.g. injury"
+                    aria-label="Add a keyword to mute"
                     class="flex-1 rounded-md border-gray-300 text-sm focus:border-brand-500 focus:ring-brand-500" />
                 <button @click="addWord" class="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-100">Add</button>
                 <button @click="saveMutes" class="rounded-md bg-brand-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-700">Save</button>

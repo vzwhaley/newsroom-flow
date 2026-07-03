@@ -38,6 +38,8 @@ const seoJsonLd = computed(() => {
             offers: [
                 { '@type': 'Offer', price: '0', priceCurrency: 'USD', name: 'Free' },
                 { '@type': 'Offer', price: String(pricing.value.monthly ?? '4.99'), priceCurrency: 'USD', name: 'Pro Monthly' },
+                { '@type': 'Offer', price: String(pricing.value.annual ?? '49.99'), priceCurrency: 'USD', name: 'Pro Yearly' },
+                { '@type': 'Offer', price: String(pricing.value.lifetime ?? '149.99'), priceCurrency: 'USD', name: 'Pro Lifetime' },
             ],
         },
     ];
@@ -158,7 +160,7 @@ const sample = {
                                 </div>
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-brand-700 ring-1 ring-brand-100 backdrop-blur">
                                     <span class="relative flex h-1.5 w-1.5">
-                                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                                        <span class="absolute inline-flex h-full w-full motion-safe:animate-ping rounded-full bg-green-400 opacity-75"></span>
                                         <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500"></span>
                                     </span>
                                     Today · 12 Stories

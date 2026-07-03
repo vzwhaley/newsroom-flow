@@ -26,6 +26,13 @@ const tierLabel = computed(() => {
 
 <template>
     <div class="min-h-screen bg-gray-50">
+        <!-- Skip link for keyboard/screen-reader users (WCAG 2.4.1) -->
+        <a
+            href="#main-content"
+            class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-brand-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+        >
+            Skip to content
+        </a>
         <nav class="sticky top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex h-24 justify-between">
@@ -86,14 +93,16 @@ const tierLabel = computed(() => {
 
                         <div class="relative ms-1">
                             <Dropdown align="right" width="48">
-                                <template #trigger>
+                                <template #trigger="{ open }">
                                     <span class="inline-flex rounded-md">
                                         <button
                                             type="button"
-                                            class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                                            aria-haspopup="true"
+                                            :aria-expanded="open"
+                                            class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
                                         >
                                             {{ user.name }}
-                                            <svg class="-me-0.5 ms-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <svg class="-me-0.5 ms-2 h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                             </svg>
                                         </button>
@@ -115,9 +124,12 @@ const tierLabel = computed(() => {
                     <div class="-me-2 flex items-center sm:hidden">
                         <button
                             @click="showingNavigationDropdown = !showingNavigationDropdown"
-                            class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
+                            aria-label="Toggle navigation menu"
+                            aria-controls="mobile-menu"
+                            :aria-expanded="showingNavigationDropdown"
+                            class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                         >
-                            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <svg class="h-6 w-6" aria-hidden="true" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                                 <path :class="{ hidden: showingNavigationDropdown, 'inline-flex': !showingNavigationDropdown }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                                 <path :class="{ hidden: !showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -127,7 +139,7 @@ const tierLabel = computed(() => {
             </div>
 
             <!-- Responsive menu -->
-            <div :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }" class="sm:hidden">
+            <div id="mobile-menu" :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }" class="sm:hidden">
                 <div class="space-y-1 pb-3 pt-2">
                     <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                         My NewsFlow
@@ -172,7 +184,7 @@ const tierLabel = computed(() => {
             </div>
         </header>
 
-        <main>
+        <main id="main-content">
             <slot />
         </main>
 

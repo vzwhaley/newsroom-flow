@@ -168,9 +168,10 @@ function quickAdd(name) {
                                     @click="toggle(t.id)"
                                     class="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
                                     :aria-expanded="!isCollapsed(t.id)"
+                                    :aria-label="`${isCollapsed(t.id) ? 'Expand' : 'Collapse'} ${t.name} subtopics`"
                                     :title="isCollapsed(t.id) ? 'Expand' : 'Collapse'"
                                 >
-                                    <svg class="h-4 w-4 transition-transform" :class="{ '-rotate-90': isCollapsed(t.id) }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                                    <svg class="h-4 w-4 transition-transform" :class="{ '-rotate-90': isCollapsed(t.id) }" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
                                 </button>
                                 <span v-else class="w-6 shrink-0" aria-hidden="true"></span>
 
@@ -185,9 +186,10 @@ function quickAdd(name) {
                                 <button
                                     @click="startSubtopic(t.id)"
                                     title="Add a subtopic"
-                                    class="ml-1 hidden rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-brand-600 group-hover:block"
+                                    :aria-label="`Add a subtopic under ${t.name}`"
+                                    class="ml-1 rounded p-1 text-gray-400 opacity-0 hover:bg-gray-100 hover:text-brand-600 focus:opacity-100 focus-visible:ring-2 focus-visible:ring-brand-500 group-hover:opacity-100"
                                 >
-                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                                    <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
                                 </button>
                             </div>
                             <!-- Children (hidden when the category is collapsed) -->
@@ -209,8 +211,8 @@ function quickAdd(name) {
                 <!-- Main column -->
                 <div class="min-w-0 flex-1">
                     <!-- Flash -->
-                    <div v-if="flash.success" class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ flash.success }}</div>
-                    <div v-if="flash.error" class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ flash.error }}</div>
+                    <div v-if="flash.success" role="status" class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ flash.success }}</div>
+                    <div v-if="flash.error" role="alert" class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ flash.error }}</div>
 
                     <!-- Mobile topic selector -->
                     <div v-if="topics.length" class="mb-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">
