@@ -4,12 +4,14 @@ use App\Http\Controllers\AdsTxtController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\BriefingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DigestUnsubscribeController;
 use App\Http\Controllers\PreferencesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SavedArticleController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\ShareController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\WorldNewsController;
 use Illuminate\Support\Facades\Route;
@@ -59,6 +61,11 @@ Route::get('/sitemap.xml', function () {
     return response($xml, 200, ['Content-Type' => 'application/xml']);
 })->name('sitemap');
 
+// Public branded share cards — server-rendered so scrapers get OG tags.
+Route::get('/s/{code}', [ShareController::class, 'show'])
+    ->where('code', '[a-z0-9]{6,12}')
+    ->name('share.show');
+
 // One-click digest unsubscribe from the daily email (signed URL — no login).
 // GET serves the human clicking the footer link; POST serves RFC 8058
 // List-Unsubscribe-Post requests sent automatically by mailbox providers.
@@ -90,6 +97,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/articles/{article}/summary', [ArticleController::class, 'summary'])->middleware('throttle:30,1')->name('articles.summary');
     Route::post('/articles/{article}/read', [ArticleController::class, 'markRead'])->name('articles.read');
     Route::delete('/articles/{article}/read', [ArticleController::class, 'markUnread'])->name('articles.unread');
+    Route::post('/articles/{article}/share', [ShareController::class, 'store'])->middleware('throttle:30,1')->name('articles.share');
+
+    // AI daily briefing (Pro; one LLM call per user per day, throttled anyway)
+    Route::get('/briefing', [BriefingController::class, 'show'])->middleware('throttle:12,1')->name('briefing');
 
     // Search across feeds + saved (Pro)
     Route::get('/search', [SearchController::class, 'index'])->name('search');

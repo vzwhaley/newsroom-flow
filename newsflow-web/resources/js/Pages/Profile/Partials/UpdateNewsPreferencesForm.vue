@@ -42,6 +42,7 @@ const form = useForm({
     digest_topic_ids: props.topics.filter((t) => t.include_in_digest).map((t) => t.id),
     blocked_sources: [...(user.value.blocked_sources ?? [])],
     watch_keywords: [...(user.value.watch_keywords ?? [])],
+    watchlist_push_enabled: user.value.watchlist_push_enabled ?? true,
 });
 
 function topicLabel(t) {
@@ -131,6 +132,16 @@ function submit() {
                     <p class="mb-2 text-xs text-gray-500">Stories across any topic that mention these words get pinned to a “Watchlist” at the top of your feed.</p>
                     <TagInput v-model="form.watch_keywords" placeholder="e.g. recall, merger" />
                 </div>
+
+                <label class="flex items-start gap-3 border-t border-gray-100 pt-4">
+                    <input type="checkbox" v-model="form.watchlist_push_enabled" class="mt-1 rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500" />
+                    <span class="text-sm text-gray-700">
+                        <span class="font-medium text-gray-900">Priority Watchlist Push</span><br />
+                        Get a push notification the moment a fresh story matches one of your
+                        watch keywords — no waiting for the daily notification. (Requires
+                        push notifications to be enabled on a device.)
+                    </span>
+                </label>
             </div>
             <div v-else class="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-brand-50 px-4 py-3">
                 <p class="text-sm text-brand-800">Block publishers and set keyword watchlists with <strong>Pro</strong>.</p>

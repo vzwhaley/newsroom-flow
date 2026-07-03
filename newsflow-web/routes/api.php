@@ -3,12 +3,14 @@
 use App\Http\Controllers\Api\ArchiveController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BriefingController;
 use App\Http\Controllers\Api\ConfigController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FeedController;
 use App\Http\Controllers\Api\PreferencesController;
 use App\Http\Controllers\Api\SavedController;
 use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\ShareController;
 use App\Http\Controllers\Api\TopicController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +52,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/articles/{article}/read', [ArticleController::class, 'markRead']);
     Route::delete('/articles/{article}/read', [ArticleController::class, 'markUnread']);
     Route::post('/articles/{article}/summary', [ArticleController::class, 'summary'])->middleware('throttle:30,1');
+    Route::post('/articles/{article}/share', [ShareController::class, 'store'])->middleware('throttle:30,1');
+
+    // AI daily briefing (Pro; cached per user per local day)
+    Route::get('/briefing', [BriefingController::class, 'show'])->middleware('throttle:12,1');
 
     // Saved
     Route::get('/saved', [SavedController::class, 'index']);

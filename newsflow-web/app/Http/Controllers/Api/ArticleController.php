@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Article;
+use App\Models\ReadingDay;
 use App\Services\Articles\ArticleSummarizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,6 +20,7 @@ class ArticleController extends Controller
 
         if (is_null($article->read_at)) {
             $article->forceFill(['read_at' => now()])->save();
+            ReadingDay::bump($request->user());
         }
 
         return response()->json(['is_read' => true]);

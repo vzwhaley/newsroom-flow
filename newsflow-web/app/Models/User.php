@@ -49,6 +49,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'digest_sent_at'        => 'datetime',
             'push_enabled'          => 'boolean',
             'push_sent_at'          => 'datetime',
+            'watchlist_push_enabled' => 'boolean',
+            'briefing_for'          => 'date',
             'blocked_sources'       => 'array',
             'watch_keywords'        => 'array',
         ];
@@ -86,6 +88,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function deviceTokens(): HasMany
     {
         return $this->hasMany(DeviceToken::class);
+    }
+
+    public function readingDays(): HasMany
+    {
+        return $this->hasMany(ReadingDay::class);
+    }
+
+    public function sharedArticles(): HasMany
+    {
+        return $this->hasMany(SharedArticle::class)->latest();
     }
 
     /*
@@ -222,8 +234,10 @@ class User extends Authenticatable implements MustVerifyEmail
             'digest_enabled'    => (bool) $this->digest_enabled,
             'digest_new_only'   => (bool) $this->digest_new_only,
             'push_enabled'      => (bool) $this->push_enabled,
+            'watchlist_push_enabled' => (bool) $this->watchlist_push_enabled,
             'watch_keywords'    => $this->watch_keywords ?? [],
             'blocked_sources'   => $this->blocked_sources ?? [],
+            'reading'           => ReadingDay::statsFor($this),
         ];
     }
 

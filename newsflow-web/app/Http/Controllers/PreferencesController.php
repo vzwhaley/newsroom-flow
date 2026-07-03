@@ -21,6 +21,7 @@ class PreferencesController extends Controller
             'timezone'           => ['required', 'string', Rule::in(timezone_identifiers_list())],
             'digest_enabled'     => ['required', 'boolean'],
             'digest_new_only'    => ['required', 'boolean'],
+            'watchlist_push_enabled' => ['sometimes', 'boolean'],
             'digest_topic_ids'   => ['array'],
             'digest_topic_ids.*' => ['integer'],
             'blocked_sources'    => ['array', 'max:100'],
@@ -32,14 +33,20 @@ class PreferencesController extends Controller
         $clean = fn ($list) => collect($list ?? [])
             ->map(fn ($s) => trim($s))->filter()->unique()->values()->all();
 
-        $user->forceFill([
+        $fill = [
             'refresh_hour'    => $validated['refresh_hour'],
             'timezone'        => $validated['timezone'],
             'digest_enabled'  => $validated['digest_enabled'],
             'digest_new_only' => $validated['digest_new_only'],
             'blocked_sources' => $clean($validated['blocked_sources'] ?? []),
             'watch_keywords'  => $clean($validated['watch_keywords'] ?? []),
-        ])->save();
+        ];
+
+        if ($request->has('watchlist_push_enabled')) {
+            $fill['watchlist_push_enabled'] = $validated['watchlist_push_enabled'];
+        }
+
+        $user->forceFill($fill)->save();
 
         // Per-topic digest inclusion: the submitted ids are the included ones.
         if ($request->has('digest_topic_ids')) {

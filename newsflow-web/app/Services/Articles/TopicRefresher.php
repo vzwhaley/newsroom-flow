@@ -6,6 +6,7 @@ use App\Contracts\ArticleProvider;
 use App\Models\Article;
 use App\Models\ArticleArchive;
 use App\Models\Topic;
+use App\Services\Push\WatchlistPusher;
 use App\Support\FetchedArticle;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,7 @@ class TopicRefresher
 {
     public function __construct(
         private readonly ArticleProvider $provider,
+        private readonly ?WatchlistPusher $watchlistPusher = null,
     ) {
     }
 
@@ -63,8 +65,9 @@ class TopicRefresher
         $now = Carbon::now();
         $added = 0;
         $dropped = 0;
+        $inserted = [];
 
-        DB::transaction(function () use ($topic, $existing, $newOnes, $target, $now, &$added, &$dropped) {
+        DB::transaction(function () use ($topic, $existing, $newOnes, $target, $now, &$added, &$dropped, &$inserted) {
             $currentCount = $existing->count();
 
             if ($currentCount < $target) {
@@ -73,11 +76,13 @@ class TopicRefresher
                 $toAdd = array_slice($newOnes, 0, $room);
                 $this->insertAtTop($topic, $toAdd, $now);
                 $added = count($toAdd);
+                $inserted = $toAdd;
             } else {
                 // Full feed: prepend new stories, drop an equal number of the
                 // oldest so the total stays at target.
                 $toAdd = array_slice($newOnes, 0, $target); // never add more than a full refresh
                 $added = count($toAdd);
+                $inserted = $toAdd;
 
                 if ($added > 0) {
                     // Drop the oldest $added articles (highest position values).
@@ -105,6 +110,12 @@ class TopicRefresher
                 'last_new_articles_at' => $added > 0 ? $now : $topic->last_new_articles_at,
             ])->save();
         });
+
+        // Priority watchlist push (Pro): fires only for the articles this
+        // refresh actually inserted, so a story is never pushed twice.
+        if (! empty($inserted) && $this->watchlistPusher) {
+            $this->watchlistPusher->pushMatches($topic, $inserted);
+        }
 
         return [
             'topic'   => $topic->name,

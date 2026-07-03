@@ -59,6 +59,29 @@ function openArticle() {
     emit('mark-read', props.article.id); // marks read; the anchor still opens
 }
 
+// Branded share link — mint /s/{code}, then the native share sheet (or
+// clipboard fallback). Free feature: every share is marketing.
+const shareState = ref(null); // null | 'sharing' | 'shared' | 'copied'
+
+async function share() {
+    if (shareState.value === 'sharing') return;
+    shareState.value = 'sharing';
+    try {
+        const { data } = await window.axios.post(route('articles.share', props.article.id));
+        if (navigator.share) {
+            await navigator.share({ title: props.article.headline, url: data.url });
+            shareState.value = 'shared';
+        } else {
+            await navigator.clipboard.writeText(data.url);
+            shareState.value = 'copied';
+        }
+    } catch {
+        shareState.value = null;
+        return;
+    }
+    setTimeout(() => (shareState.value = null), 2000);
+}
+
 async function toggleTldr() {
     if (tldr.value) {
         tldrOpen.value = !tldrOpen.value;
@@ -101,6 +124,20 @@ async function toggleTldr() {
             <span v-if="when" class="text-gray-400">· {{ when }}</span>
 
             <span class="ml-auto flex items-center gap-1">
+                <!-- Share (branded link) -->
+                <button
+                    @click="share"
+                    :disabled="shareState === 'sharing'"
+                    :title="shareState === 'copied' ? 'Link copied!' : 'Share this article'"
+                    :aria-label="shareState === 'copied' ? 'Link copied to clipboard' : 'Share this article'"
+                    class="rounded p-1 hover:bg-gray-100"
+                    :class="shareState === 'copied' || shareState === 'shared' ? 'text-green-600' : 'text-gray-300 hover:text-gray-500'"
+                >
+                    <svg v-if="shareState === 'copied' || shareState === 'shared'" class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    <svg v-else class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                </button>
+                <span v-if="shareState === 'copied'" role="status" class="sr-only">Link copied to clipboard</span>
+
                 <!-- Read / unread toggle -->
                 <button
                     @click="emit('toggle-read', article.id)"

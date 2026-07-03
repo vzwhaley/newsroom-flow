@@ -4,13 +4,14 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import TopicSection from '@/Components/TopicSection.vue';
 import InputError from '@/Components/InputError.vue';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 
 const props = defineProps({
     topics: { type: Array, default: () => [] },
     savedFingerprints: { type: Array, default: () => [] },
     watchlist: { type: Array, default: () => [] },
     watchKeywords: { type: Array, default: () => [] },
+    reading: { type: Object, default: () => ({ streak: 0, read_today: false, total_reads: 0 }) },
 });
 
 function openWatch(id) {
@@ -126,6 +127,23 @@ function quickAdd(name) {
     form.name = name;
     addTopic();
 }
+
+// --- AI daily briefing (Pro) — one Claude-written front page per day. ---
+const briefing = ref(null);
+const briefingLoading = ref(false);
+
+onMounted(async () => {
+    if (!user.value.is_pro || !props.topics.length) return;
+    briefingLoading.value = true;
+    try {
+        const { data } = await window.axios.get(route('briefing'));
+        briefing.value = data;
+    } catch {
+        briefing.value = null; // quietly hide the card (e.g. no articles yet)
+    } finally {
+        briefingLoading.value = false;
+    }
+});
 </script>
 
 <template>
@@ -138,9 +156,19 @@ function quickAdd(name) {
                     <h1 class="font-serif text-2xl font-bold text-ink">My NewsFlow</h1>
                     <p class="text-sm text-gray-500">{{ limitLabel }}</p>
                 </div>
-                <span class="text-sm text-gray-400">
-                    {{ new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) }}
-                </span>
+                <div class="flex items-center gap-3">
+                    <span
+                        v-if="reading.streak > 0"
+                        class="inline-flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700 ring-1 ring-inset ring-orange-200"
+                        :title="`${reading.total_reads} articles read all-time${reading.read_today ? '' : ' — read one today to keep your streak!'}`"
+                    >
+                        <span aria-hidden="true">🔥</span>
+                        {{ reading.streak }}-day streak
+                    </span>
+                    <span class="text-sm text-gray-400">
+                        {{ new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) }}
+                    </span>
+                </div>
             </div>
         </template>
 
@@ -213,6 +241,22 @@ function quickAdd(name) {
                     <!-- Flash -->
                     <div v-if="flash.success" role="status" class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ flash.success }}</div>
                     <div v-if="flash.error" role="alert" class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ flash.error }}</div>
+
+                    <!-- AI daily briefing (Pro) -->
+                    <section
+                        v-if="briefingLoading || briefing"
+                        class="relative mb-8 overflow-hidden rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-indigo-50 p-5 shadow-sm"
+                        aria-label="Your daily briefing"
+                    >
+                        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 via-indigo-500 to-violet-500"></div>
+                        <div class="mb-2 flex items-center gap-2">
+                            <svg class="h-5 w-5 text-brand-600" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            <h2 class="font-serif text-lg font-bold text-ink">Your Daily Briefing</h2>
+                            <span v-if="briefing && !briefing.ai" class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500">Preview</span>
+                        </div>
+                        <p v-if="briefingLoading" role="status" class="text-sm text-gray-500">Writing your front page…</p>
+                        <p v-else class="text-sm leading-relaxed text-gray-700">{{ briefing.briefing }}</p>
+                    </section>
 
                     <!-- Mobile topic selector -->
                     <div v-if="topics.length" class="mb-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">

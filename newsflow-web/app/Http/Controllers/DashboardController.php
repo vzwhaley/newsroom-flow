@@ -35,6 +35,7 @@ class DashboardController extends Controller
             'savedFingerprints' => $savedFingerprints,
             'watchlist'         => $this->watchlist($user, $topicModels),
             'watchKeywords'     => $user->isPro() ? ($user->watch_keywords ?? []) : [],
+            'reading'           => \App\Models\ReadingDay::statsFor($user),
         ]);
     }
 

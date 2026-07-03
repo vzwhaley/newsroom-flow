@@ -69,6 +69,7 @@ class HandleInertiaRequests extends Middleware
                     'digest_new_only'     => (bool) $user->digest_new_only,
                     'blocked_sources'     => $user->blocked_sources ?? [],
                     'watch_keywords'      => $user->watch_keywords ?? [],
+                    'watchlist_push_enabled' => (bool) $user->watchlist_push_enabled,
                 ] : null,
             ],
 

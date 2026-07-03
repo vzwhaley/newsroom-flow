@@ -22,6 +22,7 @@ class PreferencesController extends Controller
             'digest_enabled'     => ['required', 'boolean'],
             'digest_new_only'    => ['required', 'boolean'],
             'push_enabled'       => ['sometimes', 'boolean'],
+            'watchlist_push_enabled' => ['sometimes', 'boolean'],
             'watch_keywords'     => ['sometimes', 'array', 'max:100'],
             'watch_keywords.*'   => ['string', 'max:60'],
             'blocked_sources'    => ['sometimes', 'array', 'max:100'],
@@ -52,6 +53,9 @@ class PreferencesController extends Controller
         }
         if ($request->has('push_enabled')) {
             $fill['push_enabled'] = $data['push_enabled'];
+        }
+        if ($request->has('watchlist_push_enabled')) {
+            $fill['watchlist_push_enabled'] = $data['watchlist_push_enabled'];
         }
 
         $user->forceFill($fill)->save();
