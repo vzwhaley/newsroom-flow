@@ -109,6 +109,7 @@ const tierLabel = computed(() => {
                                     </span>
                                 </template>
                                 <template #content>
+                                    <DropdownLink :href="route('stats')">Reading Stats</DropdownLink>
                                     <DropdownLink :href="route('billing')">Billing</DropdownLink>
                                     <DropdownLink :href="route('profile.edit')">Profile</DropdownLink>
                                     <DropdownLink :href="route('how-to-use')">How to Use</DropdownLink>
@@ -169,6 +170,7 @@ const tierLabel = computed(() => {
                         </span>
                     </div>
                     <div class="mt-3 space-y-1">
+                        <ResponsiveNavLink :href="route('stats')">Reading Stats</ResponsiveNavLink>
                         <ResponsiveNavLink :href="route('profile.edit')">Profile</ResponsiveNavLink>
                         <ResponsiveNavLink :href="route('logout')" method="post" as="button">
                             Log Out

@@ -7,6 +7,12 @@ Here’s what’s new since your last digest.
 Here are today’s top headlines on your topics.
 @endif
 
+@if (! empty($briefing))
+## Your Daily Briefing
+
+{{ $briefing }}
+@endif
+
 @foreach ($topics as $topic)
 ## {{ $topic['name'] }}
 

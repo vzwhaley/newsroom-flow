@@ -4,11 +4,13 @@ namespace App\Console\Commands;
 
 use App\Models\Article;
 use App\Models\User;
+use App\Services\Articles\DailyBriefing;
 use App\Services\Push\PushMessage;
 use App\Services\Push\PushNotifier;
 use App\Services\RefreshWindow;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 /**
  * Sends the daily "your newsroom is ready" push to opted-in users with at
@@ -28,7 +30,7 @@ class SendPushNotifications extends Command
 
     protected $description = 'Send the daily push notification to opted-in users.';
 
-    public function handle(PushNotifier $notifier): int
+    public function handle(PushNotifier $notifier, DailyBriefing $briefing): int
     {
         $users = $this->recipients();
 
@@ -41,7 +43,7 @@ class SendPushNotifications extends Command
         $notified = 0;
 
         foreach ($users as $user) {
-            $message = $this->buildMessage($user);
+            $message = $this->buildMessage($user, $briefing);
 
             if (! $message) {
                 $this->line("  • {$user->email}: nothing new — skipped");
@@ -64,7 +66,7 @@ class SendPushNotifications extends Command
         return self::SUCCESS;
     }
 
-    private function buildMessage(User $user): ?PushMessage
+    private function buildMessage(User $user, DailyBriefing $briefing): ?PushMessage
     {
         $since = $user->push_sent_at;
 
@@ -78,8 +80,8 @@ class SendPushNotifications extends Command
             return null;
         }
 
-        // Pro: feature the first new story that matches a watch keyword.
         if ($user->isPro()) {
+            // Feature the first new story that matches a watch keyword.
             foreach ($newArticles as $article) {
                 if (! empty($user->watchMatches($article->headline, $article->description))) {
                     return new PushMessage(
@@ -88,6 +90,16 @@ class SendPushNotifications extends Command
                         data: ['type' => 'watchlist', 'url' => (string) $article->url],
                     );
                 }
+            }
+
+            // Otherwise the morning push IS the daily briefing (cached per day).
+            $result = $briefing->for($user);
+            if ($result && filled($result['briefing'])) {
+                return new PushMessage(
+                    title: 'Your daily briefing',
+                    body: Str::limit($result['briefing'], 170),
+                    data: ['type' => 'briefing'],
+                );
             }
         }
 

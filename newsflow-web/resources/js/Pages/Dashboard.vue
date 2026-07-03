@@ -157,14 +157,15 @@ onMounted(async () => {
                     <p class="text-sm text-gray-500">{{ limitLabel }}</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span
+                    <Link
                         v-if="reading.streak > 0"
-                        class="inline-flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700 ring-1 ring-inset ring-orange-200"
+                        :href="route('stats')"
+                        class="inline-flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700 ring-1 ring-inset ring-orange-200 hover:bg-orange-100"
                         :title="`${reading.total_reads} articles read all-time${reading.read_today ? '' : ' — read one today to keep your streak!'}`"
                     >
                         <span aria-hidden="true">🔥</span>
                         {{ reading.streak }}-day streak
-                    </span>
+                    </Link>
                     <span class="text-sm text-gray-400">
                         {{ new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) }}
                     </span>

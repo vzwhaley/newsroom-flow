@@ -12,6 +12,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SavedArticleController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ShareController;
+use App\Http\Controllers\StatsController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\WorldNewsController;
 use Illuminate\Support\Facades\Route;
@@ -66,6 +67,11 @@ Route::get('/s/{code}', [ShareController::class, 'show'])
     ->where('code', '[a-z0-9]{6,12}')
     ->name('share.show');
 
+// Public streak brag cards (same server-rendered OG treatment).
+Route::get('/streak/{code}', [StatsController::class, 'card'])
+    ->where('code', '[a-z0-9]{6,12}')
+    ->name('streak.show');
+
 // One-click digest unsubscribe from the daily email (signed URL — no login).
 // GET serves the human clicking the footer link; POST serves RFC 8058
 // List-Unsubscribe-Post requests sent automatically by mailbox providers.
@@ -101,6 +107,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // AI daily briefing (Pro; one LLM call per user per day, throttled anyway)
     Route::get('/briefing', [BriefingController::class, 'show'])->middleware('throttle:12,1')->name('briefing');
+
+    // Reading stats + streak brag card (all tiers)
+    Route::get('/stats', [StatsController::class, 'show'])->name('stats');
+    Route::post('/stats/share', [StatsController::class, 'share'])->middleware('throttle:12,1')->name('stats.share');
 
     // Search across feeds + saved (Pro)
     Route::get('/search', [SearchController::class, 'index'])->name('search');

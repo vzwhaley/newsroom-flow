@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Mail\DailyDigest;
 use App\Models\User;
+use App\Services\Articles\DailyBriefing;
 use App\Services\RefreshWindow;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -26,7 +27,7 @@ class SendDigests extends Command
 
     protected $description = 'Email the daily digest to opted-in users.';
 
-    public function handle(): int
+    public function handle(DailyBriefing $briefingService): int
     {
         $perTopic = max(1, (int) $this->option('articles'));
 
@@ -66,8 +67,12 @@ class SendDigests extends Command
                 continue;
             }
 
+            // Pro digests open with the daily briefing (cached — at most one
+            // LLM call per user per day, shared with the push and dashboard).
+            $briefing = $user->isPro() ? ($briefingService->for($user)['briefing'] ?? null) : null;
+
             try {
-                Mail::to($user->email)->send(new DailyDigest($user, $topics, $user->digest_new_only));
+                Mail::to($user->email)->send(new DailyDigest($user, $topics, $user->digest_new_only, $briefing));
                 $user->forceFill(['digest_sent_at' => Carbon::now()])->save();
                 $sent++;
                 $this->line("  • sent to {$user->email}");

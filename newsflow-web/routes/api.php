@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\PreferencesController;
 use App\Http\Controllers\Api\SavedController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\ShareController;
+use App\Http\Controllers\Api\StatsController;
 use App\Http\Controllers\Api\TopicController;
 use Illuminate\Support\Facades\Route;
 
@@ -56,6 +57,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // AI daily briefing (Pro; cached per user per local day)
     Route::get('/briefing', [BriefingController::class, 'show'])->middleware('throttle:12,1');
+
+    // Reading stats + streak brag card (all tiers)
+    Route::get('/stats', [StatsController::class, 'show']);
+    Route::post('/stats/share', [StatsController::class, 'share'])->middleware('throttle:12,1');
 
     // Saved
     Route::get('/saved', [SavedController::class, 'index']);

@@ -22,6 +22,7 @@ class DailyDigest extends Mailable
         public User $user,
         public array $topics,
         public bool $newOnly = false,
+        public ?string $briefing = null,
     ) {
     }
 
@@ -52,6 +53,7 @@ class DailyDigest extends Mailable
                 'user'           => $this->user,
                 'topics'         => $this->topics,
                 'newOnly'        => $this->newOnly,
+                'briefing'       => $this->briefing,
                 'url'            => route('dashboard'),
                 'unsubscribeUrl' => $this->unsubscribeUrl(),
             ],

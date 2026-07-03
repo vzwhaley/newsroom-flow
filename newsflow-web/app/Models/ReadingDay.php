@@ -83,4 +83,49 @@ class ReadingDay extends Model
             'total_reads' => (int) static::where('user_id', $user->id)->sum('reads'),
         ];
     }
+
+    /**
+     * Everything the /stats page needs: current stats + longest-ever streak,
+     * days active, and a day→reads heatmap covering the last $weeks weeks.
+     *
+     * @return array{streak:int, read_today:bool, total_reads:int,
+     *               longest_streak:int, days_active:int,
+     *               heatmap:array<string,int>, from:string, to:string}
+     */
+    public static function fullStatsFor(User $user, int $weeks = 26): array
+    {
+        $stats = static::statsFor($user);
+
+        $tz = $user->timezone ?: config('app.timezone');
+        $to = Carbon::now($tz)->startOfDay();
+        $from = $to->copy()->subWeeks($weeks)->startOfWeek();
+
+        $all = static::query()
+            ->where('user_id', $user->id)
+            ->orderBy('date')
+            ->get(['date', 'reads']);
+
+        // Longest streak ever: walk the full sorted day list.
+        $longest = 0;
+        $run = 0;
+        $prev = null;
+        foreach ($all as $row) {
+            $run = ($prev !== null && $row->date->copy()->subDay()->isSameDay($prev)) ? $run + 1 : 1;
+            $longest = max($longest, $run);
+            $prev = $row->date;
+        }
+
+        $heatmap = $all
+            ->filter(fn ($row) => $row->date->gte($from))
+            ->mapWithKeys(fn ($row) => [$row->date->toDateString() => (int) $row->reads])
+            ->all();
+
+        return $stats + [
+            'longest_streak' => $longest,
+            'days_active'    => $all->count(),
+            'heatmap'        => $heatmap,
+            'from'           => $from->toDateString(),
+            'to'             => $to->toDateString(),
+        ];
+    }
 }
