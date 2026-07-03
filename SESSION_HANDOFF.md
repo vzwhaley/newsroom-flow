@@ -1,8 +1,8 @@
 # NewsFlow™ — Session Handoff
 
-**Last updated:** 2026-07-02
+**Last updated:** 2026-07-03
 **Repo:** `vzwhaley/news-flow` (GitHub) · local: `C:\Users\vzwhaley\Herd\MOON_WHALE_MEDIA\NewsFlow`
-**Branch:** `main` (in sync with `origin/main` at commit `ef06133`) — **working tree CLEAN, nothing uncommitted**
+**Branch:** `main` (in sync with `origin/main` at commit `8ed6f15`) — **working tree CLEAN, nothing uncommitted**
 
 > Paste this whole file as your first message in a new Claude Code session,
 > or just say "read SESSION_HANDOFF.md". The memory notes auto-load already;
@@ -38,12 +38,16 @@ is env-gated: the app runs fully on placeholder data today.
 
 **v1 is feature-complete on all three platforms, with full mobile↔web Pro
 parity, push-notification plumbing, ads plumbing, SEO, and a completed
-3-platform audit/fix round (2026-07-02).** Web suite: **154 passing**.
+3-platform audit/fix round (2026-07-02).** Web suite: **174 passing**.
 
 ### Recent work (this session, newest first)
 
 | Commit | What landed |
 |---|---|
+| `8ed6f15` | **iOS: briefing card, streak chip, share sheet, watchlist-push toggle** (parity pass; no new files, no pbxproj change; build-unverified). |
+| `e6b2385` | **Android: same four features** (compileDebugKotlin green). |
+| `5d89804` | **Web/API: three new features** — ① AI daily briefing (Pro): `DailyBriefing` service, cached per user/day on `users.briefing(_for)`, `GET /briefing` + `GET /api/briefing`, deterministic non-AI fallback when no `ANTHROPIC_API_KEY` (`ai=false` → "Preview" tag). ② Watchlist priority push (Pro): `WatchlistPusher` fires at refresh time for newly-inserted watch-keyword matches (cap 3/refresh, never repushes), `users.watchlist_push_enabled` toggle everywhere. ③ Streaks + share cards (Free): `reading_days` table + `ReadingDay::bump/statsFor` (streak/read_today/total_reads in `/api/me.user.reading` + dashboard props + 🔥 chip), `shared_articles` + public `/s/{code}` OG share page (noindex, click counter) + share buttons on all clients. 20 new tests. |
+| `425c1bf` | **Web: accessibility (WCAG 2.1 AA) + SEO hardening sweep** — skip links, aria-labels on all icon buttons, keyboard fixes, focus rings, noindex on private pages, full JSON-LD offers, sitemap lastmod. |
 | `ef06133` | **iOS: adaptive dark-mode palette** (dark mode was ink-on-black illegible — Brand tokens now dynamic light/dark mirroring Android), verify-email banner, reorder rollback. |
 | `790bbf2` | Android: verify-email banner + reorder rollback. |
 | `59275fa` | Web: `POST /api/auth/resend-verification` (throttled) backing the apps' verify-email banners. |
@@ -102,7 +106,7 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
 ## 5. How to work in this repo (build/test/git rules)
 
 - **PHP/Composer/Herd only work via the PowerShell tool** — WSL bash can't see them.
-- **Web:** `cd newsflow-web; php artisan test` (154 green). After editing
+- **Web:** `cd newsflow-web; php artisan test` (174 green). After editing
   `resources/js|css` run `npm run build`. PHP-only edits need no build.
 - **`php artisan tinker` hangs with multiline `--execute`** — use a seeder or a
   one-liner instead.
@@ -145,6 +149,10 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
 - **Feed ordering:** topic feeds ordered by region — American, European, Asian;
   World News demo shows one article per publisher.
 - **Archive** records articles for Pro users only (storage trade-off, deliberate).
+- **Feature tiers (added 2026-07-03):** AI daily briefing + priority watchlist
+  push are **Pro**; reading streaks + branded share cards (`/s/{code}`) are
+  **Free** (shares are marketing). Briefing costs ≤1 LLM call per user per day
+  (cached on the user row); non-AI fallback is labeled "Preview".
 - **Brand:** "NewsFlow™" with ™ on the web; "by moon whale media, llc" lowercase
   signature is deliberate.
 
