@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-07-03
 **Repo:** `vzwhaley/news-flow` (GitHub) · local: `C:\Users\vzwhaley\Herd\MOON_WHALE_MEDIA\NewsFlow`
-**Branch:** `main` (in sync with `origin/main` at commit `8ed6f15`) — **working tree CLEAN, nothing uncommitted**
+**Branch:** `main` (in sync with `origin/main` at commit `7a3cab6`) — **working tree CLEAN, nothing uncommitted**
 
 > Paste this whole file as your first message in a new Claude Code session,
 > or just say "read SESSION_HANDOFF.md". The memory notes auto-load already;
@@ -38,12 +38,13 @@ is env-gated: the app runs fully on placeholder data today.
 
 **v1 is feature-complete on all three platforms, with full mobile↔web Pro
 parity, push-notification plumbing, ads plumbing, SEO, and a completed
-3-platform audit/fix round (2026-07-02).** Web suite: **174 passing**.
+3-platform audit/fix round (2026-07-02).** Web suite: **186 passing**.
 
 ### Recent work (this session, newest first)
 
 | Commit | What landed |
 |---|---|
+| `7a3cab6` | **Web: briefing rides push + digest email (Pro)** — morning push body IS the briefing (watchlist hit still wins), digest email opens with it, one shared LLM call/user/day. **Reading stats + streak brag cards (Free)** — `/stats` heatmap page (`ReadingDay::fullStatsFor`), `shared_streaks` + public `/streak/{code}` OG card, `GET /api/stats` ready for the apps (**mobile stats screens are a follow-up**). |
 | `8ed6f15` | **iOS: briefing card, streak chip, share sheet, watchlist-push toggle** (parity pass; no new files, no pbxproj change; build-unverified). |
 | `e6b2385` | **Android: same four features** (compileDebugKotlin green). |
 | `5d89804` | **Web/API: three new features** — ① AI daily briefing (Pro): `DailyBriefing` service, cached per user/day on `users.briefing(_for)`, `GET /briefing` + `GET /api/briefing`, deterministic non-AI fallback when no `ANTHROPIC_API_KEY` (`ai=false` → "Preview" tag). ② Watchlist priority push (Pro): `WatchlistPusher` fires at refresh time for newly-inserted watch-keyword matches (cap 3/refresh, never repushes), `users.watchlist_push_enabled` toggle everywhere. ③ Streaks + share cards (Free): `reading_days` table + `ReadingDay::bump/statsFor` (streak/read_today/total_reads in `/api/me.user.reading` + dashboard props + 🔥 chip), `shared_articles` + public `/s/{code}` OG share page (noindex, click counter) + share buttons on all clients. 20 new tests. |
