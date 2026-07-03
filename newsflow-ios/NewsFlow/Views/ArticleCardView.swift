@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// One article tile — the iOS port of the Android `ArticleCard` composable.
 /// Crisp white surface with a subtle border/shadow, a gradient "Read more"
@@ -19,6 +20,8 @@ struct ArticleCardView: View {
     @State private var tldr: String?
     @State private var tldrLoading = false
     @State private var tldrShown = false
+    @State private var sharing = false
+    @State private var shareItem: ShareItem?
 
     private var api: NewsFlowAPI { ServiceLocator.shared.api }
 
@@ -44,6 +47,16 @@ struct ArticleCardView: View {
                     .clipShape(Capsule())
                 }
                 Spacer(minLength: 0)
+                if let articleId {
+                    Button(action: { share(articleId) }) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 15))
+                            .foregroundColor(Brand.gray500)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(sharing)
+                    .accessibilityLabel("Share article")
+                }
                 if let onToggleRead {
                     Button(action: onToggleRead) {
                         Image(systemName: isRead ? "checkmark.circle.fill" : "circle")
@@ -141,6 +154,21 @@ struct ArticleCardView: View {
                 .stroke(Brand.gray100, lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
+        .sheet(item: $shareItem) { item in
+            ShareSheet(items: [item.url])
+        }
+    }
+
+    /// Mint the branded share link, then hand it to the system share sheet.
+    private func share(_ id: Int) {
+        guard !sharing else { return }
+        Task {
+            sharing = true
+            defer { sharing = false }
+            guard let res = try? await api.shareArticle(id),
+                  let url = URL(string: res.url) else { return }
+            shareItem = ShareItem(url: url)
+        }
     }
 
     private func toggleTldr(_ id: Int) {
@@ -156,4 +184,21 @@ struct ArticleCardView: View {
             tldrShown = true
         }
     }
+}
+
+/// Identifiable wrapper so a freshly-minted share URL can drive `.sheet(item:)`.
+struct ShareItem: Identifiable {
+    let id = UUID()
+    let url: URL
+}
+
+/// UIKit share sheet bridge (`UIActivityViewController`).
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
 }

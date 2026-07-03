@@ -152,6 +152,16 @@ final class NewsFlowAPI {
         try await send("api/articles/\(id)/summary", method: "POST")
     }
 
+    func shareArticle(_ id: Int) async throws -> ShareResponse {
+        try await send("api/articles/\(id)/share", method: "POST")
+    }
+
+    // MARK: - Daily briefing (Pro)
+
+    func briefing() async throws -> BriefingResponse {
+        try await send("api/briefing", method: "GET")
+    }
+
     // MARK: - Saved
 
     func saved() async throws -> SavedListResponse {

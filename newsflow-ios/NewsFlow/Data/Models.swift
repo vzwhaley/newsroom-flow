@@ -35,6 +35,7 @@ struct PreferencesRequest: Encodable {
     let digestEnabled: Bool
     let digestNewOnly: Bool
     let pushEnabled: Bool
+    var watchlistPushEnabled: Bool = true
     let watchKeywords: [String]
     let blockedSources: [String]
 }
@@ -115,8 +116,10 @@ struct User: Decodable, Identifiable {
     let digestEnabled: Bool
     let digestNewOnly: Bool
     let pushEnabled: Bool
+    let watchlistPushEnabled: Bool
     let watchKeywords: [String]
     let blockedSources: [String]
+    let reading: ReadingStats
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -134,8 +137,29 @@ struct User: Decodable, Identifiable {
         digestEnabled = try c.decodeIfPresent(Bool.self, forKey: .digestEnabled) ?? false
         digestNewOnly = try c.decodeIfPresent(Bool.self, forKey: .digestNewOnly) ?? false
         pushEnabled = try c.decodeIfPresent(Bool.self, forKey: .pushEnabled) ?? false
+        watchlistPushEnabled = try c.decodeIfPresent(Bool.self, forKey: .watchlistPushEnabled) ?? true
         watchKeywords = try c.decodeIfPresent([String].self, forKey: .watchKeywords) ?? []
         blockedSources = try c.decodeIfPresent([String].self, forKey: .blockedSources) ?? []
+        reading = try c.decodeIfPresent(ReadingStats.self, forKey: .reading) ?? ReadingStats()
+    }
+}
+
+struct ReadingStats: Decodable {
+    let streak: Int
+    let readToday: Bool
+    let totalReads: Int
+
+    init(streak: Int = 0, readToday: Bool = false, totalReads: Int = 0) {
+        self.streak = streak
+        self.readToday = readToday
+        self.totalReads = totalReads
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        streak = try c.decodeIfPresent(Int.self, forKey: .streak) ?? 0
+        readToday = try c.decodeIfPresent(Bool.self, forKey: .readToday) ?? false
+        totalReads = try c.decodeIfPresent(Int.self, forKey: .totalReads) ?? 0
     }
 }
 
@@ -234,6 +258,26 @@ struct TldrResponse: Decodable {
 
 struct MessageResponse: Decodable {
     let message: String?
+}
+
+struct ShareResponse: Decodable {
+    let code: String
+    let url: String
+}
+
+struct BriefingResponse: Decodable {
+    let briefing: String
+    let ai: Bool
+    let date: String
+    let cached: Bool
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        briefing = try c.decodeIfPresent(String.self, forKey: .briefing) ?? ""
+        ai = try c.decodeIfPresent(Bool.self, forKey: .ai) ?? false
+        date = try c.decodeIfPresent(String.self, forKey: .date) ?? ""
+        cached = try c.decodeIfPresent(Bool.self, forKey: .cached) ?? false
+    }
 }
 
 struct SavedItem: Decodable, Identifiable {

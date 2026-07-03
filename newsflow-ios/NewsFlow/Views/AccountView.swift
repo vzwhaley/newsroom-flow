@@ -7,6 +7,7 @@ final class AccountViewModel: ObservableObject {
     @Published var digestEnabled = false
     @Published var digestNewOnly = false
     @Published var pushEnabled = false
+    @Published var watchlistPushEnabled = true
     @Published var watchKeywords: [String] = []
     @Published var blockedSources: [String] = []
     @Published var saving = false
@@ -24,6 +25,7 @@ final class AccountViewModel: ObservableObject {
                 digestEnabled = u.digestEnabled
                 digestNewOnly = u.digestNewOnly
                 pushEnabled = u.pushEnabled
+                watchlistPushEnabled = u.watchlistPushEnabled
                 watchKeywords = u.watchKeywords
                 blockedSources = u.blockedSources
             }
@@ -50,6 +52,7 @@ final class AccountViewModel: ObservableObject {
                         digestEnabled: digestEnabled,
                         digestNewOnly: digestNewOnly,
                         pushEnabled: pushEnabled,
+                        watchlistPushEnabled: watchlistPushEnabled,
                         watchKeywords: watchKeywords,
                         blockedSources: blockedSources
                     )
@@ -190,6 +193,19 @@ struct AccountView: View {
                     .font(.system(size: 14))
                     .foregroundColor(Brand.ink)
             }
+
+            if vm.user?.isPro == true && vm.pushEnabled {
+                Toggle(isOn: $vm.watchlistPushEnabled) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Priority watchlist push")
+                            .font(.system(size: 14))
+                            .foregroundColor(Brand.ink)
+                        Text("Push the moment a fresh story matches a watch keyword.")
+                            .font(.system(size: 12))
+                            .foregroundColor(Brand.gray500)
+                    }
+                }
+            }
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -201,6 +217,7 @@ struct AccountView: View {
             vm.saved = false
             if enabled { PushManager.shared.requestAuthorizationAndRegister() }
         }
+        .onChange(of: vm.watchlistPushEnabled) { _ in vm.saved = false }
     }
 
     private var powerFeaturesCard: some View {

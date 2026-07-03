@@ -19,6 +19,8 @@ final class FeedViewModel: ObservableObject {
     @Published var watchlist: [Article] = []
     @Published var readIds: Set<Int> = []
     @Published var savedFps: Set<String> = []
+    @Published var reading = ReadingStats()
+    @Published var briefing: BriefingResponse?
     @Published var busy = false
     @Published var error: String?
 
@@ -68,6 +70,15 @@ final class FeedViewModel: ObservableObject {
         watchlist = feed.watchlist
         readIds = Set(read)
         savedFps = Set(feed.savedFingerprints)
+        reading = me?.user.reading ?? ReadingStats()
+
+        // Pro: today's AI briefing (server caches it per user per day).
+        if isPro && !feed.topics.isEmpty {
+            briefing = try? await api.briefing()
+        } else {
+            briefing = nil
+        }
+
         loading = false
     }
 
@@ -223,6 +234,14 @@ struct FeedView: View {
                             verifyEmailBanner
                         }
 
+                        if vm.reading.streak > 0 {
+                            streakChip
+                        }
+
+                        if let briefing = vm.briefing {
+                            briefingCard(briefing)
+                        }
+
                         addTopicRow
 
                         if !vm.watchlist.isEmpty {
@@ -279,6 +298,42 @@ struct FeedView: View {
         } message: {
             Text("Add a topic nested under this category.")
         }
+    }
+
+    private var streakChip: some View {
+        Text("🔥 \(vm.reading.streak)-day reading streak" +
+             (vm.reading.readToday ? "" : " — read a story to keep it!"))
+            .font(.system(size: 12, weight: .semibold))
+            .foregroundColor(Color(red: 0.76, green: 0.25, blue: 0.05))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 5)
+            .background(Color(red: 1.0, green: 0.97, blue: 0.93))
+            .clipShape(Capsule())
+    }
+
+    private func briefingCard(_ b: BriefingResponse) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 6) {
+                Image(systemName: "bolt.fill")
+                    .font(.system(size: 13))
+                    .foregroundColor(Brand.blue)
+                Text("Your Daily Briefing")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(Brand.ink)
+                if !b.ai {
+                    Text("PREVIEW")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundColor(Brand.gray500)
+                }
+            }
+            Text(b.briefing)
+                .font(.system(size: 13))
+                .foregroundColor(Brand.ink)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Brand.blueLight)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private var verifyEmailBanner: some View {
