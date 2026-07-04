@@ -139,4 +139,39 @@ return [
         // back to the city/state the user typed.
         'zip_geocoder' => env('NEWSFLOW_ZIP_GEOCODER', 'https://api.zippopotam.us'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI local-source discovery
+    |--------------------------------------------------------------------------
+    |
+    | A self-learning extension of config/localnews.php. When a user creates an
+    | area whose location isn't in the curated directory, a web-search-grounded
+    | Claude call discovers its real local outlets and caches them (shared
+    | across all users). Degrades gracefully: with no ANTHROPIC_API_KEY, or
+    | when disabled, areas simply use the curated directory + statewide/country
+    | fallback exactly as before.
+    |
+    */
+
+    'discovery' => [
+        'enabled' => (bool) env('NEWSFLOW_DISCOVERY', true) && (bool) env('ANTHROPIC_API_KEY'),
+
+        // Web-search + reasoning benefit from a stronger model than the Haiku
+        // used for one-line summaries. One call per location, cached forever,
+        // so cost is negligible.
+        'model'         => env('NEWSFLOW_DISCOVERY_MODEL', 'claude-sonnet-5'),
+        'max_searches'  => (int) env('NEWSFLOW_DISCOVERY_MAX_SEARCHES', 5),
+        'max_domains'   => (int) env('NEWSFLOW_DISCOVERY_MAX_DOMAINS', 6),
+
+        // Learned records re-verify after this many days (outlets rebrand/merge).
+        'reverify_days' => (int) env('NEWSFLOW_DISCOVERY_REVERIFY_DAYS', 120),
+
+        // Best-effort HTTP liveness check that also canonicalizes redirects
+        // (auto-catches rebrands like ktuu.com → alaskasnewssource.com).
+        'validate_liveness' => (bool) env('NEWSFLOW_DISCOVERY_VALIDATE', true),
+
+        // Anthropic server-side web search tool identifier.
+        'web_search_tool' => env('NEWSFLOW_DISCOVERY_TOOL', 'web_search_20250305'),
+    ],
 ];

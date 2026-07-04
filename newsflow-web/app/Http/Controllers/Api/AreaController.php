@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AreaRequest;
+use App\Jobs\DiscoverAreaLocalSources;
 use App\Models\Topic;
 use App\Services\Articles\LocationQuery;
 use App\Services\Articles\TopicRefresher;
@@ -47,6 +48,8 @@ class AreaController extends Controller
             report($e);
         }
 
+        DiscoverAreaLocalSources::dispatch($area->id);
+
         return response()->json(['area' => $this->area($area->fresh(), $user)], 201);
     }
 
@@ -76,6 +79,8 @@ class AreaController extends Controller
         } catch (\Throwable $e) {
             report($e);
         }
+
+        DiscoverAreaLocalSources::dispatch($area->id);
 
         return response()->json(['area' => $this->area($area->fresh(), $user)]);
     }

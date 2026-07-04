@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AreaRequest;
+use App\Jobs\DiscoverAreaLocalSources;
 use App\Models\Topic;
 use App\Services\Articles\LocationQuery;
 use App\Services\Articles\TopicRefresher;
@@ -41,6 +42,10 @@ class AreaController extends Controller
 
         $this->safeRefresh($refresher, $area);
 
+        // Learn this location's real local outlets in the background (no-op if
+        // already curated/discovered or discovery is disabled).
+        DiscoverAreaLocalSources::dispatch($area->id);
+
         return back()->with('success', "Now following local news for {$resolved['label']}.");
     }
 
@@ -67,6 +72,8 @@ class AreaController extends Controller
         // Location changed — clear the old feed and repopulate for the new place.
         $area->articles()->delete();
         $this->safeRefresh($refresher, $area->fresh());
+
+        DiscoverAreaLocalSources::dispatch($area->id);
 
         return back()->with('success', "Updated your local area to {$resolved['label']}.");
     }
