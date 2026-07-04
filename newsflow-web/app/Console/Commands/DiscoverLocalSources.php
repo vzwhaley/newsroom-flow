@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\DiscoverAreaLocalSources;
 use App\Models\DiscoveredLocalSource;
 use App\Models\Topic;
 use App\Services\Articles\LocalSourceDiscovery;
@@ -25,7 +26,9 @@ class DiscoverLocalSources extends Command
         {--state= : Ad-hoc US state abbreviation}
         {--country=US : Ad-hoc country code}
         {--reverify : Re-verify learned records older than the TTL}
-        {--force : Discover even for locations already curated/cached}';
+        {--force : Discover even for locations already curated/cached}
+        {--queue : Dispatch background jobs instead of discovering inline (for the scheduled sweep)}
+        {--limit=0 : Max areas to process this run (0 = no cap)}';
 
     protected $description = 'Discover and cache local news outlets for area locations (AI + web search).';
 
@@ -52,8 +55,24 @@ class DiscoverLocalSources extends Command
 
         $areas = $this->targetAreas($sources);
 
+        if (($limit = (int) $this->option('limit')) > 0) {
+            $areas = $areas->take($limit);
+        }
+
         if ($areas->isEmpty()) {
             $this->info('No areas need discovery right now.');
+
+            return self::SUCCESS;
+        }
+
+        // Scheduled sweep path: hand each area to the queue (parallel, retryable,
+        // non-blocking). The job re-checks skip conditions, so this is safe even
+        // if an area was covered since it was selected.
+        if ($this->option('queue')) {
+            foreach ($areas as $area) {
+                DiscoverAreaLocalSources::dispatch($area->id);
+            }
+            $this->info("Queued discovery for {$areas->count()} area(s).");
 
             return self::SUCCESS;
         }

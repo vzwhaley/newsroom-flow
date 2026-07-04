@@ -171,4 +171,35 @@ class LocalSourceDiscoveryTest extends TestCase
 
         \Illuminate\Support\Facades\Bus::assertDispatched(DiscoverAreaLocalSources::class);
     }
+
+    public function test_scheduled_sweep_queues_only_areas_that_need_discovery(): void
+    {
+        \Illuminate\Support\Facades\Bus::fake();
+
+        $erwin = $this->area('Erwin', 'TN');           // uncovered, no record → queue
+        $this->area('Cleveland', 'OH');                // curated → skip
+        $norton = $this->area('Norton', 'TN');         // uncovered but freshly discovered → skip
+        DiscoveredLocalSource::remember($norton, ['some-local.com']);
+
+        $this->artisan('newsflow:discover-sources --reverify --queue')->assertSuccessful();
+
+        \Illuminate\Support\Facades\Bus::assertDispatched(
+            DiscoverAreaLocalSources::class,
+            fn ($job) => $job->areaId === $erwin->id,
+        );
+        \Illuminate\Support\Facades\Bus::assertDispatchedTimes(DiscoverAreaLocalSources::class, 1);
+    }
+
+    public function test_scheduled_sweep_respects_the_limit(): void
+    {
+        \Illuminate\Support\Facades\Bus::fake();
+
+        foreach (['Erwin', 'Unicoi', 'Elizabethton'] as $town) {
+            $this->area($town, 'TN'); // three uncovered TN towns
+        }
+
+        $this->artisan('newsflow:discover-sources --queue --limit=2')->assertSuccessful();
+
+        \Illuminate\Support\Facades\Bus::assertDispatchedTimes(DiscoverAreaLocalSources::class, 2);
+    }
 }

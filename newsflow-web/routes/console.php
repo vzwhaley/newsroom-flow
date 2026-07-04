@@ -47,3 +47,24 @@ Schedule::command('newsflow:push --due')
     ->withoutOverlapping()
     ->runInBackground()
     ->description('Hourly "Your NewsFlow is ready" push for due, opted-in users.');
+
+/*
+|--------------------------------------------------------------------------
+| Local-source discovery — daily safety-net sweep
+|--------------------------------------------------------------------------
+|
+| The create-time job handles new areas, but this catches the stragglers:
+| areas created while discovery was disabled, ones whose discovery failed, and
+| learned records that have aged past their re-verify TTL (outlets rebrand). It
+| only targets areas that actually need it (uncovered / stale), dispatches them
+| to the queue, and caps the burst so a backlog drains gradually. A near-no-op
+| on most days, and a clean no-op when discovery is disabled.
+|
+| Requires a queue worker in production to process the dispatched jobs.
+|
+*/
+Schedule::command('newsflow:discover-sources --reverify --queue --limit=50')
+    ->dailyAt('03:20')
+    ->withoutOverlapping()
+    ->runInBackground()
+    ->description('Daily safety-net sweep to discover/re-verify local sources for areas that need it.');
