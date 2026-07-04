@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-07-03
 **Repo:** `vzwhaley/news-flow` (GitHub) · local: `C:\Users\vzwhaley\Herd\MOON_WHALE_MEDIA\NewsFlow`
-**Branch:** `main` (in sync with `origin/main` at commit `7a3cab6`) — **working tree CLEAN, nothing uncommitted**
+**Branch:** `main` (in sync with `origin/main` at commit `985d7d9`) — **working tree CLEAN, nothing uncommitted**
 
 > Paste this whole file as your first message in a new Claude Code session,
 > or just say "read SESSION_HANDOFF.md". The memory notes auto-load already;
@@ -38,12 +38,13 @@ is env-gated: the app runs fully on placeholder data today.
 
 **v1 is feature-complete on all three platforms, with full mobile↔web Pro
 parity, push-notification plumbing, ads plumbing, SEO, and a completed
-3-platform audit/fix round (2026-07-02).** Web suite: **186 passing**.
+3-platform audit/fix round (2026-07-02).** Web suite: **200 passing**.
 
 ### Recent work (this session, newest first)
 
 | Commit | What landed |
 |---|---|
+| `985d7d9` / `f18b6d1` / `53937f1` | **Local-area news — all 3 platforms.** New area-tailored feed, separate from topics. USA form = city/state/ZIP, international = city/country. **Free = 1 area, permanent after a 24h typo-grace window; Pro = unlimited add/edit/delete.** Reuses the topic pipeline (`kind='area'` on topics, outside the topic limit). Precision = geocoded queries (ZIP→city via Zippopotam.us) + country hints + curated local-outlet domain biasing (`config/localnews.php` + new `LocationAwareProvider`/`fetchLocal`). Endpoints `/areas` + `/api/areas`; areas in dashboard/feed/`/api/me`. 14 tests. iOS build-unverified. |
 | `7a3cab6` | **Web: briefing rides push + digest email (Pro)** — morning push body IS the briefing (watchlist hit still wins), digest email opens with it, one shared LLM call/user/day. **Reading stats + streak brag cards (Free)** — `/stats` heatmap page (`ReadingDay::fullStatsFor`), `shared_streaks` + public `/streak/{code}` OG card, `GET /api/stats` ready for the apps (**mobile stats screens are a follow-up**). |
 | `8ed6f15` | **iOS: briefing card, streak chip, share sheet, watchlist-push toggle** (parity pass; no new files, no pbxproj change; build-unverified). |
 | `e6b2385` | **Android: same four features** (compileDebugKotlin green). |
@@ -107,7 +108,7 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
 ## 5. How to work in this repo (build/test/git rules)
 
 - **PHP/Composer/Herd only work via the PowerShell tool** — WSL bash can't see them.
-- **Web:** `cd newsflow-web; php artisan test` (174 green). After editing
+- **Web:** `cd newsflow-web; php artisan test` (200 green). After editing
   `resources/js|css` run `npm run build`. PHP-only edits need no build.
 - **`php artisan tinker` hangs with multiline `--execute`** — use a seeder or a
   one-liner instead.
@@ -154,6 +155,14 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
   push are **Pro**; reading streaks + branded share cards (`/s/{code}`) are
   **Free** (shares are marketing). Briefing costs ≤1 LLM call per user per day
   (cached on the user row); non-AI fallback is labeled "Preview".
+- **Local-area news (added 2026-07-04):** separate from topics, both tiers.
+  Free = **1 area, locked after a 24h typo-grace window** (edit/delete only
+  within grace; `config('newsflow.areas.edit_grace_hours')`); Pro = unlimited.
+  An area is a `kind='area'` topic (outside the topic limit) — do NOT let it
+  count against topics(); `User::topics()` is scoped to `kind='topic'`, areas
+  via `User::areas()`. Precision ceiling is deliberate: metros excellent,
+  small ZIPs degrade to nearest city. Local-outlet directory in
+  `config/localnews.php` is a living asset — extend it to improve precision.
 - **Brand:** "NewsFlow™" with ™ on the web; "by moon whale media, llc" lowercase
   signature is deliberate.
 
