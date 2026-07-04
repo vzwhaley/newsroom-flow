@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-07-03
 **Repo:** `vzwhaley/news-flow` (GitHub) · local: `C:\Users\vzwhaley\Herd\MOON_WHALE_MEDIA\NewsFlow`
-**Branch:** `main` (in sync with `origin/main` at commit `985d7d9`) — **working tree CLEAN, nothing uncommitted**
+**Branch:** `main` (in sync with `origin/main` at commit `50fd71d`) — **working tree CLEAN, nothing uncommitted**
 
 > Paste this whole file as your first message in a new Claude Code session,
 > or just say "read SESSION_HANDOFF.md". The memory notes auto-load already;
@@ -38,12 +38,15 @@ is env-gated: the app runs fully on placeholder data today.
 
 **v1 is feature-complete on all three platforms, with full mobile↔web Pro
 parity, push-notification plumbing, ads plumbing, SEO, and a completed
-3-platform audit/fix round (2026-07-02).** Web suite: **200 passing**.
+3-platform audit/fix round (2026-07-02).** Web suite: **209 passing**.
 
 ### Recent work (this session, newest first)
 
 | Commit | What landed |
 |---|---|
+| `50fd71d` | **Self-learning AI local-source discovery** (web). When an area's location isn't in the curated `localnews.php`, a web-search-grounded Claude call (`LocalSourceDiscovery` + Anthropic `web_search` tool) finds its real local outlets, validates domains (liveness + redirect-canonicalization auto-catches rebrands), and caches them in `discovered_local_sources` **globally per location** (discovered once, reused by everyone). Resolution: curated metro → discovered cache → statewide → country. Queued `DiscoverAreaLocalSources` job on area create/update; `newsflow:discover-sources` backfill/reverify command. Fully env-gated on `NEWSFLOW_DISCOVERY`+`ANTHROPIC_API_KEY` (clean no-op without them). **Needs a queue worker in prod** for async discovery. |
+| `c039133` | **Northeast TN + Knoxville local outlets** — Greeneville Sun, Johnson City Press, Kingsport Times-News, Bristol Herald Courier, WJHL/WCYB/WETS, Knoxville (News Sentinel/WBIR/WATE/WVLT/WUOT), all web-verified; test locks in resolution. |
+| `e57980c` | **Broadened local-outlet directory** — ~95 metros, all 50 states, 20 countries; every domain web-verified (6 rebrand/defunct fixes). |
 | `985d7d9` / `f18b6d1` / `53937f1` | **Local-area news — all 3 platforms.** New area-tailored feed, separate from topics. USA form = city/state/ZIP, international = city/country. **Free = 1 area, permanent after a 24h typo-grace window; Pro = unlimited add/edit/delete.** Reuses the topic pipeline (`kind='area'` on topics, outside the topic limit). Precision = geocoded queries (ZIP→city via Zippopotam.us) + country hints + curated local-outlet domain biasing (`config/localnews.php` + new `LocationAwareProvider`/`fetchLocal`). Endpoints `/areas` + `/api/areas`; areas in dashboard/feed/`/api/me`. 14 tests. iOS build-unverified. |
 | `7a3cab6` | **Web: briefing rides push + digest email (Pro)** — morning push body IS the briefing (watchlist hit still wins), digest email opens with it, one shared LLM call/user/day. **Reading stats + streak brag cards (Free)** — `/stats` heatmap page (`ReadingDay::fullStatsFor`), `shared_streaks` + public `/streak/{code}` OG card, `GET /api/stats` ready for the apps (**mobile stats screens are a follow-up**). |
 | `8ed6f15` | **iOS: briefing card, streak chip, share sheet, watchlist-push toggle** (parity pass; no new files, no pbxproj change; build-unverified). |
@@ -108,7 +111,7 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
 ## 5. How to work in this repo (build/test/git rules)
 
 - **PHP/Composer/Herd only work via the PowerShell tool** — WSL bash can't see them.
-- **Web:** `cd newsflow-web; php artisan test` (200 green). After editing
+- **Web:** `cd newsflow-web; php artisan test` (209 green). After editing
   `resources/js|css` run `npm run build`. PHP-only edits need no build.
 - **`php artisan tinker` hangs with multiline `--execute`** — use a seeder or a
   one-liner instead.
