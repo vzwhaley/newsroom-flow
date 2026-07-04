@@ -50,6 +50,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.newsflow.android.data.AddTopicRequest
+import com.newsflow.android.data.Area
+import com.newsflow.android.data.AreaRequest
 import com.newsflow.android.data.Article
 import com.newsflow.android.data.BriefingResponse
 import com.newsflow.android.data.ReadingStats
@@ -75,11 +77,16 @@ data class FeedUiState(
     val savedFps: Set<String> = emptySet(),
     val reading: ReadingStats = ReadingStats(),
     val briefing: BriefingResponse? = null,
+    val areas: List<Area> = emptyList(),
+    val areaLimit: Int? = null,
     val busy: Boolean = false,
     val error: String? = null,
 ) {
     /** Free user sitting at their topic cap right now. */
     val atTopicLimit: Boolean get() = topicLimit != null && topicCount >= topicLimit
+
+    /** Can the user add another local area? (Free = 1, Pro = unlimited.) */
+    val canAddArea: Boolean get() = areaLimit == null || areas.size < areaLimit
 }
 
 data class FeedRow(val topic: Topic, val parentName: String?)
@@ -135,7 +142,30 @@ class FeedViewModel : ViewModel() {
             savedFps = body.savedFingerprints.toSet(),
             reading = user?.reading ?: ReadingStats(),
             briefing = briefing,
+            areas = body.areas,
+            areaLimit = user?.areaLimit,
         )
+    }
+
+    fun addArea(req: AreaRequest) = viewModelScope.launch {
+        _state.value = _state.value.copy(busy = true, error = null)
+        val res = runCatching { ServiceLocator.api.addArea(req) }.getOrNull()
+        _state.value = _state.value.copy(busy = false)
+        if (res != null && res.isSuccessful) load()
+        else _state.value = _state.value.copy(error = "Couldn't add that area.")
+    }
+
+    fun updateArea(id: Long, req: AreaRequest) = viewModelScope.launch {
+        _state.value = _state.value.copy(busy = true, error = null)
+        val res = runCatching { ServiceLocator.api.updateArea(id, req) }.getOrNull()
+        _state.value = _state.value.copy(busy = false)
+        if (res != null && res.isSuccessful) load()
+        else _state.value = _state.value.copy(error = "This area is locked — upgrade to Pro to change it.")
+    }
+
+    fun deleteArea(id: Long) = viewModelScope.launch {
+        runCatching { ServiceLocator.api.deleteArea(id) }
+        load()
     }
 
     fun resendVerification() = viewModelScope.launch {
@@ -252,6 +282,8 @@ fun FeedTab() {
     var newTopic by remember { mutableStateOf("") }
     var muteTarget by remember { mutableStateOf<Topic?>(null) }
     var subtopicParent by remember { mutableStateOf<Topic?>(null) }
+    var showAddArea by remember { mutableStateOf(false) }
+    var editArea by remember { mutableStateOf<Area?>(null) }
 
     fun open(article: Article) {
         vm.markRead(article)
@@ -423,6 +455,59 @@ fun FeedTab() {
             }
         }
 
+        // ---- Local News (area-tailored feeds) ----
+        if (state.areas.isNotEmpty() || state.canAddArea) {
+            item {
+                Spacer(Modifier.height(10.dp))
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Text("📍 Local News", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.weight(1f))
+                    if (state.canAddArea) {
+                        TextButton(onClick = { showAddArea = true }) { Text("Add area") }
+                    }
+                }
+                if (!state.isPro) {
+                    Text(
+                        if (state.areas.isEmpty()) "Free accounts include one local area — choose carefully! It's permanent after a short window to fix typos."
+                        else "Free includes one local area. Upgrade to Pro for more places and anytime edits.",
+                        fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                if (state.areas.isEmpty()) {
+                    Spacer(Modifier.height(6.dp))
+                    Text("Add your city to get news tailored to just your area.", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+
+            state.areas.forEach { area ->
+                item(key = "area" + area.id) {
+                    Spacer(Modifier.height(6.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                        Text(area.name, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.weight(1f))
+                        if (area.locked) {
+                            Text("Locked", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        } else {
+                            TextButton(onClick = { editArea = area }) { Text("Edit", fontSize = 12.sp) }
+                            TextButton(onClick = { vm.deleteArea(area.id) }) { Text("Remove", fontSize = 12.sp, color = MaterialTheme.colorScheme.error) }
+                        }
+                    }
+                }
+                if (area.articles.isEmpty()) {
+                    item(key = "areaEmpty" + area.id) {
+                        Text("Gathering local stories — check back after the next refresh.", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                } else {
+                    items(area.articles, key = { "aa" + it.id }) { a ->
+                        ArticleCard(
+                            headline = a.headline, source = a.source, description = a.description,
+                            topicLabel = area.name, isRead = a.id in state.readIds, isPro = state.isPro,
+                            isSaved = a.fingerprint in state.savedFps, articleId = a.id,
+                            onOpen = { open(a) }, onToggleSave = { vm.save(a) }, onToggleRead = { vm.toggleRead(a) },
+                        )
+                    }
+                }
+            }
+        }
+
         // Free-tier ad banner (Pro removes it).
         item { AdBanner(isPro = state.isPro) }
     }
@@ -440,6 +525,21 @@ fun FeedTab() {
             parent = parent,
             onDismiss = { subtopicParent = null },
             onAdd = { name -> vm.addTopic(name, parent.id); subtopicParent = null },
+        )
+    }
+
+    if (showAddArea) {
+        AreaDialog(
+            existing = null,
+            onDismiss = { showAddArea = false },
+            onSubmit = { req -> vm.addArea(req); showAddArea = false },
+        )
+    }
+    editArea?.let { area ->
+        AreaDialog(
+            existing = area,
+            onDismiss = { editArea = null },
+            onSubmit = { req -> vm.updateArea(area.id, req); editArea = null },
         )
     }
     }

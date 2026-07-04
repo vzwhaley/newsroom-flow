@@ -62,6 +62,15 @@ interface NewsFlowApi {
     @DELETE("api/topics/{id}")
     suspend fun deleteTopic(@Path("id") id: Long): Response<MessageResponse>
 
+    @POST("api/areas")
+    suspend fun addArea(@Body body: AreaRequest): Response<AreaResponse>
+
+    @PATCH("api/areas/{id}")
+    suspend fun updateArea(@Path("id") id: Long, @Body body: AreaRequest): Response<AreaResponse>
+
+    @DELETE("api/areas/{id}")
+    suspend fun deleteArea(@Path("id") id: Long): Response<MessageResponse>
+
     @POST("api/articles/{id}/read")
     suspend fun markRead(@Path("id") id: Long): Response<ReadResponse>
 

@@ -35,6 +35,8 @@ data class User(
     val tier: String? = null,
     @SerialName("topic_limit") val topicLimit: Int? = null,
     @SerialName("topic_count") val topicCount: Int = 0,
+    @SerialName("area_limit") val areaLimit: Int? = null,
+    @SerialName("area_count") val areaCount: Int = 0,
     @SerialName("refresh_hour") val refreshHour: Int = 6,
     val timezone: String = "UTC",
     @SerialName("digest_enabled") val digestEnabled: Boolean = false,
@@ -88,10 +90,35 @@ data class Topic(
 @Serializable
 data class FeedResponse(
     val topics: List<Topic> = emptyList(),
+    val areas: List<Area> = emptyList(),
     @SerialName("saved_fingerprints") val savedFingerprints: List<String> = emptyList(),
     val watchlist: List<Article> = emptyList(),
     @SerialName("watch_keywords") val watchKeywords: List<String> = emptyList(),
 )
+
+@Serializable
+data class Area(
+    val id: Long,
+    val name: String,
+    val locality: String? = null,
+    val region: String? = null,
+    @SerialName("postal_code") val postalCode: String? = null,
+    @SerialName("country_code") val countryCode: String? = null,
+    val locked: Boolean = false,
+    @SerialName("last_refreshed_at") val lastRefreshedAt: String? = null,
+    val articles: List<Article> = emptyList(),
+)
+
+@Serializable
+data class AreaRequest(
+    @SerialName("country_code") val countryCode: String,
+    val city: String,
+    val state: String? = null,
+    val zip: String? = null,
+)
+
+@Serializable
+data class AreaResponse(val area: Area)
 
 @Serializable
 data class AddTopicRequest(
