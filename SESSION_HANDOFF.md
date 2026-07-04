@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-07-03
 **Repo:** `vzwhaley/news-flow` (GitHub) · local: `C:\Users\vzwhaley\Herd\MOON_WHALE_MEDIA\NewsFlow`
-**Branch:** `main` (in sync with `origin/main` at commit `50fd71d`) — **working tree CLEAN, nothing uncommitted**
+**Branch:** `main` (in sync with `origin/main` at commit `f78a49e`) — **working tree CLEAN, nothing uncommitted**
 
 > Paste this whole file as your first message in a new Claude Code session,
 > or just say "read SESSION_HANDOFF.md". The memory notes auto-load already;
@@ -38,7 +38,7 @@ is env-gated: the app runs fully on placeholder data today.
 
 **v1 is feature-complete on all three platforms, with full mobile↔web Pro
 parity, push-notification plumbing, ads plumbing, SEO, and a completed
-3-platform audit/fix round (2026-07-02).** Web suite: **209 passing**.
+3-platform audit/fix round (2026-07-02).** Web suite: **211 passing**.
 
 ### Recent work (this session, newest first)
 
@@ -111,7 +111,7 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
 ## 5. How to work in this repo (build/test/git rules)
 
 - **PHP/Composer/Herd only work via the PowerShell tool** — WSL bash can't see them.
-- **Web:** `cd newsflow-web; php artisan test` (209 green). After editing
+- **Web:** `cd newsflow-web; php artisan test` (211 green). After editing
   `resources/js|css` run `npm run build`. PHP-only edits need no build.
 - **`php artisan tinker` hangs with multiline `--execute`** — use a seeder or a
   one-liner instead.
@@ -196,8 +196,11 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
   `php artisan serve --port=8011` instead (both work).
 - Verification emails DO send on app signup (`Registered` event) — Gmail SMTP
   creds are already configured and proven.
-- The scheduler runs `newsflow:refresh --due` hourly and `newsflow:push --due`
-  hourly at :07 — production needs a real cron entry for `schedule:run`.
+- The scheduler runs `newsflow:refresh --due` hourly, `newsflow:digest --due`
+  hourly at :05, `newsflow:push --due` hourly at :07, and
+  `newsflow:discover-sources --reverify --queue --limit=50` daily at 03:20 —
+  production needs a real cron entry for `schedule:run` **and a queue worker**
+  (`php artisan queue:work`) for the discovery jobs.
 
 ---
 
