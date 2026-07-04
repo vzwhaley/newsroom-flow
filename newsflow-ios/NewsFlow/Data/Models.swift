@@ -40,6 +40,13 @@ struct PreferencesRequest: Encodable {
     let blockedSources: [String]
 }
 
+struct AreaRequest: Encodable {
+    let countryCode: String
+    let city: String
+    var state: String? = nil
+    var zip: String? = nil
+}
+
 struct DeviceTokenRequest: Encodable {
     let platform: String
     let token: String
@@ -120,6 +127,8 @@ struct User: Decodable, Identifiable {
     let watchKeywords: [String]
     let blockedSources: [String]
     let reading: ReadingStats
+    let areaLimit: Int?
+    let areaCount: Int
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -132,6 +141,8 @@ struct User: Decodable, Identifiable {
         tier = try c.decodeIfPresent(String.self, forKey: .tier)
         topicLimit = try c.decodeIfPresent(Int.self, forKey: .topicLimit)
         topicCount = try c.decodeIfPresent(Int.self, forKey: .topicCount) ?? 0
+        areaLimit = try c.decodeIfPresent(Int.self, forKey: .areaLimit)
+        areaCount = try c.decodeIfPresent(Int.self, forKey: .areaCount) ?? 0
         refreshHour = try c.decodeIfPresent(Int.self, forKey: .refreshHour) ?? 6
         timezone = try c.decodeIfPresent(String.self, forKey: .timezone) ?? "UTC"
         digestEnabled = try c.decodeIfPresent(Bool.self, forKey: .digestEnabled) ?? false
@@ -220,6 +231,7 @@ struct Topic: Decodable, Identifiable {
 
 struct FeedResponse: Decodable {
     let topics: [Topic]
+    let areas: [Area]
     let savedFingerprints: [String]
     let watchlist: [Article]
     let watchKeywords: [String]
@@ -227,10 +239,38 @@ struct FeedResponse: Decodable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         topics = try c.decodeIfPresent([Topic].self, forKey: .topics) ?? []
+        areas = try c.decodeIfPresent([Area].self, forKey: .areas) ?? []
         savedFingerprints = try c.decodeIfPresent([String].self, forKey: .savedFingerprints) ?? []
         watchlist = try c.decodeIfPresent([Article].self, forKey: .watchlist) ?? []
         watchKeywords = try c.decodeIfPresent([String].self, forKey: .watchKeywords) ?? []
     }
+}
+
+struct Area: Decodable, Identifiable {
+    let id: Int
+    let name: String
+    let locality: String?
+    let region: String?
+    let postalCode: String?
+    let countryCode: String?
+    let locked: Bool
+    let articles: [Article]
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(Int.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        locality = try c.decodeIfPresent(String.self, forKey: .locality)
+        region = try c.decodeIfPresent(String.self, forKey: .region)
+        postalCode = try c.decodeIfPresent(String.self, forKey: .postalCode)
+        countryCode = try c.decodeIfPresent(String.self, forKey: .countryCode)
+        locked = try c.decodeIfPresent(Bool.self, forKey: .locked) ?? false
+        articles = try c.decodeIfPresent([Article].self, forKey: .articles) ?? []
+    }
+}
+
+struct AreaResponse: Decodable {
+    let area: Area
 }
 
 struct TopicResponse: Decodable {

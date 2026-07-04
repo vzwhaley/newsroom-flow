@@ -21,8 +21,16 @@ final class FeedViewModel: ObservableObject {
     @Published var savedFps: Set<String> = []
     @Published var reading = ReadingStats()
     @Published var briefing: BriefingResponse?
+    @Published var areas: [Area] = []
+    @Published var areaLimit: Int?
     @Published var busy = false
     @Published var error: String?
+
+    /// Can the user add another local area? (Free = 1, Pro = unlimited.)
+    var canAddArea: Bool {
+        guard let limit = areaLimit else { return true }
+        return areas.count < limit
+    }
 
     /// Free user sitting at their topic cap right now.
     var atTopicLimit: Bool {
@@ -71,6 +79,8 @@ final class FeedViewModel: ObservableObject {
         readIds = Set(read)
         savedFps = Set(feed.savedFingerprints)
         reading = me?.user.reading ?? ReadingStats()
+        areas = feed.areas
+        areaLimit = me?.user.areaLimit
 
         // Pro: today's AI briefing (server caches it per user per day).
         if isPro && !feed.topics.isEmpty {
@@ -80,6 +90,31 @@ final class FeedViewModel: ObservableObject {
         }
 
         loading = false
+    }
+
+    func addArea(_ req: AreaRequest) {
+        Task {
+            busy = true
+            do { _ = try await api.addArea(req); load() }
+            catch { self.error = "Couldn't add that area." }
+            busy = false
+        }
+    }
+
+    func updateArea(_ id: Int, _ req: AreaRequest) {
+        Task {
+            busy = true
+            do { _ = try await api.updateArea(id, req); load() }
+            catch { self.error = "This area is locked — upgrade to Pro to change it." }
+            busy = false
+        }
+    }
+
+    func deleteArea(_ id: Int) {
+        Task {
+            _ = try? await api.deleteArea(id)
+            load()
+        }
     }
 
     func resendVerification() {
@@ -210,6 +245,8 @@ struct FeedView: View {
     @State private var subtopicParentId: Int?
     @State private var showSubtopicAlert = false
     @State private var subtopicName = ""
+    @State private var showAddArea = false
+    @State private var editingArea: Area?
     @Environment(\.openURL) private var openURL
 
     var body: some View {
@@ -271,6 +308,8 @@ struct FeedView: View {
                                 .padding(.top, 24)
                         }
 
+                        localNewsSection
+
                         // Free-tier ad banner (Pro removes it).
                         AdBanner(isPro: vm.isPro)
                             .frame(maxWidth: .infinity)
@@ -297,6 +336,74 @@ struct FeedView: View {
             Button("Cancel", role: .cancel) { subtopicName = "" }
         } message: {
             Text("Add a topic nested under this category.")
+        }
+        .sheet(isPresented: $showAddArea) {
+            AreaSheet(existing: nil) { req in vm.addArea(req) }
+        }
+        .sheet(item: $editingArea) { area in
+            AreaSheet(existing: area) { req in vm.updateArea(area.id, req) }
+        }
+    }
+
+    // MARK: - Local News (area-tailored feeds)
+
+    @ViewBuilder
+    private var localNewsSection: some View {
+        if !vm.areas.isEmpty || vm.canAddArea {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text("📍 Local News")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(Brand.ink)
+                    Spacer()
+                    if vm.canAddArea {
+                        Button("Add area") { showAddArea = true }
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                }
+                .padding(.top, 8)
+
+                if !vm.isPro {
+                    Text(vm.areas.isEmpty
+                         ? "Free accounts include one local area — choose carefully! It's permanent after a short window to fix typos."
+                         : "Free includes one local area. Upgrade to Pro for more places and anytime edits.")
+                        .font(.system(size: 12))
+                        .foregroundColor(Brand.gray500)
+                }
+
+                if vm.areas.isEmpty {
+                    Text("Add your city to get news tailored to just your area.")
+                        .font(.system(size: 13))
+                        .foregroundColor(Brand.gray500)
+                }
+
+                ForEach(vm.areas) { area in
+                    HStack {
+                        Text(area.name)
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundColor(Brand.ink)
+                        Spacer()
+                        if area.locked {
+                            Text("Locked").font(.system(size: 12)).foregroundColor(Brand.gray500)
+                        } else {
+                            Button("Edit") { editingArea = area }.font(.system(size: 13))
+                            Button("Remove") { vm.deleteArea(area.id) }
+                                .font(.system(size: 13)).foregroundColor(.red)
+                        }
+                    }
+                    .padding(.top, 4)
+
+                    if area.articles.isEmpty {
+                        Text("Gathering local stories — check back after the next refresh.")
+                            .font(.system(size: 13))
+                            .foregroundColor(Brand.gray500)
+                    } else {
+                        ForEach(area.articles) { a in
+                            card(for: a, topicLabel: area.name)
+                        }
+                    }
+                }
+            }
         }
     }
 

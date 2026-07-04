@@ -136,6 +136,21 @@ final class NewsFlowAPI {
         try await send("api/topics/\(id)", method: "DELETE")
     }
 
+    // MARK: - Local areas
+
+    func addArea(_ body: AreaRequest) async throws -> AreaResponse {
+        try await send("api/areas", method: "POST", body: body)
+    }
+
+    func updateArea(_ id: Int, _ body: AreaRequest) async throws -> AreaResponse {
+        try await send("api/areas/\(id)", method: "PATCH", body: body)
+    }
+
+    @discardableResult
+    func deleteArea(_ id: Int) async throws -> MessageResponse {
+        try await send("api/areas/\(id)", method: "DELETE")
+    }
+
     // MARK: - Article actions
 
     @discardableResult
