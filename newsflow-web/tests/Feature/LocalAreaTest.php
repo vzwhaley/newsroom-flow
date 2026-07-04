@@ -285,4 +285,41 @@ class LocalAreaTest extends TestCase
                 && str_contains((string) $request['domain'], 'cleveland'); // cleveland.com → 'cleveland'
         });
     }
+
+    /**
+     * Northeast Tennessee (Tri-Cities + Greene County) + Knoxville resolve to
+     * genuinely local outlets, not the distant statewide fallback.
+     */
+    public function test_northeast_tennessee_towns_resolve_to_local_outlets(): void
+    {
+        $sources = new \App\Services\Articles\LocalSources();
+        $area = function (string $city, string $region = 'TN') {
+            $t = new Topic();
+            $t->kind = 'area';
+            $t->locality = $city;
+            $t->region = $region;
+            $t->country_code = 'US';
+
+            return $t;
+        };
+
+        // Greene County towns → The Greeneville Sun.
+        $this->assertContains('greenevillesun.com', $sources->forArea($area('Afton')));
+        $this->assertContains('greenevillesun.com', $sources->forArea($area('Chuckey')));
+        $this->assertContains('greenevillesun.com', $sources->forArea($area('Greeneville')));
+        // Washington County towns → Johnson City Press + WETS.
+        $this->assertContains('johnsoncitypress.com', $sources->forArea($area('Jonesborough')));
+        $this->assertContains('johnsoncitypress.com', $sources->forArea($area('Telford')));
+        $this->assertContains('wets.org', $sources->forArea($area('Johnson City')));
+        // Sullivan County → Kingsport Times-News / Bristol Herald Courier.
+        $this->assertContains('timesnews.net', $sources->forArea($area('Kingsport')));
+        $this->assertContains('heraldcourier.com', $sources->forArea($area('Bristol')));
+        // Every NE-TN town shares the WJHL regional TV anchor.
+        foreach (['Afton', 'Chuckey', 'Limestone', 'Telford', 'Jonesborough', 'Kingsport'] as $town) {
+            $this->assertContains('wjhl.com', $sources->forArea($area($town)), "$town should include WJHL");
+        }
+        // Knoxville + Nashville.
+        $this->assertContains('knoxnews.com', $sources->forArea($area('Knoxville')));
+        $this->assertContains('newschannel5.com', $sources->forArea($area('Nashville')));
+    }
 }

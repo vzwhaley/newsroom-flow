@@ -94,7 +94,21 @@ return [
         'baton rouge,la'   => ['theadvocate.com', 'wafb.com', 'wrkf.org'],
         'little rock,ar'   => ['arkansasonline.com', 'ualrpublicradio.org', 'thv11.com'],
         'memphis,tn'       => ['commercialappeal.com', 'dailymemphian.com', 'wknofm.org'],
-        'nashville,tn'     => ['tennessean.com', 'wsmv.com', 'wpln.org'],
+        'nashville,tn'     => ['tennessean.com', 'newschannel5.com', 'wsmv.com', 'wpln.org'],
+        'knoxville,tn'     => ['knoxnews.com', 'wbir.com', 'wate.com', 'wvlt.tv', 'wuot.org'],
+        // Northeast Tennessee — Tri-Cities. WJHL (News Channel 11) + WCYB are the
+        // regional TV anchors covering all of NE TN; WETS is the ETSU/NPR station.
+        'johnson city,tn'  => ['johnsoncitypress.com', 'wjhl.com', 'wets.org'],
+        'jonesborough,tn'  => ['johnsoncitypress.com', 'wjhl.com', 'wets.org'],
+        'telford,tn'       => ['johnsoncitypress.com', 'wjhl.com', 'wets.org'],
+        'limestone,tn'     => ['greenevillesun.com', 'johnsoncitypress.com', 'wjhl.com'],
+        'kingsport,tn'     => ['timesnews.net', 'wjhl.com', 'wcyb.com'],
+        'bristol,tn'       => ['heraldcourier.com', 'wcyb.com', 'wjhl.com'],
+        // Northeast Tennessee — Greene County. The Greeneville Sun is the
+        // county's hometown daily; WEMT Fox 39 Greeneville runs under WCYB.
+        'greeneville,tn'   => ['greenevillesun.com', 'wjhl.com', 'wcyb.com'],
+        'afton,tn'         => ['greenevillesun.com', 'wjhl.com', 'wcyb.com'],
+        'chuckey,tn'       => ['greenevillesun.com', 'wjhl.com', 'wcyb.com'],
         'louisville,ky'    => ['courier-journal.com', 'lpm.org', 'wlky.com'],
         'birmingham,al'    => ['al.com', 'wbhm.org', 'abc3340.com'],
         'jackson,ms'       => ['clarionledger.com', 'mpbonline.org', 'wlbt.com'],
@@ -201,7 +215,7 @@ return [
         'ri' => ['providencejournal.com', 'thepublicsradio.org'],
         'sc' => ['postandcourier.com', 'thestate.com', 'greenvilleonline.com'],
         'sd' => ['argusleader.com', 'sdpb.org'],
-        'tn' => ['tennessean.com', 'wbir.com'],
+        'tn' => ['tennessean.com', 'wbir.com', 'commercialappeal.com'],
         'tx' => ['texastribune.org', 'dallasnews.com', 'houstonchronicle.com'],
         'ut' => ['sltrib.com', 'deseret.com', 'kuer.org'],
         'vt' => ['vtdigger.org', 'burlingtonfreepress.com', 'vermontpublic.org'],
