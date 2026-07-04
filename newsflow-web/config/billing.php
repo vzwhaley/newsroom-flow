@@ -57,6 +57,11 @@ return [
 
     'free_limits' => [
         'topics' => 2,
+
+        // Local-area news feeds a Free user may follow. Free gets a single
+        // area which is permanent after a short typo-grace window (see
+        // config('newsflow.areas.edit_grace_hours')); Pro is unlimited.
+        'areas' => 1,
     ],
 
     /*

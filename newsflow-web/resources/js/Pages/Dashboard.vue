@@ -2,6 +2,7 @@
 import AdSlot from '@/Components/AdSlot.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import TopicSection from '@/Components/TopicSection.vue';
+import LocalNews from '@/Components/LocalNews.vue';
 import InputError from '@/Components/InputError.vue';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, nextTick, onMounted, ref } from 'vue';
@@ -12,6 +13,8 @@ const props = defineProps({
     watchlist: { type: Array, default: () => [] },
     watchKeywords: { type: Array, default: () => [] },
     reading: { type: Object, default: () => ({ streak: 0, read_today: false, total_reads: 0 }) },
+    areas: { type: Array, default: () => [] },
+    geoOptions: { type: Object, default: () => ({ states: {}, countries: {} }) },
 });
 
 function openWatch(id) {
@@ -399,6 +402,14 @@ onMounted(async () => {
                         :can-move-up="entry.canUp"
                         :can-move-down="entry.canDown"
                         @move="move"
+                    />
+
+                    <!-- Local News (area-tailored feeds) -->
+                    <LocalNews
+                        v-if="selected === 'all'"
+                        :areas="areas"
+                        :geo-options="geoOptions"
+                        :saved-fingerprints="savedFingerprints"
                     />
                 </div>
             </div>

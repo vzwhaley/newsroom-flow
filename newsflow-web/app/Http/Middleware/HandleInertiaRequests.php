@@ -63,6 +63,8 @@ class HandleInertiaRequests extends Middleware
                     'topic_limit'         => $user->topicLimit(),
                     'topic_count'         => $user->topics()->count(),
                     'remaining_topics'    => $user->remainingTopicSlots(),
+                    'area_limit'          => $user->areaLimit(),
+                    'area_count'          => $user->areas()->count(),
                     'refresh_hour'        => $user->refresh_hour,
                     'timezone'            => $user->timezone,
                     'digest_enabled'      => (bool) $user->digest_enabled,

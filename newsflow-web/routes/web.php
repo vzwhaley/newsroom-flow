@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdsTxtController;
+use App\Http\Controllers\AreaController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\BillingController;
@@ -111,6 +112,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Reading stats + streak brag card (all tiers)
     Route::get('/stats', [StatsController::class, 'show'])->name('stats');
     Route::post('/stats/share', [StatsController::class, 'share'])->middleware('throttle:12,1')->name('stats.share');
+
+    // Local-area news (Free: 1 area; Pro: unlimited add/edit/delete)
+    Route::post('/areas', [AreaController::class, 'store'])->middleware('throttle:20,1')->name('areas.store');
+    Route::patch('/areas/{area}', [AreaController::class, 'update'])->middleware('throttle:20,1')->name('areas.update');
+    Route::delete('/areas/{area}', [AreaController::class, 'destroy'])->name('areas.destroy');
 
     // Search across feeds + saved (Pro)
     Route::get('/search', [SearchController::class, 'index'])->name('search');

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ArchiveController;
+use App\Http\Controllers\Api\AreaController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BriefingController;
@@ -39,6 +40,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Push notification device tokens (APNs / FCM)
     Route::post('/device-tokens', [DeviceTokenController::class, 'store']);
     Route::delete('/device-tokens', [DeviceTokenController::class, 'destroy']);
+
+    // Local-area news (Free: 1 area; Pro: unlimited)
+    Route::post('/areas', [AreaController::class, 'store'])->middleware('throttle:20,1');
+    Route::patch('/areas/{area}', [AreaController::class, 'update'])->middleware('throttle:20,1');
+    Route::delete('/areas/{area}', [AreaController::class, 'destroy']);
 
     // Topics (store/refresh throttled — refresh fans out to the news API)
     Route::post('/topics', [TopicController::class, 'store'])->middleware('throttle:30,1');

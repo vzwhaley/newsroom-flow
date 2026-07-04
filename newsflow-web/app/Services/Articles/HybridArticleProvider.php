@@ -3,6 +3,7 @@
 namespace App\Services\Articles;
 
 use App\Contracts\ArticleProvider;
+use App\Contracts\LocationAwareProvider;
 use App\Services\Articles\Signals\HackerNewsSignal;
 use App\Support\FetchedArticle;
 use Illuminate\Support\Carbon;
@@ -25,8 +26,16 @@ use Illuminate\Support\Facades\Log;
  * provider falls back to the StubArticleProvider so the app always returns a
  * full feed during local development.
  */
-class HybridArticleProvider implements ArticleProvider
+class HybridArticleProvider implements ArticleProvider, LocationAwareProvider
 {
+    /**
+     * Per-fetch geographic context (set by fetchLocal, cleared after). Threaded
+     * into each source request to scope results to a place.
+     *
+     * @var array{country:?string, domains:array<string>}
+     */
+    private array $geo = ['country' => null, 'domains' => []];
+
     public function __construct(
         private readonly StubArticleProvider $stub,
         private readonly HackerNewsSignal $hackerNews,
@@ -77,6 +86,27 @@ class HybridArticleProvider implements ArticleProvider
         return $this->summarizeWithLlm($topic, $final);
     }
 
+    /**
+     * Local-area fetch: same pipeline, scoped to a country and biased toward
+     * curated local outlets (precision layers 1 + 2). The geo context is
+     * threaded into every source request, then cleared.
+     */
+    public function fetchLocal(
+        string $query,
+        int $count,
+        array $excludeFingerprints = [],
+        ?string $country = null,
+        array $domains = [],
+    ): array {
+        $this->geo = ['country' => $country, 'domains' => $domains];
+
+        try {
+            return $this->fetch($query, $count, $excludeFingerprints);
+        } finally {
+            $this->geo = ['country' => null, 'domains' => []];
+        }
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Layer 1 — fresh coverage from news aggregator APIs
@@ -117,14 +147,22 @@ class HybridArticleProvider implements ArticleProvider
     private function fromTheNewsApi(string $topic, int $pool, string $key): array
     {
         try {
-            $response = Http::timeout(15)->get(config('newsflow.sources.thenewsapi.endpoint'), [
+            $params = [
                 'api_token'       => $key,
                 'search'          => $topic,
                 'language'        => 'en',
                 'sort'            => 'relevance_score',
                 'published_after' => Carbon::yesterday()->toDateString(),
                 'limit'           => min($pool, 100),
-            ]);
+            ];
+            if ($this->geo['country']) {
+                $params['locale'] = $this->geo['country'];
+            }
+            if ($this->geo['domains']) {
+                $params['domains'] = implode(',', $this->geo['domains']);
+            }
+
+            $response = Http::timeout(15)->get(config('newsflow.sources.thenewsapi.endpoint'), $params);
 
             if (! $response->ok()) {
                 return [];
@@ -153,14 +191,20 @@ class HybridArticleProvider implements ArticleProvider
     private function fromNewsApi(string $topic, int $pool, string $key): array
     {
         try {
-            $response = Http::timeout(15)->get(config('newsflow.sources.newsapi.endpoint'), [
+            $params = [
                 'q'        => $topic,
                 'from'     => Carbon::yesterday()->toDateString(),
                 'sortBy'   => 'popularity',
                 'language' => 'en',
                 'pageSize' => min($pool, 100),
                 'apiKey'   => $key,
-            ]);
+            ];
+            // NewsAPI /everything has no country filter; bias by domain instead.
+            if ($this->geo['domains']) {
+                $params['domains'] = implode(',', $this->geo['domains']);
+            }
+
+            $response = Http::timeout(15)->get(config('newsflow.sources.newsapi.endpoint'), $params);
 
             if (! $response->ok()) {
                 return [];
@@ -189,14 +233,20 @@ class HybridArticleProvider implements ArticleProvider
     private function fromGNews(string $topic, int $pool, string $key): array
     {
         try {
-            $response = Http::timeout(15)->get(config('newsflow.sources.gnews.endpoint'), [
+            $params = [
                 'q'      => $topic,
                 'lang'   => 'en',
                 'max'    => min($pool, 100),
                 'from'   => Carbon::yesterday()->toIso8601String(),
                 'sortby' => 'relevance',
                 'apikey' => $key,
-            ]);
+            ];
+            // GNews supports country scoping (no domain filter).
+            if ($this->geo['country']) {
+                $params['country'] = $this->geo['country'];
+            }
+
+            $response = Http::timeout(15)->get(config('newsflow.sources.gnews.endpoint'), $params);
 
             if (! $response->ok()) {
                 return [];
@@ -225,11 +275,23 @@ class HybridArticleProvider implements ArticleProvider
     private function fromNewsData(string $topic, string $key): array
     {
         try {
-            $response = Http::timeout(15)->get(config('newsflow.sources.newsdata.endpoint'), [
+            $params = [
                 'apikey'   => $key,
                 'q'        => $topic,
                 'language' => 'en',
-            ]);
+            ];
+            // NewsData.io supports both country and domain scoping.
+            if ($this->geo['country']) {
+                $params['country'] = $this->geo['country'];
+            }
+            if ($this->geo['domains']) {
+                $params['domain'] = implode(',', array_map(
+                    fn ($d) => explode('.', $d)[0], // NewsData wants the id, not the FQDN
+                    $this->geo['domains'],
+                ));
+            }
+
+            $response = Http::timeout(15)->get(config('newsflow.sources.newsdata.endpoint'), $params);
 
             if (! $response->ok()) {
                 return [];

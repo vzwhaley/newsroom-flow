@@ -41,10 +41,30 @@ class FeedController extends Controller
 
         return response()->json([
             'topics'             => $topicModels->map(fn ($t) => $this->topic($t, true))->all(),
+            'areas'              => $this->areas($user),
             'saved_fingerprints' => $savedFingerprints,
             'watchlist'          => $this->watchlist($user, $topicModels),
             'watch_keywords'     => $user->isPro() ? ($user->watch_keywords ?? []) : [],
         ]);
+    }
+
+    /**
+     * Local-area feeds for the native apps, with lock state.
+     */
+    private function areas(User $user): array
+    {
+        return $user->areas()->with(['articles' => fn ($q) => $q->orderBy('position')])->get()
+            ->map(fn (Topic $area) => [
+                'id'           => $area->id,
+                'name'         => $area->name,
+                'locality'     => $area->locality,
+                'region'       => $area->region,
+                'postal_code'  => $area->postal_code,
+                'country_code' => $area->country_code,
+                'locked'       => ! $user->canModifyArea($area),
+                'last_refreshed_at' => $area->last_refreshed_at?->toIso8601String(),
+                'articles'     => \App\Support\Region::order($area->articles)->map(fn ($a) => $this->article($a))->all(),
+            ])->all();
     }
 
     private function topic(Topic $topic, bool $withChildren = false): array

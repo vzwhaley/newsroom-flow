@@ -11,8 +11,13 @@ class Topic extends Model
     protected $fillable = [
         'user_id',
         'parent_id',
+        'kind',
         'name',
         'query',
+        'locality',
+        'region',
+        'postal_code',
+        'country_code',
         'mute_keywords',
         'include_in_digest',
         'position',
@@ -77,6 +82,15 @@ class Topic extends Model
     public function isChild(): bool
     {
         return ! is_null($this->parent_id);
+    }
+
+    /**
+     * A local-area feed (city/state/ZIP or city/country) rather than a
+     * user-chosen keyword topic.
+     */
+    public function isArea(): bool
+    {
+        return $this->kind === 'area';
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Services\Articles;
 
 use App\Contracts\ArticleProvider;
+use App\Contracts\LocationAwareProvider;
 use App\Models\Article;
 use App\Models\ArticleArchive;
 use App\Models\Topic;
@@ -29,6 +30,7 @@ class TopicRefresher
     public function __construct(
         private readonly ArticleProvider $provider,
         private readonly ?WatchlistPusher $watchlistPusher = null,
+        private readonly ?LocalSources $localSources = null,
     ) {
     }
 
@@ -44,11 +46,24 @@ class TopicRefresher
 
         // Ask the provider for a full set, telling it what we already have so
         // it can prioritise genuinely new stories (and keep scouring to fill).
-        $candidates = $this->provider->fetch(
-            $topic->searchQuery(),
-            $target,
-            $existingFingerprints,
-        );
+        // Local-area feeds use the location-aware path (country + curated local
+        // outlets) when the provider supports it.
+        if ($topic->isArea() && $this->provider instanceof LocationAwareProvider) {
+            $sources = $this->localSources ?? new LocalSources();
+            $candidates = $this->provider->fetchLocal(
+                $topic->searchQuery(),
+                $target,
+                $existingFingerprints,
+                $sources->countryCode($topic),
+                $sources->forArea($topic),
+            );
+        } else {
+            $candidates = $this->provider->fetch(
+                $topic->searchQuery(),
+                $target,
+                $existingFingerprints,
+            );
+        }
 
         // Drop muted topics and articles from blocked publishers (Pro) before
         // considering anything.

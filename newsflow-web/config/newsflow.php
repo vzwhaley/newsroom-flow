@@ -121,4 +121,22 @@ return [
     // Daily refresh hour (local app timezone). The scheduled command runs
     // at this time; users on Pro can also trigger an on-demand refresh.
     'refresh_hour' => 6,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Local-area news
+    |--------------------------------------------------------------------------
+    */
+
+    'areas' => [
+        // How long after creating an area a Free user may still edit/delete it
+        // (typo-grace). After this window a Free user's single area is locked;
+        // only upgrading to Pro re-enables changes. Pro is never locked.
+        'edit_grace_hours' => 24,
+
+        // Zippopotam.us — keyless US ZIP → city/state geocoder. Best-effort:
+        // used only to enrich an area when a ZIP is supplied; failures fall
+        // back to the city/state the user typed.
+        'zip_geocoder' => env('NEWSFLOW_ZIP_GEOCODER', 'https://api.zippopotam.us'),
+    ],
 ];

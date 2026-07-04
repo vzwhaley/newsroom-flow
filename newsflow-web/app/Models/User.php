@@ -64,7 +64,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function topics(): HasMany
     {
-        return $this->hasMany(Topic::class)->orderBy('position');
+        return $this->hasMany(Topic::class)->where('kind', 'topic')->orderBy('position');
     }
 
     /**
@@ -72,7 +72,16 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function topLevelTopics(): HasMany
     {
-        return $this->hasMany(Topic::class)->whereNull('parent_id')->orderBy('position');
+        return $this->hasMany(Topic::class)->where('kind', 'topic')->whereNull('parent_id')->orderBy('position');
+    }
+
+    /**
+     * Local-area news feeds (city/state/ZIP or city/country). A separate
+     * surface from chosen topics and outside the topic limit.
+     */
+    public function areas(): HasMany
+    {
+        return $this->hasMany(Topic::class)->where('kind', 'area')->orderBy('position');
     }
 
     public function savedArticles(): HasMany
@@ -214,6 +223,51 @@ class User extends Authenticatable implements MustVerifyEmail
         return max(0, $limit - $this->topics()->count());
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Local-area limits — Free = 1 area (locked after grace), Pro = unlimited
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Maximum number of local areas this user may follow. null = unlimited.
+     */
+    public function areaLimit(): ?int
+    {
+        return $this->isPro() ? null : (int) config('billing.free_limits.areas', 1);
+    }
+
+    /**
+     * Can the user add another local area right now?
+     */
+    public function canAddArea(): bool
+    {
+        $limit = $this->areaLimit();
+
+        if ($limit === null) {
+            return true;
+        }
+
+        return $this->areas()->count() < $limit;
+    }
+
+    /**
+     * May the user edit/delete this area right now? Pro can always. Free may
+     * only during the typo-grace window just after creating it — after that
+     * their single area is permanent until they upgrade.
+     */
+    public function canModifyArea(Topic $area): bool
+    {
+        if ($this->isPro()) {
+            return true;
+        }
+
+        $graceHours = (int) config('newsflow.areas.edit_grace_hours', 24);
+
+        return $area->created_at !== null
+            && $area->created_at->gt(now()->subHours($graceHours));
+    }
+
     /**
      * Compact representation for the native apps' JSON API.
      */
@@ -229,6 +283,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'tier'              => $this->subscriptionTier(),
             'topic_limit'       => $this->topicLimit(),
             'topic_count'       => $this->topics()->count(),
+            'area_limit'        => $this->areaLimit(),
+            'area_count'        => $this->areas()->count(),
             'refresh_hour'      => $this->refresh_hour,
             'timezone'          => $this->timezone,
             'digest_enabled'    => (bool) $this->digest_enabled,

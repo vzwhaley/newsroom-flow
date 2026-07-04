@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Topic;
+use App\Services\Articles\LocationQuery;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -36,7 +37,31 @@ class DashboardController extends Controller
             'watchlist'         => $this->watchlist($user, $topicModels),
             'watchKeywords'     => $user->isPro() ? ($user->watch_keywords ?? []) : [],
             'reading'           => \App\Models\ReadingDay::statsFor($user),
+            'areas'             => $this->areas($user),
+            'geoOptions'        => [
+                'states'    => LocationQuery::US_STATES,
+                'countries' => LocationQuery::COUNTRIES,
+            ],
         ]);
+    }
+
+    /**
+     * The user's local-area feeds, each with its snapshot + lock state.
+     */
+    private function areas($user): array
+    {
+        return $user->areas()->with(['articles' => fn ($q) => $q->orderBy('position')])->get()
+            ->map(fn (Topic $area) => [
+                'id'           => $area->id,
+                'name'         => $area->name,
+                'locality'     => $area->locality,
+                'region'       => $area->region,
+                'postal_code'  => $area->postal_code,
+                'country_code' => $area->country_code,
+                'locked'       => ! $user->canModifyArea($area),
+                'last_refreshed_at' => $area->last_refreshed_at?->toIso8601String(),
+                'articles'     => \App\Support\Region::order($area->articles)->map(fn ($a) => $this->articleArray($a))->all(),
+            ])->all();
     }
 
     /**
