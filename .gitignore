@@ -60,6 +60,10 @@ newsflow-web/auth.json
 dist-ssr/
 *.local
 
+# ---- Generated deliverables (regenerable documents — keep out of git) ----
+/NewsFlow_Media_Kit.docx
+/NewsFlow_Media_Kit.pdf
+
 # ---- Android (future newsflow-android) ----
 newsflow-android/.gradle/
 newsflow-android/.kotlin/
