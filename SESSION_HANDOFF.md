@@ -79,17 +79,12 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
 
 **Nothing is pending or uncommitted.** Open items, in rough priority:
 
-1. **Decision needed: API email verification.** The website requires a verified
-   email for the dashboard; the JSON API deliberately does not (would strand app
-   signups — the apps have no verify screen). Current compromise: non-blocking
-   verify-email banner + resend button in both apps. If you want hard parity,
-   the apps need a proper verification gate/screen first.
-2. **iOS build verification** — everything since the last Mac build (audit fixes,
+1. **iOS build verification** — everything since the last Mac build (audit fixes,
    dark-mode palette, banners, local-area feature) compiles on paper only. Needs one Xcode build.
-3. **Mobile Reading-Stats screens** — the web `/stats` heatmap shipped and
+2. **Mobile Reading-Stats screens** — the web `/stats` heatmap shipped and
    `GET /api/stats` is live and ready, but the Android/iOS stats screens aren't
    built yet. Small parity follow-up (mirror the streak/heatmap UI).
-4. v1.1 backlog (parked): offline reading, RSS/OPML export, widgets, audio digest.
+3. v1.1 backlog (parked): offline reading, RSS/OPML export, widgets, audio digest.
 
 ---
 
@@ -177,6 +172,16 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
 - **Pricing-page card order (set 2026-07-05):** Free → Pro Lifetime → Pro Yearly
   → Pro Monthly. Display order only; prices and the highlighted "Best Value"
   (Yearly) are unchanged. Don't revert without direction.
+- **API email verification — NOT enforced for v1 (decided 2026-07-05):** the web
+  dashboard stays behind `['auth','verified']`; the JSON API stays on
+  `auth:sanctum` only (no `verified` middleware). Native-app users get the
+  non-blocking verify-email banner + `POST /api/auth/resend-verification`, never
+  a hard gate — a mandatory verify screen would strand new app signups (the apps
+  have none) and lands the cost on the build-unverified iOS client for little
+  real-world benefit (a personal news reader has no abuse surface). Revisit only
+  if abuse from unverified accounts shows up post-launch; then build real in-app
+  verification screens FIRST, then add `verified` to the API routes. Do not
+  soft-gate. Don't re-raise without that trigger.
 
 ---
 
