@@ -79,24 +79,27 @@ const proFeatures = [
                     </Link>
                 </div>
 
-                <!-- MONTHLY -->
-                <div class="flex flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                    <h3 class="text-lg font-semibold text-ink">Pro Monthly</h3>
+                <!-- LIFETIME -->
+                <div class="flex flex-col rounded-2xl border border-ink bg-ink p-6 text-white shadow-sm">
+                    <h3 class="text-lg font-semibold">Pro Lifetime</h3>
                     <p class="mt-2 flex items-baseline gap-1">
-                        <span class="font-serif text-4xl font-bold text-ink">${{ pricing.monthly ?? '4.99' }}</span>
-                        <span class="text-sm text-gray-500">/month</span>
+                        <span class="font-serif text-4xl font-bold">${{ pricing.lifetime ?? '149.99' }}</span>
+                        <span class="text-sm text-gray-400">once</span>
                     </p>
-                    <p class="mt-3 text-sm text-gray-600">Unlimited topics, billed monthly.</p>
-                    <ul class="mt-6 flex-1 space-y-3 text-sm text-gray-700">
+                    <p class="mt-3 text-sm text-gray-300">
+                        Pay once, own Pro for the current version. No recurring billing.
+                    </p>
+                    <ul class="mt-6 flex-1 space-y-3 text-sm text-gray-200">
                         <li v-for="f in proFeatures" :key="f" class="flex gap-2">
-                            <span class="text-brand-600" aria-hidden="true">✓</span> {{ f }}
+                            <span class="text-brand-300" aria-hidden="true">✓</span> {{ f }}
                         </li>
+                        <li class="flex gap-2"><span class="text-brand-300" aria-hidden="true">✓</span> One-time payment</li>
                     </ul>
                     <Link
                         :href="ctaHref"
-                        class="mt-6 rounded-lg border border-brand-600 px-4 py-2.5 text-center text-sm font-semibold text-brand-700 hover:bg-brand-50"
+                        class="mt-6 rounded-lg bg-white px-4 py-2.5 text-center text-sm font-semibold text-ink hover:bg-gray-100"
                     >
-                        Choose Monthly
+                        Buy Lifetime
                     </Link>
                 </div>
 
@@ -126,27 +129,24 @@ const proFeatures = [
                     </Link>
                 </div>
 
-                <!-- LIFETIME -->
-                <div class="flex flex-col rounded-2xl border border-ink bg-ink p-6 text-white shadow-sm">
-                    <h3 class="text-lg font-semibold">Pro Lifetime</h3>
+                <!-- MONTHLY -->
+                <div class="flex flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-ink">Pro Monthly</h3>
                     <p class="mt-2 flex items-baseline gap-1">
-                        <span class="font-serif text-4xl font-bold">${{ pricing.lifetime ?? '149.99' }}</span>
-                        <span class="text-sm text-gray-400">once</span>
+                        <span class="font-serif text-4xl font-bold text-ink">${{ pricing.monthly ?? '4.99' }}</span>
+                        <span class="text-sm text-gray-500">/month</span>
                     </p>
-                    <p class="mt-3 text-sm text-gray-300">
-                        Pay once, own Pro for the current version. No recurring billing.
-                    </p>
-                    <ul class="mt-6 flex-1 space-y-3 text-sm text-gray-200">
+                    <p class="mt-3 text-sm text-gray-600">Unlimited topics, billed monthly.</p>
+                    <ul class="mt-6 flex-1 space-y-3 text-sm text-gray-700">
                         <li v-for="f in proFeatures" :key="f" class="flex gap-2">
-                            <span class="text-brand-300" aria-hidden="true">✓</span> {{ f }}
+                            <span class="text-brand-600" aria-hidden="true">✓</span> {{ f }}
                         </li>
-                        <li class="flex gap-2"><span class="text-brand-300" aria-hidden="true">✓</span> One-time payment</li>
                     </ul>
                     <Link
                         :href="ctaHref"
-                        class="mt-6 rounded-lg bg-white px-4 py-2.5 text-center text-sm font-semibold text-ink hover:bg-gray-100"
+                        class="mt-6 rounded-lg border border-brand-600 px-4 py-2.5 text-center text-sm font-semibold text-brand-700 hover:bg-brand-50"
                     >
-                        Buy Lifetime
+                        Choose Monthly
                     </Link>
                 </div>
             </div>
