@@ -1,8 +1,8 @@
 # NewsFlow™ — Session Handoff
 
-**Last updated:** 2026-07-03
+**Last updated:** 2026-07-05
 **Repo:** `vzwhaley/news-flow` (GitHub) · local: `C:\Users\vzwhaley\Herd\MOON_WHALE_MEDIA\NewsFlow`
-**Branch:** `main` (in sync with `origin/main` at commit `f78a49e`) — **working tree CLEAN, nothing uncommitted**
+**Branch:** `main` (in sync with `origin/main` at commit `de0ba08`) — **working tree CLEAN, nothing uncommitted**
 
 > Paste this whole file as your first message in a new Claude Code session,
 > or just say "read SESSION_HANDOFF.md". The memory notes auto-load already;
@@ -44,6 +44,9 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
 
 | Commit | What landed |
 |---|---|
+| `de0ba08` | **Web: pricing-page tier order** changed to Free → Lifetime → Yearly → Monthly (display order only; containers/styling/prices unchanged, Yearly still the highlighted "Best Value"). |
+| _(uncommitted, local only)_ | **Media Kit refreshed** — `NewsFlow_Media_Kit.docx`/`.pdf` at repo root (gitignored). Now has the official logo lockup at the top + a full visual tour at the bottom: sliced full-page screenshots of **all 17 pages** (10 public + 7 signed-in app), captured from a fictitious "John Doe" Pro demo account (no real data). See §8 for the regeneration pipeline. |
+| `add7e89` / `f78a49e` | **Daily safety-net discovery sweep** — `newsflow:discover-sources --reverify --queue --limit=50` scheduled daily at 03:20; catches areas created while discovery was off, failed discoveries, and records past the re-verify TTL. Added `--queue`/`--limit`. |
 | `50fd71d` | **Self-learning AI local-source discovery** (web). When an area's location isn't in the curated `localnews.php`, a web-search-grounded Claude call (`LocalSourceDiscovery` + Anthropic `web_search` tool) finds its real local outlets, validates domains (liveness + redirect-canonicalization auto-catches rebrands), and caches them in `discovered_local_sources` **globally per location** (discovered once, reused by everyone). Resolution: curated metro → discovered cache → statewide → country. Queued `DiscoverAreaLocalSources` job on area create/update; `newsflow:discover-sources` backfill/reverify command. Fully env-gated on `NEWSFLOW_DISCOVERY`+`ANTHROPIC_API_KEY` (clean no-op without them). **Needs a queue worker in prod** for async discovery. |
 | `c039133` | **Northeast TN + Knoxville local outlets** — Greeneville Sun, Johnson City Press, Kingsport Times-News, Bristol Herald Courier, WJHL/WCYB/WETS, Knoxville (News Sentinel/WBIR/WATE/WVLT/WUOT), all web-verified; test locks in resolution. |
 | `e57980c` | **Broadened local-outlet directory** — ~95 metros, all 50 states, 20 countries; every domain web-verified (6 rebrand/defunct fixes). |
@@ -82,8 +85,11 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
    verify-email banner + resend button in both apps. If you want hard parity,
    the apps need a proper verification gate/screen first.
 2. **iOS build verification** — everything since the last Mac build (audit fixes,
-   dark-mode palette, banners) compiles on paper only. Needs one Xcode build.
-3. v1.1 backlog (parked): offline reading, RSS/OPML export, widgets, audio digest.
+   dark-mode palette, banners, local-area feature) compiles on paper only. Needs one Xcode build.
+3. **Mobile Reading-Stats screens** — the web `/stats` heatmap shipped and
+   `GET /api/stats` is live and ready, but the Android/iOS stats screens aren't
+   built yet. Small parity follow-up (mirror the streak/heatmap UI).
+4. v1.1 backlog (parked): offline reading, RSS/OPML export, widgets, audio digest.
 
 ---
 
@@ -168,6 +174,9 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
   `config/localnews.php` is a living asset — extend it to improve precision.
 - **Brand:** "NewsFlow™" with ™ on the web; "by moon whale media, llc" lowercase
   signature is deliberate.
+- **Pricing-page card order (set 2026-07-05):** Free → Pro Lifetime → Pro Yearly
+  → Pro Monthly. Display order only; prices and the highlighted "Best Value"
+  (Yearly) are unchanged. Don't revert without direction.
 
 ---
 
@@ -201,6 +210,22 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
   `newsflow:discover-sources --reverify --queue --limit=50` daily at 03:20 —
   production needs a real cron entry for `schedule:run` **and a queue worker**
   (`php artisan queue:work`) for the discovery jobs.
+- **Media Kit** (`NewsFlow_Media_Kit.docx`/`.pdf` at repo root, **gitignored**):
+  regenerable, not in git. Generation pipeline lives in the *session scratchpad*
+  (does NOT survive into a new session — recreate it if you need to rebuild):
+  (1) a `_demoseed.php` in `newsflow-web/` seeds a fake **John Doe** Pro account
+  (topics + subtopic, a Springfield-IL area, reading_days for the streak/heatmap,
+  saved + archived articles) — **use only fake data, never the user's**;
+  (2) a Node script (`puppeteer-core` driving installed Chrome against
+  `https://newsflow.test`) logs in as John Doe, dismisses the cookie banner,
+  full-page-screenshots all 17 pages, then slices each tall PNG into
+  page-height bands (`pngjs`) encoded as JPEG (`jpeg-js`, q84, 1.5×) so images
+  flow across doc pages without clipping; (3) an extended
+  `docx_pdf_generator`-style PS script embeds the logo (top) + slices (bottom)
+  — DOCX via OOXML `word/media` parts + drawing XML, PDF via headless-Chrome
+  `<img>`. Delete John Doe (`_democlean.php`) + the scratch `_demo*.php` after.
+  The logo lockup is reproduced from `ApplicationLogo.vue` (newspaper mark) +
+  "NewsFlow™" + the Spantaran-font "by moon whale media, llc" signature.
 
 ---
 
