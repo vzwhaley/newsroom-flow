@@ -95,6 +95,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Topics (store/refresh throttled — refresh fans out to the news API)
     Route::post('/topics', [TopicController::class, 'store'])->middleware('throttle:30,1')->name('topics.store');
     Route::post('/topics/reorder', [TopicController::class, 'reorder'])->name('topics.reorder');
+    Route::post('/topics/{topic}/move', [TopicController::class, 'move'])->name('topics.move');
     Route::post('/topics/{topic}/refresh', [TopicController::class, 'refresh'])->middleware('throttle:15,1')->name('topics.refresh');
     Route::patch('/topics/{topic}/mutes', [TopicController::class, 'mutes'])->name('topics.mutes');
     Route::post('/topics/{topic}/read-all', [TopicController::class, 'markAllRead'])->name('topics.read-all');

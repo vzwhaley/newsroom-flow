@@ -190,6 +190,56 @@ class TopicController extends Controller
         return back();
     }
 
+    /**
+     * Re-parent a topic: nest it under another top-level topic, or promote it to
+     * top level (parent_id = null). Backs both the sidebar drag-and-drop and the
+     * per-topic "Move under…" menu. Enforces the one-level nesting rule.
+     */
+    public function move(Request $request, Topic $topic): RedirectResponse
+    {
+        $this->authorizeTopic($request, $topic);
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'parent_id' => ['nullable', 'integer'],
+        ]);
+
+        $newParentId = null;
+
+        if (! empty($validated['parent_id'])) {
+            $parent = $user->topics()->whereKey($validated['parent_id'])->first();
+
+            if (! $parent) {
+                return back()->with('error', 'That category no longer exists.');
+            }
+            if ($parent->id === $topic->id) {
+                return back()->with('error', 'A topic can’t be nested under itself.');
+            }
+            if ($parent->isChild()) {
+                return back()->with('error', 'You can only nest topics one level deep.');
+            }
+            if ($topic->children()->exists()) {
+                return back()->with('error', 'Move or remove this category’s subtopics before nesting it.');
+            }
+
+            $newParentId = $parent->id;
+        }
+
+        // No-op if nothing changes.
+        if ($topic->parent_id === $newParentId) {
+            return back();
+        }
+
+        // Place at the end of the destination sibling group.
+        $maxPos = $user->topics()->where('parent_id', $newParentId)->max('position');
+        $topic->forceFill([
+            'parent_id' => $newParentId,
+            'position'  => ($maxPos ?? -1) + 1,
+        ])->save();
+
+        return back()->with('success', "Moved \"{$topic->name}\".");
+    }
+
     public function destroy(Request $request, Topic $topic): RedirectResponse
     {
         $this->authorizeTopic($request, $topic);

@@ -1,6 +1,7 @@
 <script setup>
 import AdSlot from '@/Components/AdSlot.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import Dropdown from '@/Components/Dropdown.vue';
 import TopicSection from '@/Components/TopicSection.vue';
 import LocalNews from '@/Components/LocalNews.vue';
 import InputError from '@/Components/InputError.vue';
@@ -118,6 +119,67 @@ function move({ id, dir }) {
     router.post(route('topics.reorder'), { order: ids }, { preserveScroll: true });
 }
 
+// --- Re-parent: drag-and-drop + the per-topic "Move under…" menu ---
+const dragId = ref(null);
+const dropTargetId = ref(null); // a topic id, or 'toplevel'
+
+function onDragStart(id, e) {
+    dragId.value = id;
+    if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = 'move';
+        try { e.dataTransfer.setData('text/plain', String(id)); } catch { /* ignore */ }
+    }
+}
+function onDragEnd() {
+    dragId.value = null;
+    dropTargetId.value = null;
+}
+function onDragOverTopic(id, e) {
+    if (dragId.value && dragId.value !== id) {
+        e.preventDefault();
+        dropTargetId.value = id;
+    }
+}
+function onDropOnTopic(targetId, e) {
+    e.preventDefault();
+    const id = dragId.value;
+    onDragEnd();
+    if (!id || id === targetId) return;
+    moveTo(id, targetId); // nest the dragged topic under the target
+}
+function onDragOverTop(e) {
+    if (dragId.value) {
+        e.preventDefault();
+        dropTargetId.value = 'toplevel';
+    }
+}
+function onDropTop(e) {
+    e.preventDefault();
+    const id = dragId.value;
+    onDragEnd();
+    if (!id) return;
+    moveTo(id, null); // promote to top level
+}
+
+// Valid destinations for a topic's "Move under…" menu.
+function moveOptions(node) {
+    const isChild = !!node.parent_id;
+    const hasChildren = (node.children || []).length > 0;
+    const opts = [];
+    if (isChild) opts.push({ label: '↑ Move to top level', parentId: null });
+    if (!hasChildren) {
+        for (const t of props.topics) {
+            if (t.id === node.id) continue;            // not under itself
+            if (isChild && t.id === node.parent_id) continue; // already there
+            opts.push({ label: `Under “${t.name}”`, parentId: t.id });
+        }
+    }
+    return opts;
+}
+function moveTo(id, parentId) {
+    router.post(route('topics.move', id), { parent_id: parentId }, { preserveScroll: true });
+}
+
 // --- Add topic (optionally under a parent) ---
 const form = useForm({ name: '', parent_id: '' });
 
@@ -190,24 +252,55 @@ onMounted(async () => {
 
             <div class="lg:flex lg:gap-8">
                 <!-- Left-column topic navigation (desktop) -->
-                <aside v-if="topics.length" class="hidden lg:block lg:w-60 lg:shrink-0">
-                    <nav class="sticky top-28 space-y-1" aria-label="Topics">
+                <aside v-if="topics.length" class="hidden lg:block lg:w-64 lg:shrink-0">
+                    <nav class="sticky top-28 space-y-1 rounded-2xl bg-slate-800 p-3 text-slate-200 shadow-sm ring-1 ring-black/10" aria-label="Topics">
+                        <!-- Local News — first, always available -->
+                        <button
+                            @click="scrollToLocal"
+                            class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-semibold text-slate-100 hover:bg-white/10"
+                        >
+                            <span aria-hidden="true">📍</span>
+                            <span class="truncate">Local News</span>
+                        </button>
+
+                        <div class="my-1 border-t border-white/10"></div>
+
+                        <!-- All Topics (also the drop zone to promote a topic to top level) -->
                         <button
                             @click="select('all')"
-                            class="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm font-semibold"
-                            :class="selected === 'all' ? 'bg-brand-50 text-brand-700' : 'text-gray-700 hover:bg-gray-100'"
+                            @dragover="onDragOverTop"
+                            @drop="onDropTop"
+                            @dragleave="dropTargetId === 'toplevel' ? (dropTargetId = null) : null"
+                            class="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm font-semibold transition"
+                            :class="[
+                                selected === 'all' ? 'bg-brand-600 text-white' : 'text-slate-300 hover:bg-white/10',
+                                dropTargetId === 'toplevel' ? 'ring-2 ring-brand-400' : '',
+                            ]"
                         >
-                            All Topics
-                            <span class="text-xs text-gray-400">{{ user.topic_count }}</span>
+                            <span>{{ dragId ? 'Drop here → top level' : 'All Topics' }}</span>
+                            <span v-if="!dragId" class="text-xs text-slate-400">{{ user.topic_count }}</span>
                         </button>
 
                         <template v-for="t in topics" :key="t.id">
-                            <div class="group flex items-center">
+                            <div
+                                class="group flex items-center rounded-md"
+                                draggable="true"
+                                @dragstart="onDragStart(t.id, $event)"
+                                @dragend="onDragEnd"
+                                @dragover="onDragOverTopic(t.id, $event)"
+                                @dragleave="dropTargetId === t.id ? (dropTargetId = null) : null"
+                                @drop="onDropOnTopic(t.id, $event)"
+                                :class="dropTargetId === t.id ? 'bg-white/5 ring-2 ring-brand-400' : ''"
+                            >
+                                <!-- Drag handle -->
+                                <span class="shrink-0 cursor-grab px-0.5 text-slate-500 group-hover:text-slate-300" title="Drag to move" aria-hidden="true">
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a1 1 0 11-2 0 1 1 0 012 0zM7 10a1 1 0 11-2 0 1 1 0 012 0zM7 16a1 1 0 11-2 0 1 1 0 012 0zM13 4a1 1 0 11-2 0 1 1 0 012 0zM13 10a1 1 0 11-2 0 1 1 0 012 0zM13 16a1 1 0 11-2 0 1 1 0 012 0z" /></svg>
+                                </span>
                                 <!-- Expand/collapse toggle (parents with children) -->
                                 <button
                                     v-if="t.children && t.children.length"
                                     @click="toggle(t.id)"
-                                    class="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                                    class="rounded p-1 text-slate-400 hover:bg-white/10 hover:text-white"
                                     :aria-expanded="!isCollapsed(t.id)"
                                     :aria-label="`${isCollapsed(t.id) ? 'Expand' : 'Collapse'} ${t.name} subtopics`"
                                     :title="isCollapsed(t.id) ? 'Expand' : 'Collapse'"
@@ -219,44 +312,83 @@ onMounted(async () => {
                                 <button
                                     @click="select(t.id)"
                                     class="flex flex-1 items-center gap-2 rounded-md px-2 py-2 text-left text-sm"
-                                    :class="selected === t.id ? 'bg-brand-50 font-semibold text-brand-700' : 'text-gray-700 hover:bg-gray-100'"
+                                    :class="selected === t.id ? 'bg-brand-600 font-semibold text-white' : 'text-slate-300 hover:bg-white/10'"
                                 >
                                     <span class="truncate">{{ t.name }}</span>
-                                    <span v-if="t.children && t.children.length && isCollapsed(t.id)" class="ml-auto text-xs text-gray-400">{{ t.children.length }}</span>
+                                    <span v-if="t.children && t.children.length && isCollapsed(t.id)" class="ml-auto text-xs text-slate-400">{{ t.children.length }}</span>
                                 </button>
-                                <button
-                                    @click="startSubtopic(t.id)"
-                                    title="Add a subtopic"
-                                    :aria-label="`Add a subtopic under ${t.name}`"
-                                    class="ml-1 rounded p-1 text-gray-400 opacity-0 hover:bg-gray-100 hover:text-brand-600 focus:opacity-100 focus-visible:ring-2 focus-visible:ring-brand-500 group-hover:opacity-100"
-                                >
-                                    <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-                                </button>
+
+                                <!-- Options menu (add subtopic + move under…) -->
+                                <Dropdown align="left" width="48">
+                                    <template #trigger>
+                                        <button
+                                            title="Topic options"
+                                            aria-label="Topic options"
+                                            class="rounded p-1 text-slate-400 opacity-0 hover:bg-white/10 hover:text-white focus:opacity-100 group-hover:opacity-100"
+                                        >
+                                            <svg class="h-4 w-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>
+                                        </button>
+                                    </template>
+                                    <template #content>
+                                        <button @click="startSubtopic(t.id)" class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">Add subtopic</button>
+                                        <template v-if="moveOptions(t).length">
+                                            <div class="my-1 border-t border-gray-100"></div>
+                                            <p class="px-4 py-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400">Move</p>
+                                            <button
+                                                v-for="opt in moveOptions(t)"
+                                                :key="`${t.id}-${opt.parentId}`"
+                                                @click="moveTo(t.id, opt.parentId)"
+                                                class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                                            >{{ opt.label }}</button>
+                                        </template>
+                                    </template>
+                                </Dropdown>
                             </div>
                             <!-- Children (hidden when the category is collapsed) -->
                             <template v-if="!isCollapsed(t.id)">
-                                <button
+                                <div
                                     v-for="c in (t.children || [])"
                                     :key="c.id"
-                                    @click="select(c.id)"
-                                    class="flex w-full items-center gap-2 rounded-md py-1.5 pl-11 pr-3 text-left text-sm"
-                                    :class="selected === c.id ? 'bg-brand-50 font-semibold text-brand-700' : 'text-gray-600 hover:bg-gray-100'"
+                                    class="group flex items-center rounded-md pl-6"
+                                    draggable="true"
+                                    @dragstart="onDragStart(c.id, $event)"
+                                    @dragend="onDragEnd"
                                 >
-                                    <span class="truncate">{{ c.name }}</span>
-                                </button>
+                                    <span class="shrink-0 cursor-grab px-0.5 text-slate-500 group-hover:text-slate-300" title="Drag to move" aria-hidden="true">
+                                        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a1 1 0 11-2 0 1 1 0 012 0zM7 10a1 1 0 11-2 0 1 1 0 012 0zM7 16a1 1 0 11-2 0 1 1 0 012 0zM13 4a1 1 0 11-2 0 1 1 0 012 0zM13 10a1 1 0 11-2 0 1 1 0 012 0zM13 16a1 1 0 11-2 0 1 1 0 012 0z" /></svg>
+                                    </span>
+                                    <button
+                                        @click="select(c.id)"
+                                        class="flex flex-1 items-center gap-2 rounded-md py-1.5 pl-1 pr-2 text-left text-sm"
+                                        :class="selected === c.id ? 'bg-brand-600 font-semibold text-white' : 'text-slate-400 hover:bg-white/10'"
+                                    >
+                                        <span class="truncate">{{ c.name }}</span>
+                                    </button>
+                                    <Dropdown align="left" width="48">
+                                        <template #trigger>
+                                            <button
+                                                title="Move subtopic"
+                                                aria-label="Move subtopic"
+                                                class="rounded p-1 text-slate-400 opacity-0 hover:bg-white/10 hover:text-white focus:opacity-100 group-hover:opacity-100"
+                                            >
+                                                <svg class="h-4 w-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>
+                                            </button>
+                                        </template>
+                                        <template #content>
+                                            <p class="px-4 py-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400">Move</p>
+                                            <button
+                                                v-for="opt in moveOptions(c)"
+                                                :key="`${c.id}-${opt.parentId}`"
+                                                @click="moveTo(c.id, opt.parentId)"
+                                                class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                                            >{{ opt.label }}</button>
+                                        </template>
+                                    </Dropdown>
+                                </div>
                             </template>
                         </template>
 
-                        <!-- Local News quick link (always available) -->
-                        <div class="mt-2 border-t border-gray-100 pt-2">
-                            <button
-                                @click="scrollToLocal"
-                                class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-semibold text-gray-700 hover:bg-gray-100"
-                            >
-                                <span aria-hidden="true">📍</span>
-                                <span class="truncate">Local News</span>
-                            </button>
-                        </div>
+                        <p class="px-3 pt-2 text-[11px] text-slate-400">Drag a topic onto another to nest it, or onto “All Topics” to move it back out.</p>
                     </nav>
                 </aside>
 

@@ -97,6 +97,60 @@ class TopicHierarchyTest extends TestCase
             );
     }
 
+    public function test_move_nests_a_top_level_topic_under_another(): void
+    {
+        $user = $this->pro();
+        $parent = $user->topics()->create(['name' => 'IT', 'position' => 0]);
+        $mover = $user->topics()->create(['name' => 'AI', 'position' => 1]);
+
+        $this->actingAs($user)
+            ->post(route('topics.move', $mover), ['parent_id' => $parent->id])
+            ->assertRedirect();
+
+        $this->assertSame($parent->id, $mover->fresh()->parent_id);
+    }
+
+    public function test_move_promotes_a_child_to_top_level(): void
+    {
+        $user = $this->pro();
+        $parent = $user->topics()->create(['name' => 'IT', 'position' => 0]);
+        $child = $user->topics()->create(['name' => 'AI', 'parent_id' => $parent->id, 'position' => 0]);
+
+        $this->actingAs($user)
+            ->post(route('topics.move', $child), ['parent_id' => null])
+            ->assertRedirect();
+
+        $this->assertNull($child->fresh()->parent_id);
+    }
+
+    public function test_move_cannot_nest_a_topic_that_has_children(): void
+    {
+        $user = $this->pro();
+        $target = $user->topics()->create(['name' => 'Target', 'position' => 0]);
+        $parentWithKids = $user->topics()->create(['name' => 'Parent', 'position' => 1]);
+        $user->topics()->create(['name' => 'Kid', 'parent_id' => $parentWithKids->id, 'position' => 0]);
+
+        $this->actingAs($user)
+            ->post(route('topics.move', $parentWithKids), ['parent_id' => $target->id])
+            ->assertSessionHas('error');
+
+        // Unchanged — still top level.
+        $this->assertNull($parentWithKids->fresh()->parent_id);
+    }
+
+    public function test_cannot_move_another_users_topic(): void
+    {
+        $owner = $this->pro();
+        $theirs = $owner->topics()->create(['name' => 'Theirs', 'position' => 0]);
+
+        $user = $this->pro();
+        $mine = $user->topics()->create(['name' => 'Mine', 'position' => 0]);
+
+        $this->actingAs($user)
+            ->post(route('topics.move', $theirs), ['parent_id' => $mine->id])
+            ->assertForbidden();
+    }
+
     public function test_subtopic_counts_against_the_free_limit(): void
     {
         $user = User::factory()->create(['email_verified_at' => Carbon::now()]); // free, limit 2
