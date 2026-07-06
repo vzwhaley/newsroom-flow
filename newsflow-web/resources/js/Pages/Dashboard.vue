@@ -84,6 +84,15 @@ function select(id) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// Local News quick link — jump to the always-present Local News section.
+const localRef = ref(null);
+function scrollToLocal() {
+    const el = localRef.value;
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - 100; // offset for the sticky header
+    window.scrollTo({ top: y, behavior: 'smooth' });
+}
+
 // Expand/collapse of parent categories in the sidebar (expanded by default).
 const collapsed = ref({});
 function toggle(id) {
@@ -237,6 +246,17 @@ onMounted(async () => {
                                 </button>
                             </template>
                         </template>
+
+                        <!-- Local News quick link (always available) -->
+                        <div class="mt-2 border-t border-gray-100 pt-2">
+                            <button
+                                @click="scrollToLocal"
+                                class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-semibold text-gray-700 hover:bg-gray-100"
+                            >
+                                <span aria-hidden="true">📍</span>
+                                <span class="truncate">Local News</span>
+                            </button>
+                        </div>
                     </nav>
                 </aside>
 
@@ -283,6 +303,10 @@ onMounted(async () => {
                                 :class="selected === c.id ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-600'"
                             >↳ {{ c.name }}</button>
                         </template>
+                        <button
+                            @click="scrollToLocal"
+                            class="shrink-0 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700"
+                        >📍 Local</button>
                     </div>
 
                     <!-- Add topic -->
@@ -407,11 +431,13 @@ onMounted(async () => {
                     <!-- Local News (area-tailored feeds) — always shown; it's a
                          separate section from topics and must never vanish when a
                          topic is focused or added. -->
-                    <LocalNews
-                        :areas="areas"
-                        :geo-options="geoOptions"
-                        :saved-fingerprints="savedFingerprints"
-                    />
+                    <div ref="localRef">
+                        <LocalNews
+                            :areas="areas"
+                            :geo-options="geoOptions"
+                            :saved-fingerprints="savedFingerprints"
+                        />
+                    </div>
                 </div>
             </div>
 

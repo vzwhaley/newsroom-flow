@@ -16,12 +16,6 @@ const emit = defineEmits(['mark-read', 'toggle-read']);
 
 const saving = ref(false);
 
-// TL;DR (Pro) — self-contained state.
-const tldr = ref(props.article.tldr || null);
-const tldrOpen = ref(false);
-const summarizing = ref(false);
-const tldrError = ref(null);
-
 const host = computed(() => {
     try {
         return new URL(props.article.url).hostname.replace(/^www\./, '');
@@ -80,25 +74,6 @@ async function share() {
         return;
     }
     setTimeout(() => (shareState.value = null), 2000);
-}
-
-async function toggleTldr() {
-    if (tldr.value) {
-        tldrOpen.value = !tldrOpen.value;
-        return;
-    }
-    summarizing.value = true;
-    tldrError.value = null;
-    try {
-        const { data } = await window.axios.post(route('articles.summary', props.article.id));
-        tldr.value = data.tldr;
-        tldrOpen.value = true;
-    } catch (e) {
-        tldrError.value = e?.response?.data?.error || 'Couldn’t summarize right now.';
-        tldrOpen.value = true;
-    } finally {
-        summarizing.value = false;
-    }
 }
 </script>
 
@@ -189,15 +164,6 @@ async function toggleTldr() {
             {{ article.description }}
         </p>
 
-        <!-- TL;DR panel -->
-        <div v-if="tldrOpen" class="mt-3 rounded-lg bg-brand-50/70 p-3 text-sm">
-            <p v-if="tldrError" class="text-gray-600">{{ tldrError }}</p>
-            <template v-else>
-                <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-brand-700">TL;DR</p>
-                <p class="text-gray-700">{{ tldr }}</p>
-            </template>
-        </div>
-
         <div class="mt-4 flex items-center justify-between gap-2">
             <a
                 :href="article.url"
@@ -211,27 +177,6 @@ async function toggleTldr() {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
             </a>
-
-            <!-- TL;DR action -->
-            <button
-                v-if="isPro"
-                @click="toggleTldr"
-                :disabled="summarizing"
-                class="inline-flex items-center gap-1 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-500 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 disabled:opacity-60"
-            >
-                <svg v-if="summarizing" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                {{ summarizing ? 'Summarizing…' : (tldr ? 'TL;DR' : 'TL;DR this') }}
-            </button>
-            <Link
-                v-else
-                :href="route('billing')"
-                title="TL;DR summaries are a Pro feature"
-                class="inline-flex items-center gap-1 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-400 transition hover:border-brand-300 hover:text-brand-600"
-            >
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                TL;DR
-            </Link>
         </div>
     </article>
 </template>

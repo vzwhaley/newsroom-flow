@@ -64,15 +64,16 @@ class TopicController extends Controller
             ]);
         }
 
-        // Position within the topic's sibling set (top-level, or under parent).
-        $siblingMax = $user->topics()
+        // Insert at the TOP of its sibling set (top-level, or under the parent):
+        // push every existing sibling down one slot, then take position 0.
+        $user->topics()
             ->where('parent_id', $parent?->id)
-            ->max('position');
+            ->increment('position');
 
         $topic = $user->topics()->create([
             'name'      => $name,
             'parent_id' => $parent?->id,
-            'position'  => ($siblingMax ?? -1) + 1,
+            'position'  => 0,
         ]);
 
         // Populate the feed straight away so the user sees articles instantly.
