@@ -479,16 +479,16 @@ onMounted(async () => {
                     <!-- AI daily briefing (Pro) -->
                     <section
                         v-if="briefingLoading || briefing"
-                        class="relative mb-8 overflow-hidden rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-indigo-50 p-5 shadow-sm"
+                        class="relative mb-8 flex min-h-[88px] flex-col justify-center overflow-hidden rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-indigo-50 p-5 shadow-sm"
                         aria-label="Your daily briefing"
                     >
                         <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 via-indigo-500 to-violet-500"></div>
-                        <div class="mb-2 flex items-center gap-2">
-                            <svg class="h-5 w-5 text-brand-600" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        <div class="flex items-center gap-2">
+                            <svg class="h-5 w-5 shrink-0 text-brand-600" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                             <h2 class="font-serif text-2xl font-bold text-ink">Your Daily Briefing — Today Across Your Newsroom</h2>
                         </div>
-                        <p v-if="briefingLoading" role="status" class="text-sm text-gray-500">Writing your front page…</p>
-                        <p v-else-if="briefing.ai" class="text-sm leading-relaxed text-gray-700">{{ briefing.briefing }}</p>
+                        <p v-if="briefingLoading" role="status" class="mt-2 text-sm text-gray-500">Writing your front page…</p>
+                        <p v-else-if="briefing.ai" class="mt-2 text-sm leading-relaxed text-gray-700">{{ briefing.briefing }}</p>
                     </section>
 
                     <!-- Mobile topic selector -->
