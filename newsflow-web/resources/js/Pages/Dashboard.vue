@@ -93,6 +93,48 @@ function scrollToLocal() {
     const y = el.getBoundingClientRect().top + window.scrollY - 100; // offset for the sticky header
     window.scrollTo({ top: y, behavior: 'smooth' });
 }
+function scrollToArea(id) {
+    const el = document.getElementById(`area-${id}`);
+    if (!el) return scrollToLocal();
+    const y = el.getBoundingClientRect().top + window.scrollY - 100;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+}
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Sidebar shows topics ALPHABETICALLY (parents + children). The middle column
+// keeps its own order (position — newest added on top), so the two intentionally
+// differ.
+const byName = (a, b) => (a.name || '').localeCompare(b.name || '');
+const sortedTopics = computed(() =>
+    [...props.topics]
+        .map((t) => ({ ...t, children: [...(t.children || [])].sort(byName) }))
+        .sort(byName)
+);
+
+// Local News areas grouped by state (US) / country, sorted, collapsible.
+const stateCollapsed = ref({});
+function toggleState(key) {
+    stateCollapsed.value = { ...stateCollapsed.value, [key]: !stateCollapsed.value[key] };
+}
+function stateName(key) {
+    return props.geoOptions?.states?.[key] || props.geoOptions?.countries?.[key] || key;
+}
+const areaGroups = computed(() => {
+    const groups = {};
+    for (const a of props.areas) {
+        const key = a.country_code === 'US' ? (a.region || '—') : (a.country_code || '—');
+        (groups[key] = groups[key] || []).push(a);
+    }
+    return Object.keys(groups)
+        .sort((x, y) => stateName(x).localeCompare(stateName(y)))
+        .map((key) => ({
+            key,
+            name: stateName(key),
+            areas: groups[key].slice().sort((a, b) => (a.locality || a.name).localeCompare(b.locality || b.name)),
+        }));
+});
 
 // Expand/collapse of parent categories in the sidebar (expanded by default).
 const collapsed = ref({});
@@ -262,17 +304,49 @@ onMounted(async () => {
 
             <div class="lg:flex lg:gap-8">
                 <!-- Left-column topic navigation (desktop) -->
-                <aside v-if="topics.length" class="hidden lg:block lg:w-72 lg:shrink-0">
+                <aside v-if="topics.length || areas.length" class="relative z-30 hidden lg:block lg:w-72 lg:shrink-0">
                     <div class="flex h-full min-h-[calc(100vh-9rem)] flex-col rounded-2xl bg-slate-800 p-3 text-slate-200 shadow-sm ring-1 ring-black/10">
-                    <nav class="sticky top-28 space-y-1" aria-label="Topics">
-                        <!-- Local News — first, always available -->
+                    <nav class="sticky top-28 z-30 space-y-1" aria-label="Topics">
+                        <!-- Local News — first, with its areas grouped by state -->
                         <button
                             @click="scrollToLocal"
                             class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-semibold text-slate-100 hover:bg-white/10"
                         >
                             <span aria-hidden="true">📍</span>
                             <span class="truncate">Local News</span>
+                            <span v-if="areas.length" class="ml-auto text-xs text-slate-400">{{ areas.length }}</span>
                         </button>
+
+                        <!-- Areas grouped by state (cities nested under their state) -->
+                        <template v-for="grp in areaGroups" :key="grp.key">
+                            <div class="flex items-center">
+                                <button
+                                    @click="toggleState(grp.key)"
+                                    class="rounded p-1 text-slate-400 hover:bg-white/10 hover:text-white"
+                                    :aria-expanded="!stateCollapsed[grp.key]"
+                                    :title="stateCollapsed[grp.key] ? 'Expand' : 'Collapse'"
+                                >
+                                    <svg class="h-4 w-4 transition-transform" :class="{ '-rotate-90': stateCollapsed[grp.key] }" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                                </button>
+                                <button
+                                    @click="scrollToLocal"
+                                    class="flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-slate-300 hover:bg-white/10"
+                                >
+                                    <span class="truncate">{{ grp.name }}</span>
+                                    <span class="ml-auto text-xs text-slate-400">{{ grp.areas.length }}</span>
+                                </button>
+                            </div>
+                            <template v-if="!stateCollapsed[grp.key]">
+                                <button
+                                    v-for="a in grp.areas"
+                                    :key="a.id"
+                                    @click="scrollToArea(a.id)"
+                                    class="flex w-full items-center gap-2 rounded-md py-1.5 pl-11 pr-3 text-left text-sm text-slate-400 hover:bg-white/10"
+                                >
+                                    <span class="truncate">{{ a.locality || a.name }}</span>
+                                </button>
+                            </template>
+                        </template>
 
                         <div class="my-1 border-t border-white/10"></div>
 
@@ -296,7 +370,7 @@ onMounted(async () => {
                             Drag a topic onto another to nest it, or onto “All Topics” to move it back out.
                         </p>
 
-                        <template v-for="t in topics" :key="t.id">
+                        <template v-for="t in sortedTopics" :key="t.id">
                             <div
                                 class="group flex items-center rounded-md"
                                 draggable="true"
@@ -571,6 +645,17 @@ onMounted(async () => {
                             :geo-options="geoOptions"
                             :saved-fingerprints="savedFingerprints"
                         />
+                    </div>
+
+                    <!-- Back to top -->
+                    <div v-if="topics.length || areas.length" class="mt-4 flex justify-center">
+                        <button
+                            @click="scrollToTop"
+                            class="inline-flex items-center gap-1.5 rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
+                        >
+                            <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
+                            Back to top
+                        </button>
                     </div>
                 </div>
             </div>

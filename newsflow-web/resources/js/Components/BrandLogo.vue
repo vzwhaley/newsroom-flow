@@ -37,7 +37,7 @@ const dark = computed(() => props.variant === 'dark');
                     target="_blank"
                     rel="noopener noreferrer"
                     class="font-brand transition-colors"
-                    :class="dark ? 'text-brand-200 hover:text-white' : 'text-brand-900 hover:text-gray-600'"
+                    :class="dark ? 'text-brand-200 hover:text-brand-400' : 'text-brand-900 hover:text-brand-400'"
                 >moon whale media, llc</a>
             </span>
         </span>

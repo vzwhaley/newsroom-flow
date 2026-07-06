@@ -97,7 +97,7 @@ function subtitle(area) {
         </p>
 
         <!-- Each area feed -->
-        <div v-for="area in areas" :key="area.id" class="mb-10">
+        <div v-for="area in areas" :key="area.id" :id="`area-${area.id}`" class="mb-10 scroll-mt-28">
             <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
                     <h3 class="font-serif text-xl font-bold text-ink">{{ area.name }}</h3>
