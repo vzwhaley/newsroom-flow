@@ -29,6 +29,25 @@ Schedule::command('newsflow:refresh --due')
     ->description('Hourly NewsFlow refresh for users due this hour.');
 
 /*
+|--------------------------------------------------------------------------
+| Daily global refresh — 4 AM Eastern, every topic + area, every user
+|--------------------------------------------------------------------------
+|
+| A guaranteed once-a-day sweep that grabs the newest articles for ALL
+| categories and local areas across ALL users, applying the same
+| "keep 12, prepend new, drop oldest" rotation. This runs regardless of each
+| user's per-user refresh hour above, so everyone always has a fresh top-12
+| every morning. Idempotent: only genuinely new stories are added.
+|
+*/
+Schedule::command('newsflow:refresh')
+    ->timezone('America/New_York')
+    ->dailyAt('04:00')
+    ->withoutOverlapping()
+    ->runInBackground()
+    ->description('Daily 4 AM ET global refresh — newest top-12 for every topic and area, all users.');
+
+/*
 | Daily digest email — runs 5 minutes after the refresh so opted-in users get
 | an email containing the morning's freshly-gathered stories.
 */

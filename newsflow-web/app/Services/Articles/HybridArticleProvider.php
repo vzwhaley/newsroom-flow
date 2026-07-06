@@ -151,6 +151,14 @@ class HybridArticleProvider implements ArticleProvider, LocationAwareProvider
             || config('newsflow.sources.newsapi.key'));
     }
 
+    /** Registrable-ish publisher name from a URL host (fallback source label). */
+    private function sourceFromUrl(string $url): ?string
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+
+        return $host ? preg_replace('/^www\./', '', strtolower($host)) : null;
+    }
+
     /**
      * Google News RSS — free, keyless, no signup. Scrapes the public RSS search
      * feed, which returns real, live articles for any query (topics) and any
@@ -220,6 +228,11 @@ class HybridArticleProvider implements ArticleProvider, LocationAwareProvider
             // trailing publisher so the headline reads cleanly.
             if ($source !== null && $source !== '' && str_ends_with($title, ' - '.$source)) {
                 $title = trim(substr($title, 0, -\strlen(' - '.$source)));
+            }
+
+            // Bing items often omit <source>; derive it from the publisher host.
+            if ($source === null || $source === '') {
+                $source = $this->sourceFromUrl($url);
             }
 
             // The RSS description is HTML (often a related-coverage list); strip
@@ -554,17 +567,71 @@ class HybridArticleProvider implements ArticleProvider, LocationAwareProvider
 
     private function dedupe(array $candidates): array
     {
-        $byFingerprint = [];
-
+        // Pass 1: collapse exact-URL duplicates (same link seen more than once).
+        $byUrl = [];
         foreach ($candidates as $c) {
             $fp = $c->fingerprint();
-
-            // Keep the higher-scored instance of a duplicated story.
-            if (! isset($byFingerprint[$fp]) || $c->popularityScore > $byFingerprint[$fp]->popularityScore) {
-                $byFingerprint[$fp] = $c;
-            }
+            $byUrl[$fp] = isset($byUrl[$fp]) ? $this->mergeDuplicates($byUrl[$fp], $c) : $c;
         }
 
-        return array_values($byFingerprint);
+        // Pass 2: collapse the SAME story across different sources by normalized
+        // headline (their URLs differ — e.g. a Google redirect vs a Bing direct
+        // link). Merging lets us keep, say, GDELT's image and Google's summary
+        // on one article, and prefer a direct publisher URL over an aggregator.
+        $byHeadline = [];
+        $noKey = [];
+        foreach ($byUrl as $c) {
+            $key = $this->headlineKey($c->headline);
+            // Only merge on substantial headlines; short/generic ones ("News
+            // roundup") could collide across genuinely different stories.
+            if (\strlen($key) < 20) {
+                $noKey[] = $c;
+                continue;
+            }
+            $byHeadline[$key] = isset($byHeadline[$key]) ? $this->mergeDuplicates($byHeadline[$key], $c) : $c;
+        }
+
+        return array_merge(array_values($byHeadline), $noKey);
+    }
+
+    /** Normalized headline key for cross-source dedupe (alphanumeric, lowercase). */
+    private function headlineKey(string $headline): string
+    {
+        return (string) preg_replace('/[^a-z0-9]+/', '', mb_strtolower($headline));
+    }
+
+    /** Aggregator links (Google/Bing redirects) are worse than direct publisher URLs. */
+    private function isAggregatorUrl(string $url): bool
+    {
+        $host = (string) parse_url($url, PHP_URL_HOST);
+
+        return str_contains($host, 'news.google.com') || str_contains($host, 'bing.com');
+    }
+
+    /**
+     * Merge two representations of the same story into one, keeping the better
+     * link (direct publisher over aggregator, then higher score) and filling any
+     * missing fields (image, description, source, date) from the other.
+     */
+    private function mergeDuplicates(FetchedArticle $a, FetchedArticle $b): FetchedArticle
+    {
+        $aAgg = $this->isAggregatorUrl($a->url);
+        $bAgg = $this->isAggregatorUrl($b->url);
+
+        if ($aAgg !== $bAgg) {
+            [$primary, $other] = $aAgg ? [$b, $a] : [$a, $b]; // prefer the direct URL
+        } else {
+            [$primary, $other] = $b->popularityScore > $a->popularityScore ? [$b, $a] : [$a, $b];
+        }
+
+        $primary->imageUrl = $primary->imageUrl ?: $other->imageUrl;
+        if (trim($primary->description) === '') {
+            $primary->description = $other->description;
+        }
+        $primary->source = $primary->source ?: $other->source;
+        $primary->publishedAt = $primary->publishedAt ?: $other->publishedAt;
+        $primary->popularityScore = max($primary->popularityScore, $other->popularityScore);
+
+        return $primary;
     }
 }

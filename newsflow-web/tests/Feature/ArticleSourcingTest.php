@@ -101,6 +101,44 @@ XML;
         $this->assertStringNotContainsString('<a', $first->description);     // HTML stripped
     }
 
+    public function test_merges_same_story_across_sources_preferring_direct_url(): void
+    {
+        // Two sources return the SAME story: one an aggregator (google) redirect
+        // link with a full description, the other a DIRECT publisher URL with an
+        // image. They should collapse into ONE enriched article.
+        config()->set('newsflow.sources.thenewsapi.key', 'k1');
+        config()->set('newsflow.sources.gnews.key', 'k2');
+        config()->set('newsflow.signals.hacker_news', false);
+
+        $headline = 'Major breaking news story about the national economy';
+
+        Http::fake([
+            'api.thenewsapi.com/*' => Http::response(['data' => [[
+                'title'        => $headline,
+                'description'  => 'A full description of the economic story.',
+                'url'          => 'https://news.google.com/rss/articles/ABC123',
+                'image_url'    => null,
+                'published_at' => '2026-07-06T08:00:00Z',
+            ]]]),
+            'gnews.io/*' => Http::response(['articles' => [[
+                'title'       => $headline,
+                'description' => '',
+                'url'         => 'https://realpublisher.example/economy-story',
+                'image'       => 'https://realpublisher.example/img.jpg',
+                'source'      => ['name' => 'Real Publisher'],
+                'publishedAt' => '2026-07-06T08:05:00Z',
+            ]]]),
+        ]);
+
+        $articles = $this->hybrid()->fetch('economy', 12);
+
+        $this->assertCount(1, $articles); // merged, not duplicated
+        $a = $articles[0];
+        $this->assertStringContainsString('realpublisher.example', $a->url); // direct URL preferred
+        $this->assertSame('https://realpublisher.example/img.jpg', $a->imageUrl); // image kept
+        $this->assertSame('A full description of the economic story.', $a->description); // description filled
+    }
+
     public function test_parses_thenewsapi_and_returns_articles(): void
     {
         config()->set('newsflow.sources.thenewsapi.key', 'test-key');
