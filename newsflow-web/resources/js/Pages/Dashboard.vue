@@ -485,11 +485,10 @@ onMounted(async () => {
                         <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 via-indigo-500 to-violet-500"></div>
                         <div class="mb-2 flex items-center gap-2">
                             <svg class="h-5 w-5 text-brand-600" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                            <h2 class="font-serif text-lg font-bold text-ink">Your Daily Briefing</h2>
-                            <span v-if="briefing && !briefing.ai" class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500">Preview</span>
+                            <h2 class="font-serif text-lg font-bold text-ink">Your Daily Briefing — Today Across Your Newsroom</h2>
                         </div>
                         <p v-if="briefingLoading" role="status" class="text-sm text-gray-500">Writing your front page…</p>
-                        <p v-else class="text-sm leading-relaxed text-gray-700">{{ briefing.ai ? briefing.briefing : 'Today Across Your Newsroom:' }}</p>
+                        <p v-else-if="briefing.ai" class="text-sm leading-relaxed text-gray-700">{{ briefing.briefing }}</p>
                     </section>
 
                     <!-- Mobile topic selector -->
