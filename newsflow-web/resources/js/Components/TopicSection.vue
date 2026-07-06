@@ -13,7 +13,7 @@ const props = defineProps({
     canMoveDown: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(['move']);
+const emit = defineEmits(['move', 'toggle-unread']);
 
 const refreshing = ref(false);
 const removing = ref(false);
@@ -128,11 +128,21 @@ function saveMutes() {
                     <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
 
+                <!-- Unread-only filter (global toggle, shown on each topic) -->
+                <button @click="emit('toggle-unread')"
+                    :title="unreadOnly ? 'Showing unread only' : 'Show unread only'"
+                    :aria-pressed="unreadOnly"
+                    class="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition"
+                    :class="unreadOnly ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50'">
+                    <span class="inline-block h-2 w-2 rounded-full" :class="unreadOnly ? 'bg-brand-600' : 'bg-gray-300'"></span>
+                    Unread Only
+                </button>
+
                 <!-- Mark all read -->
                 <button v-if="unreadCount" @click="markAllRead" title="Mark all read"
                     class="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    Mark Read
+                    Mark All Read
                 </button>
 
                 <!-- Mute keywords (Pro) -->

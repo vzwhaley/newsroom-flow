@@ -25,17 +25,17 @@ const values = [
         </div>
         <section class="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
             <h1 class="font-serif text-4xl font-bold tracking-tight text-ink sm:text-5xl">
-                About NewsFlow
+                About NewsFlow™
             </h1>
 
             <p class="mt-6 text-lg text-gray-700">
-                NewsFlow exists to give you back control of your news. Modern feeds are
+                NewsFlow™ exists to give you back control of your news. Modern feeds are
                 built to maximize time spent, not time well spent — endless scrolling
                 through stories you never asked for. We think there’s a better way.
             </p>
 
             <p class="mt-4 text-gray-700">
-                With NewsFlow, you build your own newsroom. Choose the topics you
+                With NewsFlow™, you build your own newsroom. Choose the topics you
                 actually care about — world news, your team, an industry, a hobby —
                 and every morning we gather the day’s most popular articles on each
                 one. Twelve headlines per topic, a short summary, and a link to the
@@ -53,7 +53,7 @@ const values = [
 
             <h2 class="mt-12 font-serif text-2xl font-bold text-ink">Built by Moon Whale Media</h2>
             <p class="mt-4 text-gray-700">
-                NewsFlow is a Moon Whale Media product, built with the same care as our
+                NewsFlow™ is a Moon Whale Media product, built with the same care as our
                 other apps. It runs on the web today, with native iOS and Android apps
                 on the way — all sharing one account so your newspaper follows you
                 everywhere.

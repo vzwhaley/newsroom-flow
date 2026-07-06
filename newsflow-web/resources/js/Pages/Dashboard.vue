@@ -39,7 +39,7 @@ const atLimit = computed(() =>
 
 const limitLabel = computed(() =>
     user.value.topic_limit === null
-        ? 'Unlimited topics'
+        ? 'Unlimited Topics'
         : `${user.value.topic_count} of ${user.value.topic_limit} topics used`
 );
 
@@ -263,26 +263,16 @@ onMounted(async () => {
 </script>
 
 <template>
-    <Head title="My NewsFlow" />
+    <Head title="My NewsFlow™" />
 
     <AuthenticatedLayout>
         <template #header>
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h1 class="font-serif text-2xl font-bold text-ink">My NewsFlow</h1>
+                    <h1 class="font-serif text-2xl font-bold text-ink">My NewsFlow™</h1>
                     <p class="text-sm text-gray-500">{{ limitLabel }}</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <!-- Global reading filter (moved up here to free the row above the feeds) -->
-                    <button
-                        v-if="topics.length"
-                        @click="unreadOnly = !unreadOnly"
-                        class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition"
-                        :class="unreadOnly ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50'"
-                    >
-                        <span class="inline-block h-2 w-2 rounded-full" :class="unreadOnly ? 'bg-brand-600' : 'bg-gray-300'"></span>
-                        Unread Only
-                    </button>
                     <Link
                         v-if="reading.streak > 0"
                         :href="route('stats')"
@@ -499,7 +489,7 @@ onMounted(async () => {
                             <span v-if="briefing && !briefing.ai" class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500">Preview</span>
                         </div>
                         <p v-if="briefingLoading" role="status" class="text-sm text-gray-500">Writing your front page…</p>
-                        <p v-else class="text-sm leading-relaxed text-gray-700">{{ briefing.briefing }}</p>
+                        <p v-else class="text-sm leading-relaxed text-gray-700">{{ briefing.ai ? briefing.briefing : 'Today Across Your Newsroom:' }}</p>
                     </section>
 
                     <!-- Mobile topic selector -->
@@ -634,6 +624,7 @@ onMounted(async () => {
                         :can-move-up="entry.canUp"
                         :can-move-down="entry.canDown"
                         @move="move"
+                        @toggle-unread="unreadOnly = !unreadOnly"
                     />
 
                     <!-- Local News (area-tailored feeds) — always shown; it's a

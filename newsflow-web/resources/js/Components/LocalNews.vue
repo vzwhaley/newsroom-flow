@@ -2,7 +2,7 @@
 import ArticleCard from '@/Components/ArticleCard.vue';
 import AreaForm from '@/Components/AreaForm.vue';
 import { router, usePage } from '@inertiajs/vue3';
-import { computed, reactive, ref } from 'vue';
+import { computed, nextTick, reactive, ref } from 'vue';
 
 const props = defineProps({
     areas: { type: Array, default: () => [] },
@@ -48,6 +48,19 @@ function removeArea(area) {
     router.delete(route('areas.destroy', area.id), { preserveScroll: true });
 }
 
+// After adding an area, jump straight to its freshly-loaded results.
+function onAreaCreated() {
+    addingOpen.value = false;
+    nextTick(() => {
+        const newest = [...props.areas].sort((a, b) => b.id - a.id)[0];
+        const el = newest && document.getElementById(`area-${newest.id}`);
+        const target = el || document.querySelector('[id^="area-"]');
+        if (!target) return;
+        const y = target.getBoundingClientRect().top + window.scrollY - 100;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+    });
+}
+
 function subtitle(area) {
     if (area.country_code === 'US') {
         return [area.locality, area.region, area.postal_code].filter(Boolean).join(', ');
@@ -86,7 +99,7 @@ function subtitle(area) {
             <AreaForm
                 :countries="geoOptions.countries"
                 :states="geoOptions.states"
-                @done="addingOpen = false"
+                @done="onAreaCreated"
                 @cancel="addingOpen = false"
             />
         </div>

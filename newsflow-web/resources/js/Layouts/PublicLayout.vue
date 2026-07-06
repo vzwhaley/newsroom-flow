@@ -60,7 +60,7 @@ function isActive(href) {
                     <div class="hidden items-center gap-3 md:flex">
                         <template v-if="user">
                             <Link :href="route('dashboard')" class="rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700">
-                                My NewsFlow
+                                My NewsFlow™
                             </Link>
                         </template>
                         <template v-else>
@@ -94,7 +94,7 @@ function isActive(href) {
                         {{ link.label }}
                     </Link>
                     <div class="mt-2 border-t border-gray-100 pt-2">
-                        <Link v-if="user" :href="route('dashboard')" class="block rounded-md bg-brand-600 px-3 py-2 text-center text-sm font-semibold text-white">My NewsFlow</Link>
+                        <Link v-if="user" :href="route('dashboard')" class="block rounded-md bg-brand-600 px-3 py-2 text-center text-sm font-semibold text-white">My NewsFlow™</Link>
                         <template v-else>
                             <Link :href="route('login')" class="block rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Log In</Link>
                             <Link :href="route('register')" class="mt-1 block rounded-md bg-brand-600 px-3 py-2 text-center text-sm font-semibold text-white">Get Started</Link>

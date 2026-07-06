@@ -38,7 +38,7 @@ function when(iso) {
                         </span>
                         <div>
                             <h1 class="font-serif text-3xl font-bold leading-tight">{{ topic }}</h1>
-                            <p class="text-sm text-brand-100">A live example of a NewsFlow topic feed</p>
+                            <p class="text-sm text-brand-100">A live example of a NewsFlow™ topic feed</p>
                         </div>
                     </div>
                     <span v-if="articles.length" class="hidden items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide ring-1 ring-inset ring-white/25 sm:inline-flex">

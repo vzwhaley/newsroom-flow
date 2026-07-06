@@ -65,7 +65,7 @@ async function shareStreak() {
     try {
         const { data } = await window.axios.post(route('stats.share'));
         if (navigator.share) {
-            await navigator.share({ title: `My ${props.stats.streak}-day NewsFlow streak`, url: data.url });
+            await navigator.share({ title: `My ${props.stats.streak}-day NewsFlow™ streak`, url: data.url });
             shareState.value = 'shared';
         } else {
             await navigator.clipboard.writeText(data.url);

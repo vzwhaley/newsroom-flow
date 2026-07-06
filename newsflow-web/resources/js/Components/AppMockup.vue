@@ -27,7 +27,7 @@ defineProps({
             <line x1="0" y1="84" x2="800" y2="84" stroke="#e5e7eb" />
             <rect x="20" y="56" width="16" height="16" rx="4" fill="#2563eb" />
             <text x="44" y="69" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#0f172a">News<tspan fill="#2563eb">Flow</tspan></text>
-            <text x="150" y="69" font-family="sans-serif" font-size="12" fill="#2563eb" font-weight="600">My NewsFlow</text>
+            <text x="150" y="69" font-family="sans-serif" font-size="12" fill="#2563eb" font-weight="600">My NewsFlow™</text>
             <text x="250" y="69" font-family="sans-serif" font-size="12" fill="#64748b">Saved</text>
             <text x="310" y="69" font-family="sans-serif" font-size="12" fill="#64748b">Billing</text>
             <rect x="690" y="54" width="90" height="20" rx="10" fill="#eff6ff" />
