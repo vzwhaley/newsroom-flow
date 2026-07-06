@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+    /* Inline text link: the brand blue from the "Flow" in the logo (brand-600),
+       no underline at rest, underline on hover/focus. Use on textual hyperlinks
+       (not nav chrome or button-styled links). */
+    .text-link {
+        @apply text-brand-600 no-underline transition-colors hover:underline focus-visible:underline;
+    }
+}
+
 /* NewsFlow brand font — used for the "by moon whale media, llc" tagline. */
 @font-face {
     font-family: 'Spantaran';

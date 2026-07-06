@@ -63,7 +63,7 @@ onBeforeUnmount(() => window.removeEventListener('nf:open-cookie-settings', open
                             We use cookies and local storage. Some are essential — they keep you
                             signed in and remember your choices. With your consent, the free plan
                             also uses advertising cookies to support the app. See our
-                            <Link href="/privacy" class="font-medium text-brand-700 underline decoration-brand-300 underline-offset-2 hover:text-brand-900">Privacy Policy</Link>.
+                            <Link href="/privacy" class="text-link font-medium">Privacy Policy</Link>.
                         </p>
                     </div>
 
@@ -82,7 +82,7 @@ onBeforeUnmount(() => window.removeEventListener('nf:open-cookie-settings', open
                         >
                             Necessary Only
                         </button>
-                        <Link href="/pricing" class="text-center text-xs font-medium text-brand-700 underline decoration-brand-300 underline-offset-2 hover:text-brand-900">
+                        <Link href="/pricing" class="text-link text-center text-xs font-medium">
                             Or Go Ad-Free With Pro
                         </Link>
                     </div>

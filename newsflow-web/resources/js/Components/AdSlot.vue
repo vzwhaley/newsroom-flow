@@ -118,7 +118,7 @@ watch(consent, activate);
             data-full-width-responsive="true"
         />
         <p class="mt-2 text-center text-xs text-gray-500">
-            <a href="/pricing" class="font-medium text-brand-700 underline decoration-brand-300 underline-offset-2 hover:text-brand-900">
+            <a href="/pricing" class="text-link font-medium">
                 Remove Ads — Upgrade To Pro
             </a>
         </p>
@@ -144,7 +144,7 @@ watch(consent, activate);
             </div>
         </div>
         <p class="mt-2 text-center text-xs text-gray-500">
-            <a href="/pricing" class="font-medium text-brand-700 underline decoration-brand-300 underline-offset-2 hover:text-brand-900">
+            <a href="/pricing" class="text-link font-medium">
                 Remove Ads — Upgrade To Pro
             </a>
         </p>
