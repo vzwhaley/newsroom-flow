@@ -231,6 +231,16 @@ onMounted(async () => {
                     <p class="text-sm text-gray-500">{{ limitLabel }}</p>
                 </div>
                 <div class="flex items-center gap-3">
+                    <!-- Global reading filter (moved up here to free the row above the feeds) -->
+                    <button
+                        v-if="topics.length"
+                        @click="unreadOnly = !unreadOnly"
+                        class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition"
+                        :class="unreadOnly ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50'"
+                    >
+                        <span class="inline-block h-2 w-2 rounded-full" :class="unreadOnly ? 'bg-brand-600' : 'bg-gray-300'"></span>
+                        Unread Only
+                    </button>
                     <Link
                         v-if="reading.streak > 0"
                         :href="route('stats')"
@@ -252,8 +262,9 @@ onMounted(async () => {
 
             <div class="lg:flex lg:gap-8">
                 <!-- Left-column topic navigation (desktop) -->
-                <aside v-if="topics.length" class="hidden lg:block lg:w-64 lg:shrink-0">
-                    <nav class="sticky top-28 space-y-1 rounded-2xl bg-slate-800 p-3 text-slate-200 shadow-sm ring-1 ring-black/10" aria-label="Topics">
+                <aside v-if="topics.length" class="hidden lg:block lg:w-72 lg:shrink-0">
+                    <div class="flex h-full min-h-[calc(100vh-9rem)] flex-col rounded-2xl bg-slate-800 p-3 text-slate-200 shadow-sm ring-1 ring-black/10">
+                    <nav class="sticky top-28 space-y-1" aria-label="Topics">
                         <!-- Local News — first, always available -->
                         <button
                             @click="scrollToLocal"
@@ -280,6 +291,10 @@ onMounted(async () => {
                             <span>{{ dragId ? 'Drop here → top level' : 'All Topics' }}</span>
                             <span v-if="!dragId" class="text-xs text-slate-400">{{ user.topic_count }}</span>
                         </button>
+
+                        <p class="px-3 pb-1 pt-1.5 text-[11px] leading-snug text-slate-400">
+                            Drag a topic onto another to nest it, or onto “All Topics” to move it back out.
+                        </p>
 
                         <template v-for="t in topics" :key="t.id">
                             <div
@@ -387,9 +402,8 @@ onMounted(async () => {
                                 </div>
                             </template>
                         </template>
-
-                        <p class="px-3 pt-2 text-[11px] text-slate-400">Drag a topic onto another to nest it, or onto “All Topics” to move it back out.</p>
                     </nav>
+                    </div>
                 </aside>
 
                 <!-- Main column -->
@@ -532,18 +546,6 @@ onMounted(async () => {
                                     class="shrink-0 text-sm font-semibold text-brand-600 hover:text-brand-700">Read →</a>
                             </li>
                         </ul>
-                    </div>
-
-                    <!-- Reading toolbar -->
-                    <div v-if="topics.length" class="mb-6 flex items-center justify-end">
-                        <button
-                            @click="unreadOnly = !unreadOnly"
-                            class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition"
-                            :class="unreadOnly ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50'"
-                        >
-                            <span class="inline-block h-2 w-2 rounded-full" :class="unreadOnly ? 'bg-brand-600' : 'bg-gray-300'"></span>
-                            Unread Only
-                        </button>
                     </div>
 
                     <!-- Topic feeds -->
