@@ -476,49 +476,7 @@ onMounted(async () => {
                     <div v-if="flash.success" role="status" class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ flash.success }}</div>
                     <div v-if="flash.error" role="alert" class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ flash.error }}</div>
 
-                    <!-- AI daily briefing (Pro) -->
-                    <section
-                        v-if="briefingLoading || briefing"
-                        class="relative mb-8 flex min-h-[88px] flex-col justify-center overflow-hidden rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-indigo-50 p-5 shadow-sm"
-                        aria-label="Your daily briefing"
-                    >
-                        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 via-indigo-500 to-violet-500"></div>
-                        <div class="flex items-center gap-2">
-                            <svg class="h-5 w-5 shrink-0 text-brand-600" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                            <h2 class="font-serif text-2xl font-bold text-ink">Your Daily Briefing — Today Across Your Newsroom</h2>
-                        </div>
-                        <p v-if="briefingLoading" role="status" class="mt-2 text-sm text-gray-500">Writing your front page…</p>
-                        <p v-else-if="briefing.ai" class="mt-2 text-sm leading-relaxed text-gray-700">{{ briefing.briefing }}</p>
-                    </section>
-
-                    <!-- Mobile topic selector -->
-                    <div v-if="topics.length" class="mb-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">
-                        <button
-                            @click="select('all')"
-                            class="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
-                            :class="selected === 'all' ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-700'"
-                        >All</button>
-                        <template v-for="t in topics" :key="t.id">
-                            <button
-                                @click="select(t.id)"
-                                class="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
-                                :class="selected === t.id ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-700'"
-                            >{{ t.name }}</button>
-                            <button
-                                v-for="c in (t.children || [])"
-                                :key="c.id"
-                                @click="select(c.id)"
-                                class="shrink-0 rounded-full px-3 py-1.5 text-xs"
-                                :class="selected === c.id ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-600'"
-                            >↳ {{ c.name }}</button>
-                        </template>
-                        <button
-                            @click="scrollToLocal"
-                            class="shrink-0 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700"
-                        >📍 Local</button>
-                    </div>
-
-                    <!-- Add topic -->
+                    <!-- Add topic (top of the column) -->
                     <div class="mb-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                         <form @submit.prevent="addTopic" class="flex flex-col gap-3 sm:flex-row sm:items-start">
                             <div class="flex-1">
@@ -574,6 +532,48 @@ onMounted(async () => {
                             </p>
                             <Link :href="route('billing')" class="rounded-md bg-brand-600 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-700">Upgrade to Pro</Link>
                         </div>
+                    </div>
+
+                    <!-- AI daily briefing (Pro) -->
+                    <section
+                        v-if="briefingLoading || briefing"
+                        class="relative mb-8 flex min-h-[88px] flex-col justify-center overflow-hidden rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-indigo-50 p-5 shadow-sm"
+                        aria-label="Your daily briefing"
+                    >
+                        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 via-indigo-500 to-violet-500"></div>
+                        <div class="flex items-center gap-2">
+                            <svg class="h-5 w-5 shrink-0 text-brand-600" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            <h2 class="font-serif text-2xl font-bold text-ink">Your Daily Briefing — Today Across Your Newsroom</h2>
+                        </div>
+                        <p v-if="briefingLoading" role="status" class="mt-2 text-sm text-gray-500">Writing your front page…</p>
+                        <p v-else-if="briefing.ai" class="mt-2 text-sm leading-relaxed text-gray-700">{{ briefing.briefing }}</p>
+                    </section>
+
+                    <!-- Mobile topic selector -->
+                    <div v-if="topics.length" class="mb-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">
+                        <button
+                            @click="select('all')"
+                            class="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
+                            :class="selected === 'all' ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-700'"
+                        >All</button>
+                        <template v-for="t in topics" :key="t.id">
+                            <button
+                                @click="select(t.id)"
+                                class="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
+                                :class="selected === t.id ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-700'"
+                            >{{ t.name }}</button>
+                            <button
+                                v-for="c in (t.children || [])"
+                                :key="c.id"
+                                @click="select(c.id)"
+                                class="shrink-0 rounded-full px-3 py-1.5 text-xs"
+                                :class="selected === c.id ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-600'"
+                            >↳ {{ c.name }}</button>
+                        </template>
+                        <button
+                            @click="scrollToLocal"
+                            class="shrink-0 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700"
+                        >📍 Local</button>
                     </div>
 
                     <!-- Empty state -->
