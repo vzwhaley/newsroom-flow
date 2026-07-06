@@ -137,7 +137,7 @@ function subtitle(area) {
             </div>
 
             <!-- Articles -->
-            <div v-if="area.articles.length" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div v-if="area.articles.length" class="grid gap-6 sm:grid-cols-2">
                 <ArticleCard
                     v-for="(a, i) in area.articles"
                     :key="a.id"
