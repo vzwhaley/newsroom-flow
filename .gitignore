@@ -17,7 +17,9 @@ newsflow-web/database/*.sqlite-journal
 
 # ---- Dependencies ----
 node_modules/
-vendor/
+# Composer deps only — anchored so it does NOT swallow published package view
+# overrides like resources/views/vendor/mail (branded email templates).
+newsflow-web/vendor/
 .pnp
 .pnp.js
 
