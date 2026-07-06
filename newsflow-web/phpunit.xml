@@ -32,5 +32,8 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- Keep the article suite network-free: the free Google News RSS source
+             is on by default in prod but off in tests (they assert stub/faked HTTP). -->
+        <env name="NEWSFLOW_GOOGLE_NEWS" value="false"/>
     </php>
 </phpunit>

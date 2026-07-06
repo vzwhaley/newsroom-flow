@@ -9,6 +9,7 @@ use App\Support\FetchedArticle;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * The recommended provider. Blends three layers:
@@ -117,6 +118,11 @@ class HybridArticleProvider implements ArticleProvider, LocationAwareProvider
     {
         $all = [];
 
+        // Free keyless baseline — real articles with zero configuration.
+        if (config('newsflow.sources.google_news.enabled')) {
+            $all = array_merge($all, $this->fromGoogleNewsRss($topic, $pool));
+        }
+
         if ($key = config('newsflow.sources.thenewsapi.key')) {
             $all = array_merge($all, $this->fromTheNewsApi($topic, $pool, $key));
         }
@@ -138,10 +144,113 @@ class HybridArticleProvider implements ArticleProvider, LocationAwareProvider
 
     private function anySourceConfigured(): bool
     {
-        return (bool) (config('newsflow.sources.thenewsapi.key')
+        return (bool) (config('newsflow.sources.google_news.enabled')
+            || config('newsflow.sources.thenewsapi.key')
             || config('newsflow.sources.newsdata.key')
             || config('newsflow.sources.gnews.key')
             || config('newsflow.sources.newsapi.key'));
+    }
+
+    /**
+     * Google News RSS — free, keyless, no signup. Scrapes the public RSS search
+     * feed, which returns real, live articles for any query (topics) and any
+     * place (local areas, via the geo country). Titles come as "Headline -
+     * Publisher"; we split off the publisher and clean the HTML snippet.
+     */
+    private function fromGoogleNewsRss(string $topic, int $pool): array
+    {
+        try {
+            // Locale: default US/English; scope to the area's country when set.
+            $gl = $this->geo['country'] ? strtoupper($this->geo['country']) : 'US';
+            $params = [
+                'q'    => $topic,
+                'hl'   => 'en-'.$gl,
+                'gl'   => $gl,
+                'ceid' => $gl.':en',
+            ];
+
+            $response = Http::timeout(15)
+                ->withHeaders(['User-Agent' => 'Mozilla/5.0 (compatible; NewsFlow/1.0)'])
+                ->get(config('newsflow.sources.google_news.endpoint'), $params);
+
+            if (! $response->ok()) {
+                return [];
+            }
+
+            return $this->parseRss($response->body(), $pool);
+        } catch (\Throwable $e) {
+            Log::warning('Google News RSS fetch failed', ['topic' => $topic, 'error' => $e->getMessage()]);
+
+            return [];
+        }
+    }
+
+    /**
+     * Parse an RSS 2.0 document into FetchedArticle candidates.
+     *
+     * @return array<int, FetchedArticle>
+     */
+    private function parseRss(string $xml, int $limit): array
+    {
+        $previous = libxml_use_internal_errors(true);
+        $doc = simplexml_load_string($xml);
+        libxml_use_internal_errors($previous);
+
+        if ($doc === false || ! isset($doc->channel->item)) {
+            return [];
+        }
+
+        $out = [];
+
+        foreach ($doc->channel->item as $item) {
+            if (count($out) >= $limit) {
+                break;
+            }
+
+            $title = trim((string) $item->title);
+            $url = trim((string) $item->link);
+
+            if ($title === '' || $url === '') {
+                continue;
+            }
+
+            $source = isset($item->source) ? trim((string) $item->source) : null;
+
+            // Google News formats titles as "Headline - Publisher"; drop the
+            // trailing publisher so the headline reads cleanly.
+            if ($source !== null && $source !== '' && str_ends_with($title, ' - '.$source)) {
+                $title = trim(substr($title, 0, -\strlen(' - '.$source)));
+            }
+
+            // The RSS description is HTML (often a related-coverage list); strip
+            // to plain text and keep it short.
+            $description = trim(preg_replace('/\s+/', ' ', html_entity_decode(
+                strip_tags((string) $item->description),
+                ENT_QUOTES | ENT_HTML5,
+            )));
+            $description = Str::limit($description, 220);
+
+            $publishedAt = null;
+            if (! empty($item->pubDate)) {
+                try {
+                    $publishedAt = Carbon::parse((string) $item->pubDate);
+                } catch (\Throwable) {
+                    $publishedAt = null;
+                }
+            }
+
+            $out[] = new FetchedArticle(
+                headline: $title,
+                description: $description,
+                url: $url,
+                source: $source,
+                imageUrl: null,
+                publishedAt: $publishedAt,
+                popularityScore: 50.0,
+            );
+        }
+
+        return $out;
     }
 
     private function fromTheNewsApi(string $topic, int $pool, string $key): array

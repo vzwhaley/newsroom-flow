@@ -58,6 +58,49 @@ class ArticleSourcingTest extends TestCase
         $this->assertInstanceOf(FetchedArticle::class, $articles[0]);
     }
 
+    public function test_parses_google_news_rss_into_real_articles(): void
+    {
+        config()->set('newsflow.sources.google_news.enabled', true);
+        config()->set('newsflow.signals.hacker_news', false);
+
+        $rss = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+  <item>
+    <title>Afton council approves new riverfront park - Greeneville Sun</title>
+    <link>https://news.google.com/rss/articles/ABC123?oc=5</link>
+    <pubDate>Mon, 06 Jul 2026 12:00:00 GMT</pubDate>
+    <description>&lt;a href="https://greenevillesun.com/x"&gt;Afton council approves new riverfront park&lt;/a&gt;</description>
+    <source url="https://www.greenevillesun.com">Greeneville Sun</source>
+  </item>
+  <item>
+    <title>Storms roll through Greene County overnight - WJHL</title>
+    <link>https://news.google.com/rss/articles/DEF456?oc=5</link>
+    <pubDate>Mon, 06 Jul 2026 11:00:00 GMT</pubDate>
+    <description>Coverage of the overnight storms.</description>
+    <source url="https://www.wjhl.com">WJHL</source>
+  </item>
+</channel></rss>
+XML;
+
+        Http::fake([
+            'news.google.com/*' => Http::response($rss, 200, ['Content-Type' => 'application/xml']),
+        ]);
+
+        $articles = $this->hybrid()->fetch('Afton, Tennessee', 12);
+
+        $this->assertCount(2, $articles);
+        $headlines = array_map(fn ($a) => $a->headline, $articles);
+        // Publisher suffix is stripped from the Google News title.
+        $this->assertContains('Afton council approves new riverfront park', $headlines);
+        $this->assertContains('Storms roll through Greene County overnight', $headlines);
+
+        $first = collect($articles)->firstWhere('headline', 'Afton council approves new riverfront park');
+        $this->assertSame('Greeneville Sun', $first->source);
+        $this->assertStringContainsString('news.google.com', $first->url); // real, clickable link (not .example)
+        $this->assertStringNotContainsString('<a', $first->description);     // HTML stripped
+    }
+
     public function test_parses_thenewsapi_and_returns_articles(): void
     {
         config()->set('newsflow.sources.thenewsapi.key', 'test-key');

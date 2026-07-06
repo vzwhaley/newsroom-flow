@@ -404,9 +404,10 @@ onMounted(async () => {
                         @move="move"
                     />
 
-                    <!-- Local News (area-tailored feeds) -->
+                    <!-- Local News (area-tailored feeds) — always shown; it's a
+                         separate section from topics and must never vanish when a
+                         topic is focused or added. -->
                     <LocalNews
-                        v-if="selected === 'all'"
                         :areas="areas"
                         :geo-options="geoOptions"
                         :saved-fingerprints="savedFingerprints"
@@ -414,7 +415,7 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <AdSlot slot="dashboard_bottom" />
+            <AdSlot slot="dashboard_bottom" format="horizontal" />
         </div>
     </AuthenticatedLayout>
 </template>

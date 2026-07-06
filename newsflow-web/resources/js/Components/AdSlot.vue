@@ -20,8 +20,9 @@ import { useCookieConsent } from '@/composables/useCookieConsent';
 const props = defineProps({
     /** Slot key under config/adsense.php → slots[] (e.g. 'home_top'). */
     slot: { type: String, required: true },
-    /** AdSense ad format → data-ad-format. 'auto' (responsive) suits most. */
-    format: { type: String, default: 'auto' },
+    /** AdSense ad format. Default 'horizontal' = fixed 728 × 90 leaderboard
+     *  (the standard placement across NewsFlow and the sibling sites). */
+    format: { type: String, default: 'horizontal' },
 });
 
 const page = usePage();

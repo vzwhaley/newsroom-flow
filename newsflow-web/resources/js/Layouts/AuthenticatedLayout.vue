@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import BrandLogo from '@/Components/BrandLogo.vue';
 import CookieConsent from '@/Components/CookieConsent.vue';
+import SiteFooter from '@/Components/SiteFooter.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
@@ -25,7 +26,7 @@ const tierLabel = computed(() => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-50">
+    <div class="flex min-h-screen flex-col bg-gray-50">
         <!-- Skip link for keyboard/screen-reader users (WCAG 2.4.1) -->
         <a
             href="#main-content"
@@ -186,9 +187,11 @@ const tierLabel = computed(() => {
             </div>
         </header>
 
-        <main id="main-content">
+        <main id="main-content" class="flex-1">
             <slot />
         </main>
+
+        <SiteFooter />
 
         <CookieConsent />
     </div>

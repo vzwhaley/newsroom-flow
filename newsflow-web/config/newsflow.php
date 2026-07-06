@@ -36,6 +36,16 @@ return [
     */
 
     'sources' => [
+        // Google News RSS — FREE, keyless, no signup. Scrapes Google News'
+        // public RSS search feed for real, live articles on any topic (and any
+        // locality for local-area feeds). This is the default baseline source so
+        // the app returns REAL articles out of the box with zero configuration;
+        // any keyed APIs below are merged on top when configured. Disable in the
+        // test suite via NEWSFLOW_GOOGLE_NEWS=false so tests stay network-free.
+        'google_news' => [
+            'enabled'  => (bool) env('NEWSFLOW_GOOGLE_NEWS', true),
+            'endpoint' => 'https://news.google.com/rss/search',
+        ],
         // TheNewsAPI — cheapest real-time COMMERCIAL option ($19-49/mo),
         // supports sort=relevance_score, returns description + image + time.
         // Recommended primary source for launch.
