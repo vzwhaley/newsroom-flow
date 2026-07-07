@@ -39,7 +39,7 @@ const tierLabel = computed(() => {
                 <div class="flex h-24 justify-between">
                     <div class="flex">
                         <div class="flex shrink-0 items-center">
-                            <BrandLogo :href="route('dashboard')" />
+                            <BrandLogo href="/" />
                         </div>
 
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
