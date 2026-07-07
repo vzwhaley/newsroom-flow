@@ -82,7 +82,15 @@ function flatIds() {
 
 function select(id) {
     selected.value = id;
+    activeArea.value = null; // selecting a topic clears the active local-news city
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// The active local-news city (mutually exclusive with a selected topic).
+const activeArea = ref(null);
+function selectArea(id) {
+    activeArea.value = id;
+    scrollToArea(id);
 }
 
 // Local News quick link — jump to the always-present Local News section.
@@ -331,8 +339,9 @@ onMounted(async () => {
                                 <button
                                     v-for="a in grp.areas"
                                     :key="a.id"
-                                    @click="scrollToArea(a.id)"
-                                    class="flex w-full items-center gap-2 rounded-md py-1.5 pl-11 pr-3 text-left text-sm text-slate-400 hover:bg-white/10"
+                                    @click="selectArea(a.id)"
+                                    class="flex w-full items-center gap-2 rounded-md py-1.5 pl-11 pr-3 text-left text-sm"
+                                    :class="activeArea === a.id ? 'bg-brand-600 font-semibold text-white' : 'text-slate-400 hover:bg-white/10'"
                                 >
                                     <span class="truncate">{{ a.locality || a.name }}</span>
                                 </button>
@@ -349,7 +358,7 @@ onMounted(async () => {
                             @dragleave="dropTargetId === 'toplevel' ? (dropTargetId = null) : null"
                             class="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm font-semibold transition"
                             :class="[
-                                selected === 'all' ? 'bg-brand-600 text-white' : 'text-slate-300 hover:bg-white/10',
+                                selected === 'all' && !activeArea ? 'bg-brand-600 text-white' : 'text-slate-300 hover:bg-white/10',
                                 dropTargetId === 'toplevel' ? 'ring-2 ring-brand-400' : '',
                             ]"
                         >
@@ -392,7 +401,7 @@ onMounted(async () => {
                                 <button
                                     @click="select(t.id)"
                                     class="flex flex-1 items-center gap-2 rounded-md px-2 py-2 text-left text-sm"
-                                    :class="selected === t.id ? 'bg-brand-600 font-semibold text-white' : 'text-slate-300 hover:bg-white/10'"
+                                    :class="selected === t.id && !activeArea ? 'bg-brand-600 font-semibold text-white' : 'text-slate-300 hover:bg-white/10'"
                                 >
                                     <span class="truncate">{{ t.name }}</span>
                                     <span v-if="t.children && t.children.length && isCollapsed(t.id)" class="ml-auto text-xs text-slate-400">{{ t.children.length }}</span>
@@ -440,7 +449,7 @@ onMounted(async () => {
                                     <button
                                         @click="select(c.id)"
                                         class="flex flex-1 items-center gap-2 rounded-md py-1.5 pl-1 pr-2 text-left text-sm"
-                                        :class="selected === c.id ? 'bg-brand-600 font-semibold text-white' : 'text-slate-400 hover:bg-white/10'"
+                                        :class="selected === c.id && !activeArea ? 'bg-brand-600 font-semibold text-white' : 'text-slate-400 hover:bg-white/10'"
                                     >
                                         <span class="truncate">{{ c.name }}</span>
                                     </button>
