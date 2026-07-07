@@ -60,8 +60,12 @@ class ArticleController extends Controller
 
         if (is_null($article->read_at)) {
             $article->forceFill(['read_at' => now()])->save();
-            ReadingDay::bump($request->user());
         }
+
+        // Every open counts as reading activity for the day, so the streak
+        // reflects that the user read today even when re-opening an article
+        // (feeds don't always surface a brand-new story to read each day).
+        ReadingDay::bump($request->user());
 
         return response()->json(['read_at' => $article->read_at?->toIso8601String()]);
     }

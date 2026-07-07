@@ -52,6 +52,20 @@ class StreaksAndSharesTest extends TestCase
         $this->assertSame(2, (int) ReadingDay::where('user_id', $user->id)->first()->reads);
     }
 
+    public function test_reopening_an_already_read_article_still_records_daily_activity(): void
+    {
+        [$user, , $article] = $this->userWithArticle();
+
+        // First open marks it read and records the day.
+        $this->actingAs($user)->postJson(route('articles.read', $article))->assertOk();
+        // Re-opening the SAME (already-read) article still counts toward the day,
+        // so the streak stays alive even when there's nothing brand-new to read.
+        $this->actingAs($user)->postJson(route('articles.read', $article))->assertOk();
+
+        $this->assertSame(1, ReadingDay::where('user_id', $user->id)->count());
+        $this->assertSame(2, (int) ReadingDay::where('user_id', $user->id)->first()->reads);
+    }
+
     public function test_streak_counts_consecutive_days_and_survives_an_unread_morning(): void
     {
         $user = User::factory()->create(['email_verified_at' => Carbon::now(), 'timezone' => 'UTC']);
