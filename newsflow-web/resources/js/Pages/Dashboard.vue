@@ -291,7 +291,7 @@ onMounted(async () => {
                         {{ reading.streak }}-day streak
                     </Link>
                     <span class="text-sm text-gray-400">
-                        {{ new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) }}
+                        {{ new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) }}
                     </span>
                 </div>
             </div>
