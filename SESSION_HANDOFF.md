@@ -1,14 +1,15 @@
 # NewsroomFlow™ — Session Handoff
 
 **Last updated:** 2026-07-07
-**Repo:** `vzwhaley/newspaper-flow` (GitHub) · local: `C:\Users\vzwhaley\Herd\MOON_WHALE_MEDIA\newspaper-flow`
+**Repo:** `vzwhaley/newsroom-flow` (GitHub — NOT renamed; stays brand-aligned) · local: `C:\Users\vzwhaley\Herd\MOON_WHALE_MEDIA\newspaper-flow`
 **Branch:** `main` — see §6 "Project slug rename" for the 2026-07-07 `newsflow` → `newspaper-flow` rename.
 
 > **Rename note (2026-07-07):** the project slug was renamed `newsflow` → `newspaper-flow`
-> across the web app, config, env, artisan commands, dev/prod domains, Herd site,
-> and the GitHub repo. The **top-level local folder** and the **GitHub repo** are
-> renamed OUTSIDE this session (see §6 / the final manual steps). If you cloned
-> before that, your local folder may still be `NewsFlow` — that's cosmetic.
+> across the web app, config, env, artisan commands, dev/prod domains, and the Herd site.
+> The **GitHub repo stays `newsroom-flow`** (remote points there, in sync). The
+> **top-level local folder** rename (`NewsFlow` → `newspaper-flow`) happens OUTSIDE this
+> session (cwd lock — see the final manual steps). If you cloned before that, your local
+> folder may still be `NewsFlow` — that's cosmetic.
 
 > Paste this whole file as your first message in a new Claude Code session,
 > or just say "read SESSION_HANDOFF.md". The memory notes auto-load already;
@@ -242,9 +243,11 @@ the mobile apps were NOT touched this session.
   - AdSense DOM marker `data-newsflow-adsense` → **`data-newspaperflow-adsense`**.
   - Herd site `newsflow` → **`newspaperflow`** (cert generated; symlink needs an elevated
     `herd link` — a manual step, see the final steps below).
-  - Top-level folder `NewsFlow` → **`newspaper-flow`** and GitHub repo `news-flow` →
-    **`newspaper-flow`** — both done OUTSIDE this session (folder = cwd lock, repo = web UI).
-    Git remote already re-pointed to `git@github.com:vzwhaley/newspaper-flow.git`.
+  - Top-level folder `NewsFlow` → **`newspaper-flow`** — done OUTSIDE this session
+    (cwd lock; rename after closing Claude Code).
+  - **GitHub repo NOT renamed** — stays **`newsroom-flow`** (already brand-aligned;
+    a slug≠repo mismatch is fine, like the old `news-flow`/`newsflow`). Remote is
+    `git@github.com:vzwhaley/newsroom-flow.git`, in sync at the rename commit.
   - **Convention:** hyphenated slug (`newspaper-flow`) for folder/subdir/repo; collapsed
     token (`newspaperflow`) for config/env/commands/domains where hyphens are illegal/ugly.
   - **NOT renamed (deliberate, pending the mobile brand rename):** the mobile apps'
