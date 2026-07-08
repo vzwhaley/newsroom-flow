@@ -8,10 +8,10 @@ to re-run.
 
 | Script | What it does | Re-run when |
 |--------|--------------|-------------|
-| [`generate-favicons.ps1`](generate-favicons.ps1) | Renders `newsflow-web/public/favicon.svg` to PNGs (180/96/32) via headless Chrome/Edge, then assembles `favicon.ico`. Produces `apple-touch-icon.png`, `favicon-96x96.png`, `favicon.ico`. | The favicon SVG changes |
-| [`generate-og-image.ps1`](generate-og-image.ps1) | Renders the 1200×630 Open Graph / Twitter share card (`newsflow-web/public/img/og-default.png`) — newspaper mark + wordmark + tagline on the brand gradient. | The brand, wordmark, or tagline changes |
+| [`generate-favicons.ps1`](generate-favicons.ps1) | Renders `newspaper-flow-web/public/favicon.svg` to PNGs (180/96/32) via headless Chrome/Edge, then assembles `favicon.ico`. Produces `apple-touch-icon.png`, `favicon-96x96.png`, `favicon.ico`. | The favicon SVG changes |
+| [`generate-og-image.ps1`](generate-og-image.ps1) | Renders the 1200×630 Open Graph / Twitter share card (`newspaper-flow-web/public/img/og-default.png`) — newspaper mark + wordmark + tagline on the brand gradient. | The brand, wordmark, or tagline changes |
 | [`generate-android-icon.ps1`](generate-android-icon.ps1) | Draws the brand-blue **"NF"** monogram launcher icon (1024×1024 PNG) with System.Drawing → `newsflow-android/.../AppIcon`-style source. | The app icon design changes |
-| [`optimize-hero-image.ps1`](optimize-hero-image.ps1) | Resizes/compresses a source photo into the homepage hero background `newsflow-web/public/images/hero-newspaper.jpg`. | A new hero photo is supplied |
+| [`optimize-hero-image.ps1`](optimize-hero-image.ps1) | Resizes/compresses a source photo into the homepage hero background `newspaper-flow-web/public/images/hero-newspaper.jpg`. | A new hero photo is supplied |
 | [`validate-pbxproj.py`](validate-pbxproj.py) | Sanity-checks the hand-authored iOS `project.pbxproj`: balanced braces/parens, matched `Begin/End` section markers, and no referenced-but-undefined object IDs. | Any manual edit to the Xcode project |
 
 ## Requirements

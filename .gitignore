@@ -1,5 +1,5 @@
 # ===== NewsFlow monorepo .gitignore =====
-# Covers: Laravel/PHP (newsflow-web), Node/Vite, and future Android/iOS apps.
+# Covers: Laravel/PHP (newspaper-flow-web), Node/Vite, and future Android/iOS apps.
 
 # ---- Secrets & local data (NEVER commit) ----
 .env
@@ -12,14 +12,14 @@
 *.keystore
 *.mobileprovision
 keystore.properties
-newsflow-web/database/*.sqlite
-newsflow-web/database/*.sqlite-journal
+newspaper-flow-web/database/*.sqlite
+newspaper-flow-web/database/*.sqlite-journal
 
 # ---- Dependencies ----
 node_modules/
 # Composer deps only — anchored so it does NOT swallow published package view
 # overrides like resources/views/vendor/mail (branded email templates).
-newsflow-web/vendor/
+newspaper-flow-web/vendor/
 .pnp
 .pnp.js
 
@@ -45,18 +45,18 @@ yarn-error.log*
 .phpunit.result.cache
 .phpunit.cache/
 
-# ---- Laravel / PHP (newsflow-web) ----
-newsflow-web/public/build/
-newsflow-web/public/hot
-newsflow-web/storage/*.key
-newsflow-web/storage/framework/cache/*
-newsflow-web/storage/framework/sessions/*
-newsflow-web/storage/framework/views/*
-newsflow-web/storage/framework/testing/*
-newsflow-web/storage/logs/*
-newsflow-web/bootstrap/cache/*.php
-newsflow-web/.phpunit.result.cache
-newsflow-web/auth.json
+# ---- Laravel / PHP (newspaper-flow-web) ----
+newspaper-flow-web/public/build/
+newspaper-flow-web/public/hot
+newspaper-flow-web/storage/*.key
+newspaper-flow-web/storage/framework/cache/*
+newspaper-flow-web/storage/framework/sessions/*
+newspaper-flow-web/storage/framework/views/*
+newspaper-flow-web/storage/framework/testing/*
+newspaper-flow-web/storage/logs/*
+newspaper-flow-web/bootstrap/cache/*.php
+newspaper-flow-web/.phpunit.result.cache
+newspaper-flow-web/auth.json
 
 # ---- Node / Vite build output ----
 dist-ssr/

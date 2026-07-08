@@ -5,14 +5,14 @@
 .DESCRIPTION
     Renders a brand-gradient social card with the newspaper logo mark, the
     "NewsFlow" wordmark, and the tagline, via headless Chrome (falls back to
-    Edge). Output: newsflow-web/public/img/og-default.png — referenced by
+    Edge). Output: newspaper-flow-web/public/img/og-default.png — referenced by
     SeoHead.vue as the default OG/Twitter image.
 
 .NOTES
     Re-run if the brand, wordmark, or tagline changes.
 #>
 param(
-    [string]$Out = (Join-Path $PSScriptRoot "..\newsflow-web\public\img\og-default.png")
+    [string]$Out = (Join-Path $PSScriptRoot "..\newspaper-flow-web\public\img\og-default.png")
 )
 
 $ErrorActionPreference = 'Continue'

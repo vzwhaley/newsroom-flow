@@ -3,10 +3,10 @@
     Generates the NewsFlow website favicon set from a single source SVG.
 
 .DESCRIPTION
-    Renders newsflow-web/public/favicon.svg to PNGs (180 / 96 / 32) using
+    Renders newspaper-flow-web/public/favicon.svg to PNGs (180 / 96 / 32) using
     headless Chrome (falls back to Edge), then assembles a favicon.ico
     (PNG-in-ICO container) from the 32px render. Outputs into
-    newsflow-web/public/:
+    newspaper-flow-web/public/:
         apple-touch-icon.png   (180x180, iOS)
         favicon-96x96.png      (96x96)
         favicon.ico            (32x32, universal fallback)
@@ -14,10 +14,10 @@
     The source SVG is the logo's newspaper mark (white on a brand-blue tile).
 
 .NOTES
-    Re-run after editing newsflow-web/public/favicon.svg.
+    Re-run after editing newspaper-flow-web/public/favicon.svg.
 #>
 param(
-    [string]$Public = (Join-Path $PSScriptRoot "..\newsflow-web\public")
+    [string]$Public = (Join-Path $PSScriptRoot "..\newspaper-flow-web\public")
 )
 
 $ErrorActionPreference = 'Continue'

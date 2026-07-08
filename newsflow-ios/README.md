@@ -3,7 +3,7 @@
 Native SwiftUI client for NewsroomFlow, mirroring the Android app
 ([`../newsflow-android`](../newsflow-android)) feature-for-feature against the
 same Sanctum-authenticated JSON API exposed by the web app
-([`../newsflow-web/routes/api.php`](../newsflow-web/routes/api.php)).
+([`../newspaper-flow-web/routes/api.php`](../newspaper-flow-web/routes/api.php)).
 
 - **UI:** SwiftUI (iOS 16+), Material-equivalent brand styling
 - **Networking:** `URLSession` + async/await, `Codable`
@@ -39,7 +39,7 @@ base URL by build configuration:
 | Build   | Base URL                  | Notes                                                            |
 |---------|---------------------------|-----------------------------------------------------------------|
 | Debug   | `http://localhost:8000`   | The iOS **simulator** shares the Mac's network, so `localhost` reaches `php artisan serve` directly (unlike Android's `10.0.2.2`). |
-| Release | `https://newsflow.app`    | Production.                                                      |
+| Release | `https://newspaperflow.app`    | Production.                                                      |
 
 For a **physical device** in Debug, change `localhost` to the Mac's LAN IP
 (e.g. `http://192.168.1.20:8000`). Cleartext localhost is permitted in Debug via
@@ -48,7 +48,7 @@ For a **physical device** in Debug, change `localhost` to the Mac's LAN IP
 To test against the local web app:
 
 ```bash
-cd ../newsflow-web
+cd ../newspaper-flow-web
 php artisan serve --host=0.0.0.0 --port=8000
 ```
 

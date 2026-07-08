@@ -39,7 +39,7 @@ android {
         versionCode = 1
         versionName = "0.1.0"
 
-        buildConfigField("String", "DEFAULT_API_BASE_URL", "\"https://newsflow.app\"")
+        buildConfigField("String", "DEFAULT_API_BASE_URL", "\"https://newspaperflow.app\"")
         vectorDrawables { useSupportLibrary = true }
     }
 
@@ -58,7 +58,7 @@ android {
         debug {
             isMinifyEnabled = false
             // Android emulator loopback to the host running
-            // `php artisan serve` (the newsflow-web app). A physical
+            // `php artisan serve` (the newspaper-flow-web app). A physical
             // device needs the host's LAN IP instead.
             buildConfigField("String", "DEFAULT_API_BASE_URL", "\"http://10.0.2.2:8000\"")
         }
@@ -68,7 +68,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            buildConfigField("String", "DEFAULT_API_BASE_URL", "\"https://newsflow.app\"")
+            buildConfigField("String", "DEFAULT_API_BASE_URL", "\"https://newspaperflow.app\"")
             if (hasReleaseKeystore) {
                 signingConfig = signingConfigs.getByName("release")
             }

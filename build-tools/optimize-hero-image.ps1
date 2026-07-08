@@ -5,7 +5,7 @@
 .DESCRIPTION
     Takes a full-resolution photo, scales it down to a max width (default 2000px,
     preserving aspect ratio) and re-encodes as JPEG at a sensible quality, writing
-    newsflow-web/public/images/hero-newspaper.jpg. This keeps the hero crisp on
+    newspaper-flow-web/public/images/hero-newspaper.jpg. This keeps the hero crisp on
     large displays while staying well under a few hundred KB.
 
 .NOTES
@@ -15,7 +15,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$Source,
 
-    [string]$Out = (Join-Path $PSScriptRoot "..\newsflow-web\public\images\hero-newspaper.jpg"),
+    [string]$Out = (Join-Path $PSScriptRoot "..\newspaper-flow-web\public\images\hero-newspaper.jpg"),
 
     [int]$MaxWidth = 2000,
     [int]$Quality = 82

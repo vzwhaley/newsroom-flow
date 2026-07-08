@@ -14,7 +14,7 @@ enum AppConfig {
         #if DEBUG
         return URL(string: "http://localhost:8000")!
         #else
-        return URL(string: "https://newsflow.app")!
+        return URL(string: "https://newspaperflow.app")!
         #endif
     }()
 
