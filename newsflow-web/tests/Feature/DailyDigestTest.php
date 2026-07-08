@@ -96,7 +96,7 @@ class DailyDigestTest extends TestCase
 
         $this->assertStringContainsString('Big story today', $html);
         $this->assertStringContainsString('World News', $html);
-        $this->assertStringContainsString('Open my NewsFlow', $html);
+        $this->assertStringContainsString('Open my NewsroomFlow', $html);
     }
 
     public function test_digest_is_sent_to_opted_in_user(): void

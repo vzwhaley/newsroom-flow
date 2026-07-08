@@ -32,7 +32,7 @@ const proFeatures = [
 <template>
     <SeoHead
         title="Pricing"
-        description="NewsFlow is free forever for 2 topics. Go Pro for unlimited topics, AI TL;DR summaries, search, archive, and an ad-free experience from $4.99/mo."
+        description="NewsroomFlow is free forever for 2 topics. Go Pro for unlimited topics, AI TL;DR summaries, search, archive, and an ad-free experience from $4.99/mo."
         path="/pricing"
     />
 

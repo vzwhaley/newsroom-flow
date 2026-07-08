@@ -170,7 +170,7 @@ class LocationQuery
         'WV' => 'West Virginia', 'WI' => 'Wisconsin', 'WY' => 'Wyoming',
     ];
 
-    // Countries NewsFlow's news sources cover well in English. Extend as needed.
+    // Countries NewsroomFlow's news sources cover well in English. Extend as needed.
     public const COUNTRIES = [
         'US' => 'United States', 'GB' => 'United Kingdom', 'CA' => 'Canada',
         'AU' => 'Australia', 'IE' => 'Ireland', 'NZ' => 'New Zealand',

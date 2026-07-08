@@ -1,6 +1,6 @@
 # build-tools
 
-Standalone scripts used to **build / generate assets and validate** the NewsFlow
+Standalone scripts used to **build / generate assets and validate** the NewsroomFlow
 project. These are *not* part of the web, Android, or iOS app source — they're
 the one-off tools that produced committed assets or checked generated files.
 Each writes into the appropriate app directory (or just validates) and is safe

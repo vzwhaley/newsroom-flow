@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 
 /**
- * Sends the "Your NewsFlow is ready" daily digest to users who opted in and
+ * Sends the "Your NewsroomFlow is ready" daily digest to users who opted in and
  * are due this hour (in their own timezone). Scheduled hourly, a few minutes
  * after the refresh so the digest contains the morning's fresh stories.
  *

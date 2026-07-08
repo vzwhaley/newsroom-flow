@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Opt-in daily "your NewsFlow is ready" email digest.
+            // Opt-in daily "your NewsroomFlow is ready" email digest.
             $table->boolean('digest_enabled')->default(false)->after('timezone');
             // Guards against double-sends within the same refresh window.
             $table->timestamp('digest_sent_at')->nullable()->after('digest_enabled');

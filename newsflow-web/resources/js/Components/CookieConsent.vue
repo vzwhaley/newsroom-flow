@@ -58,7 +58,7 @@ onBeforeUnmount(() => window.removeEventListener('nf:open-cookie-settings', open
             <div class="mx-auto max-w-4xl rounded-2xl border border-gray-200 bg-white/95 p-5 shadow-2xl ring-1 ring-black/5 backdrop-blur sm:p-6">
                 <div class="sm:flex sm:items-start sm:gap-5">
                     <div class="flex-1 text-sm leading-6 text-gray-700">
-                        <p class="text-base font-semibold text-gray-900">Cookies On NewsFlow™</p>
+                        <p class="text-base font-semibold text-gray-900">Cookies On NewsroomFlow™</p>
                         <p class="mt-1">
                             We use cookies and local storage. Some are essential — they keep you
                             signed in and remember your choices. With your consent, the free plan

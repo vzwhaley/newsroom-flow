@@ -96,7 +96,7 @@ class SocialAuthController extends Controller
         if (! $user) {
             if (! $email) {
                 return redirect()->route('register')->withErrors([
-                    'email' => 'Apple did not share an email address. Remove NewsFlow from Settings → Apple ID → Sign in with Apple and try again, or register with email and password.',
+                    'email' => 'Apple did not share an email address. Remove NewsroomFlow from Settings → Apple ID → Sign in with Apple and try again, or register with email and password.',
                 ]);
             }
 

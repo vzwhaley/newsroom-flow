@@ -4,11 +4,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Stripe Price IDs for NewsFlow Pro
+    | Stripe Price IDs for NewsroomFlow Pro
     |--------------------------------------------------------------------------
     |
     | Set these in your .env file. Each Price ID corresponds to a price
-    | created in the Stripe dashboard under Products → NewsFlow Pro.
+    | created in the Stripe dashboard under Products → NewsroomFlow Pro.
     |
     |   Monthly  Pro  — $4.99/mo   (recurring)
     |   Yearly   Pro  — $49.99/yr  (recurring)

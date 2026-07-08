@@ -24,7 +24,7 @@ Here are today’s top headlines on your topics.
 @endforeach
 
 @component('mail::button', ['url' => $url])
-Open my NewsFlow
+Open my NewsroomFlow
 @endcomponent
 
 You're receiving this because you turned on the daily digest.

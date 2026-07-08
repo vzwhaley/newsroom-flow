@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>500 — Something went wrong · NewsFlow</title>
+    <title>500 — Something went wrong · NewsroomFlow</title>
     <style>
         body { margin:0; font-family: ui-serif, Georgia, serif; background:#fff; color:#0f172a;
                display:flex; min-height:100vh; align-items:center; justify-content:center; text-align:center; }
@@ -20,7 +20,7 @@
         <p class="code">500</p>
         <h1>Something went wrong</h1>
         <p>We hit an unexpected problem on our end. Please try again in a moment.</p>
-        <a href="/">Back to NewsFlow</a>
+        <a href="/">Back to NewsroomFlow</a>
     </div>
 </body>
 </html>

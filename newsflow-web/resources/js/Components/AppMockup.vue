@@ -1,7 +1,7 @@
 <script setup>
 /**
  * A lightweight, self-contained "browser screenshot" illustration of the
- * NewsFlow feed, used on the How-to-Use page. Real screenshots can replace
+ * NewsroomFlow feed, used on the How-to-Use page. Real screenshots can replace
  * this later by swapping the <svg> for an <img>.
  */
 defineProps({
@@ -11,7 +11,7 @@ defineProps({
 
 <template>
     <figure class="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
-        <svg viewBox="0 0 800 480" class="w-full" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NewsFlow feed illustration">
+        <svg viewBox="0 0 800 480" class="w-full" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NewsroomFlow feed illustration">
             <!-- window chrome -->
             <rect width="800" height="480" fill="#f8fafc" />
             <rect width="800" height="44" fill="#ffffff" />
@@ -26,8 +26,8 @@ defineProps({
             <rect x="0" y="44" width="800" height="40" fill="#ffffff" />
             <line x1="0" y1="84" x2="800" y2="84" stroke="#e5e7eb" />
             <rect x="20" y="56" width="16" height="16" rx="4" fill="#2563eb" />
-            <text x="44" y="69" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#0f172a">News<tspan fill="#2563eb">Flow</tspan></text>
-            <text x="150" y="69" font-family="sans-serif" font-size="12" fill="#2563eb" font-weight="600">My NewsFlow™</text>
+            <text x="44" y="69" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#0f172a">Newsroom<tspan fill="#2563eb">Flow</tspan></text>
+            <text x="150" y="69" font-family="sans-serif" font-size="12" fill="#2563eb" font-weight="600">My NewsroomFlow™</text>
             <text x="250" y="69" font-family="sans-serif" font-size="12" fill="#64748b">Saved</text>
             <text x="310" y="69" font-family="sans-serif" font-size="12" fill="#64748b">Billing</text>
             <rect x="690" y="54" width="90" height="20" rx="10" fill="#eff6ff" />

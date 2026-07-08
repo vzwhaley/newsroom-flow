@@ -9,13 +9,13 @@ import { Head } from '@inertiajs/vue3';
  * Usage:
  *   <SeoHead
  *     title="Pricing"
- *     description="Free for 2 topics. NewsFlow Pro from $4.99/mo…"
+ *     description="Free for 2 topics. NewsroomFlow Pro from $4.99/mo…"
  *     path="/pricing"
  *     :jsonLd="..."   <!-- optional Object or Array of Objects -->
  *   />
  *
  * The document <title> is left bare (just `title`); the global Inertia title
- * callback in app.js appends " - NewsFlow", so we don't double-brand. JSON-LD
+ * callback in app.js appends " - NewsroomFlow", so we don't double-brand. JSON-LD
  * is injected directly into <head> (Inertia's <Head> can't render <script>
  * content) — fine for Google, which executes JS; JS-less social scrapers read
  * the server-rendered defaults in app.blade.php instead.
@@ -30,7 +30,7 @@ const props = defineProps({
 });
 
 const SITE_URL = 'https://newsflow.app';
-const SITE_NAME = 'NewsFlow™';
+const SITE_NAME = 'NewsroomFlow™';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/img/og-default.png`;
 
 const brandedTitle = computed(() => `${props.title} — ${SITE_NAME}`);
@@ -66,7 +66,7 @@ onBeforeUnmount(() => {
 
 <template>
     <Head>
-        <!-- Bare title — app.js appends " - NewsFlow". -->
+        <!-- Bare title — app.js appends " - NewsroomFlow". -->
         <title>{{ title }}</title>
         <meta name="description" :content="description" />
         <link rel="canonical" :href="canonicalUrl" />

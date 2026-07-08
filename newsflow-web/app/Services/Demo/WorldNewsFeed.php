@@ -104,7 +104,7 @@ class WorldNewsFeed
                 ->map(fn ($feed) => $pool
                     ->as($feed['source'])
                     ->timeout(5)
-                    ->withHeaders(['User-Agent' => 'NewsFlowBot/1.0 (+https://newsflow.app)'])
+                    ->withHeaders(['User-Agent' => 'NewsroomFlowBot/1.0 (+https://newsflow.app)'])
                     ->get($feed['url']))
                 ->all());
         } catch (\Throwable $e) {

@@ -8,7 +8,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * NewsFlow Pro billing — Stripe Checkout for new subscriptions (Monthly /
+ * NewsroomFlow Pro billing — Stripe Checkout for new subscriptions (Monthly /
  * Yearly) and one-time Lifetime, plus the Stripe Billing Portal for managing
  * existing subscriptions. Laravel Cashier does the heavy lifting; webhooks
  * (cancellations, payment failures, refunds) are handled at POST
@@ -135,8 +135,8 @@ class BillingController extends Controller
     public function success(Request $request): RedirectResponse
     {
         $message = $request->query('kind') === 'lifetime'
-            ? 'Thank you! Your NewsFlow Pro Lifetime purchase is confirmed — every Pro feature in the current version is unlocked, with no recurring billing.'
-            : 'Welcome to NewsFlow Pro! Your subscription is active — enjoy unlimited topics.';
+            ? 'Thank you! Your NewsroomFlow Pro Lifetime purchase is confirmed — every Pro feature in the current version is unlocked, with no recurring billing.'
+            : 'Welcome to NewsroomFlow Pro! Your subscription is active — enjoy unlimited topics.';
 
         return redirect()->route('billing')->with('success', $message);
     }

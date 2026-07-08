@@ -87,7 +87,7 @@ function submit() {
                     <input type="checkbox" v-model="form.digest_enabled" class="mt-1 rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500" />
                     <span class="text-sm text-gray-700">
                         <span class="font-medium text-gray-900">Email Me a Daily Digest</span><br />
-                        A “Your NewsFlow™ is ready” email with the morning’s headlines, delivered at your refresh time.
+                        A “Your NewsroomFlow™ is ready” email with the morning’s headlines, delivered at your refresh time.
                     </span>
                 </label>
 

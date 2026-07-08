@@ -206,7 +206,7 @@ class LocalSourceDiscovery
         foreach ($domains as $domain) {
             try {
                 $response = Http::timeout(8)
-                    ->withHeaders(['User-Agent' => 'Mozilla/5.0 (compatible; NewsFlowBot/1.0; +https://newsflow.app)'])
+                    ->withHeaders(['User-Agent' => 'Mozilla/5.0 (compatible; NewsroomFlowBot/1.0; +https://newsflow.app)'])
                     ->get("https://{$domain}/");
 
                 if (! $response->successful() && ! $response->redirect()) {

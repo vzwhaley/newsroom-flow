@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
-    <title>Unsubscribed — NewsFlow™</title>
+    <title>Unsubscribed — NewsroomFlow™</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         body { margin: 0; font-family: 'Figtree', system-ui, -apple-system, sans-serif; background: #f8fafc; color: #0f172a; display: grid; place-items: center; min-height: 100vh; }
@@ -21,7 +21,7 @@
         <div class="brand">News<span>Flow</span></div>
         <h1>You're unsubscribed</h1>
         <p>{{ $user->email }} won't receive the daily digest anymore. Changed your mind? You can turn it back on any time from your account preferences.</p>
-        <a class="btn" href="{{ route('dashboard') }}">Open NewsFlow</a>
+        <a class="btn" href="{{ route('dashboard') }}">Open NewsroomFlow</a>
     </div>
 </body>
 </html>

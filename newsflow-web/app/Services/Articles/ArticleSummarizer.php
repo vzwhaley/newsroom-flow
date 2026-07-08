@@ -46,7 +46,7 @@ class ArticleSummarizer
     {
         try {
             $response = Http::withHeaders([
-                'User-Agent' => 'Mozilla/5.0 (compatible; NewsFlowBot/1.0; +https://newsflow.test)',
+                'User-Agent' => 'Mozilla/5.0 (compatible; NewsroomFlowBot/1.0; +https://newsflow.test)',
                 'Accept'     => 'text/html',
             ])->timeout(12)->get($url);
 

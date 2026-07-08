@@ -35,7 +35,7 @@ const sections = [
             'Articles are ranked by popularity — a blend of news coverage and public engagement signals like Hacker News.',
             'Each card shows the headline, source, a short summary, and a Read More button that opens the original article in a new tab.',
             'Hit Refresh on any topic to pull the latest stories on demand.',
-            'Every morning at your chosen time, NewsFlow™ automatically gathers fresh stories and keeps each topic at a full 12.',
+            'Every morning at your chosen time, NewsroomFlow™ automatically gathers fresh stories and keeps each topic at a full 12.',
         ],
     },
     {
@@ -43,7 +43,7 @@ const sections = [
         title: 'Pro Power Features',
         pro: true,
         points: [
-            'TL;DR this: tap “TL;DR this” on any article for an instant AI summary, without leaving NewsFlow.',
+            'TL;DR this: tap “TL;DR this” on any article for an instant AI summary, without leaving NewsroomFlow.',
             'Watchlist: add keywords (e.g. “merger”, “recall”) and matching stories from any topic get pinned to the top of your feed.',
             'Search: search across every topic you follow and everything you’ve saved.',
             'Archive: stories that rotate out of your feeds are kept in your archive so you never miss a day.',
@@ -57,7 +57,7 @@ const sections = [
         title: 'Your Refresh Time & Digest',
         points: [
             'Open Profile → News preferences to choose the hour your feed refreshes and your timezone.',
-            'Turn on the daily email digest to get a “Your NewsFlow™ is ready” email with your top headlines each morning.',
+            'Turn on the daily email digest to get a “Your NewsroomFlow™ is ready” email with your top headlines each morning.',
         ],
     },
     {
@@ -74,8 +74,8 @@ const sections = [
 
 <template>
     <SeoHead
-        title="How to Use NewsFlow"
-        description="How NewsFlow works: pick your topics, and every morning we gather the day's most popular headlines on each into your own personal newspaper."
+        title="How to Use NewsroomFlow"
+        description="How NewsroomFlow works: pick your topics, and every morning we gather the day's most popular headlines on each into your own personal newspaper."
         path="/how-to-use"
     />
 
@@ -86,10 +86,10 @@ const sections = [
         <section class="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
             <div class="text-center">
                 <h1 class="font-serif text-4xl font-bold tracking-tight text-ink sm:text-5xl">
-                    How to Use NewsFlow™
+                    How to Use NewsroomFlow™
                 </h1>
                 <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600">
-                    NewsFlow™ builds you a personal newspaper from only the topics you
+                    NewsroomFlow™ builds you a personal newspaper from only the topics you
                     choose. Here’s how to get the most out of it.
                 </p>
             </div>
@@ -131,12 +131,12 @@ const sections = [
             <!-- Mobile apps -->
             <section class="mt-16 rounded-2xl border border-gray-200 bg-gray-50 p-8">
                 <div class="flex items-center gap-3">
-                    <h2 class="font-serif text-2xl font-bold text-ink">NewsFlow™ on Mobile</h2>
+                    <h2 class="font-serif text-2xl font-bold text-ink">NewsroomFlow™ on Mobile</h2>
                     <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700">Coming Soon</span>
                 </div>
                 <p class="mt-3 text-gray-600">
-                    Native NewsFlow™ apps for iOS and Android are on the way. Because
-                    NewsFlow™ is built API-first, your account, topics, saved articles,
+                    Native NewsroomFlow™ apps for iOS and Android are on the way. Because
+                    NewsroomFlow™ is built API-first, your account, topics, saved articles,
                     and preferences will sync automatically across the web and both apps —
                     sign in once and your newspaper follows you everywhere.
                 </p>
@@ -146,7 +146,7 @@ const sections = [
                     </li>
                 </ul>
                 <p class="mt-4 text-sm text-gray-500">
-                    We’ll email you when the apps launch. In the meantime, NewsFlow™ works
+                    We’ll email you when the apps launch. In the meantime, NewsroomFlow™ works
                     great in any mobile browser.
                 </p>
             </section>

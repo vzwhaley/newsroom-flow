@@ -271,13 +271,13 @@ onMounted(async () => {
 </script>
 
 <template>
-    <Head title="My NewsFlow™" />
+    <Head title="My NewsroomFlow™" />
 
     <AuthenticatedLayout>
         <template #header>
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h1 class="font-serif text-2xl font-bold text-ink">My NewsFlow™</h1>
+                    <h1 class="font-serif text-2xl font-bold text-ink">My NewsroomFlow™</h1>
                     <p class="text-sm text-gray-500">{{ limitLabel }}</p>
                 </div>
                 <div class="flex items-center gap-3">

@@ -14,7 +14,7 @@ const seoJsonLd = computed(() => {
         {
             '@context': 'https://schema.org',
             '@type': 'Organization',
-            name: 'NewsFlow',
+            name: 'NewsroomFlow',
             url: site,
             logo: `${site}/favicon.svg`,
             parentOrganization: {
@@ -26,13 +26,13 @@ const seoJsonLd = computed(() => {
         {
             '@context': 'https://schema.org',
             '@type': 'WebSite',
-            name: 'NewsFlow',
+            name: 'NewsroomFlow',
             url: site,
         },
         {
             '@context': 'https://schema.org',
             '@type': 'SoftwareApplication',
-            name: 'NewsFlow',
+            name: 'NewsroomFlow',
             applicationCategory: 'NewsApplication',
             operatingSystem: 'Web, iOS, Android',
             offers: [
@@ -54,7 +54,7 @@ const steps = [
     {
         n: '2',
         title: 'We Scour the Web at 6 AM',
-        body: 'Every morning NewsFlow™ finds the most-read, most-popular stories on each topic from the day before.',
+        body: 'Every morning NewsroomFlow™ finds the most-read, most-popular stories on each topic from the day before.',
     },
     {
         n: '3',
@@ -119,7 +119,7 @@ const sample = {
                             Your own customized news topics, every day.
                         </p>
                         <p class="mt-6 max-w-xl text-lg text-gray-200">
-                            NewsFlow™ builds you a personal front page. Choose your
+                            NewsroomFlow™ builds you a personal front page. Choose your
                             topics and every morning we deliver the day’s most
                             popular headlines on each one — nothing you didn’t ask for.
                         </p>
@@ -227,7 +227,7 @@ const sample = {
         <section class="border-y border-gray-100 bg-gray-50">
             <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
                 <h2 class="text-center font-serif text-3xl font-bold text-ink">
-                    How NewsFlow™ Works
+                    How NewsroomFlow™ Works
                 </h2>
                 <div class="mt-12 grid gap-8 md:grid-cols-3">
                     <div v-for="step in steps" :key="step.n" class="text-center">

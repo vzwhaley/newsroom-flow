@@ -86,7 +86,7 @@ class BriefingDeliveryTest extends TestCase
         $this->artisan('newsflow:push --user='.$user->id)->assertSuccessful();
 
         $this->assertCount(1, $fake->sent);
-        $this->assertSame('Your NewsFlow is ready', $fake->sent[0]['message']->title);
+        $this->assertSame('Your NewsroomFlow is ready', $fake->sent[0]['message']->title);
     }
 
     public function test_pro_digest_email_opens_with_the_briefing(): void

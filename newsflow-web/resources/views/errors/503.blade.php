@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>503 — Be right back · NewsFlow</title>
+    <title>503 — Be right back · NewsroomFlow</title>
     <style>
         body { margin:0; font-family: ui-serif, Georgia, serif; background:#fff; color:#0f172a;
                display:flex; min-height:100vh; align-items:center; justify-content:center; text-align:center; }
@@ -17,7 +17,7 @@
     <div class="wrap">
         <p class="code">503</p>
         <h1>Be right back</h1>
-        <p>NewsFlow is down for brief maintenance. Please check back shortly.</p>
+        <p>NewsroomFlow is down for brief maintenance. Please check back shortly.</p>
     </div>
 </body>
 </html>

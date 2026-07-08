@@ -178,7 +178,7 @@ class HybridArticleProvider implements ArticleProvider, LocationAwareProvider
             ];
 
             $response = Http::timeout(15)
-                ->withHeaders(['User-Agent' => 'Mozilla/5.0 (compatible; NewsFlow/1.0)'])
+                ->withHeaders(['User-Agent' => 'Mozilla/5.0 (compatible; NewsroomFlow/1.0)'])
                 ->get(config('newsflow.sources.google_news.endpoint'), $params);
 
             if (! $response->ok()) {

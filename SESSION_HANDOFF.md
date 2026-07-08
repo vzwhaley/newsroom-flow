@@ -1,4 +1,4 @@
-# NewsFlow™ — Session Handoff
+# NewsroomFlow™ — Session Handoff
 
 **Last updated:** 2026-07-05
 **Repo:** `vzwhaley/news-flow` (GitHub) · local: `C:\Users\vzwhaley\Herd\MOON_WHALE_MEDIA\NewsFlow`
@@ -10,7 +10,7 @@
 
 ---
 
-## 1. What NewsFlow is
+## 1. What NewsroomFlow is
 
 "Build your own newsroom" by **Moon Whale Media, LLC** — users follow only the
 topics they choose; each topic shows the previous day's most-popular articles,
@@ -45,7 +45,7 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
 | Commit | What landed |
 |---|---|
 | `de0ba08` | **Web: pricing-page tier order** changed to Free → Lifetime → Yearly → Monthly (display order only; containers/styling/prices unchanged, Yearly still the highlighted "Best Value"). |
-| _(uncommitted, local only)_ | **Media Kit refreshed** — `NewsFlow_Media_Kit.docx`/`.pdf` at repo root (gitignored). Now has the official logo lockup at the top + a full visual tour at the bottom: sliced full-page screenshots of **all 17 pages** (10 public + 7 signed-in app), captured from a fictitious "John Doe" Pro demo account (no real data). See §8 for the regeneration pipeline. |
+| _(uncommitted, local only)_ | **Media Kit refreshed** — `NewsroomFlow_Media_Kit.docx`/`.pdf` at repo root (gitignored). Now has the official logo lockup at the top + a full visual tour at the bottom: sliced full-page screenshots of **all 17 pages** (10 public + 7 signed-in app), captured from a fictitious "John Doe" Pro demo account (no real data). See §8 for the regeneration pipeline. |
 | `add7e89` / `f78a49e` | **Daily safety-net discovery sweep** — `newsflow:discover-sources --reverify --queue --limit=50` scheduled daily at 03:20; catches areas created while discovery was off, failed discoveries, and records past the re-verify TTL. Added `--queue`/`--limit`. |
 | `50fd71d` | **Self-learning AI local-source discovery** (web). When an area's location isn't in the curated `localnews.php`, a web-search-grounded Claude call (`LocalSourceDiscovery` + Anthropic `web_search` tool) finds its real local outlets, validates domains (liveness + redirect-canonicalization auto-catches rebrands), and caches them in `discovered_local_sources` **globally per location** (discovered once, reused by everyone). Resolution: curated metro → discovered cache → statewide → country. Queued `DiscoverAreaLocalSources` job on area create/update; `newsflow:discover-sources` backfill/reverify command. Fully env-gated on `NEWSFLOW_DISCOVERY`+`ANTHROPIC_API_KEY` (clean no-op without them). **Needs a queue worker in prod** for async discovery. |
 | `c039133` | **Northeast TN + Knoxville local outlets** — Greeneville Sun, Johnson City Press, Kingsport Times-News, Bristol Herald Courier, WJHL/WCYB/WETS, Knoxville (News Sentinel/WBIR/WATE/WVLT/WUOT), all web-verified; test locks in resolution. |
@@ -123,7 +123,7 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
   is available, needs `@OptIn(ExperimentalMaterial3Api::class)`).
 - **iOS:** edit sources freely; validate hand-edits to `project.pbxproj` with
   `python build-tools/validate-pbxproj.py`; actual builds need a Mac.
-- **Git:** monorepo root is `NewsFlow/` (not newsflow-web). **Push to
+- **Git:** monorepo root is `NewsroomFlow/` (not newsflow-web). **Push to
   `origin/main` after every commit.** Commit messages containing double-quotes
   break PS 5.1 arg-passing — write the message to a scratch file and
   `git commit -F <file>`. Commit style: `Web:|Android:|iOS:|Apps:` prefix.
@@ -167,7 +167,7 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
   via `User::areas()`. Precision ceiling is deliberate: metros excellent,
   small ZIPs degrade to nearest city. Local-outlet directory in
   `config/localnews.php` is a living asset — extend it to improve precision.
-- **Brand:** "NewsFlow™" with ™ on the web; "by moon whale media, llc" lowercase
+- **Brand:** "NewsroomFlow™" with ™ on the web; "by moon whale media, llc" lowercase
   signature is deliberate.
 - **Pricing-page card order (set 2026-07-05):** Free → Pro Lifetime → Pro Yearly
   → Pro Monthly. Display order only; prices and the highlighted "Best Value"
@@ -187,7 +187,7 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
 
 ## 7. Key files & docs to read first in a new session
 
-- `~/.claude/projects/...NewsFlow/memory/MEMORY.md` → `newsflow-project.md`
+- `~/.claude/projects/...NewsroomFlow/memory/MEMORY.md` → `newsflow-project.md`
   (auto-loads — full history incl. env gotchas).
 - `newsflow-web/README.md` — feature split, launch checklist.
 - `newsflow-android/README.md`, `newsflow-ios/README.md` — per-app setup incl.
@@ -215,7 +215,7 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
   `newsflow:discover-sources --reverify --queue --limit=50` daily at 03:20 —
   production needs a real cron entry for `schedule:run` **and a queue worker**
   (`php artisan queue:work`) for the discovery jobs.
-- **Media Kit** (`NewsFlow_Media_Kit.docx`/`.pdf` at repo root, **gitignored**):
+- **Media Kit** (`NewsroomFlow_Media_Kit.docx`/`.pdf` at repo root, **gitignored**):
   regenerable, not in git. Generation pipeline lives in the *session scratchpad*
   (does NOT survive into a new session — recreate it if you need to rebuild):
   (1) a `_demoseed.php` in `newsflow-web/` seeds a fake **John Doe** Pro account
@@ -230,7 +230,7 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
   — DOCX via OOXML `word/media` parts + drawing XML, PDF via headless-Chrome
   `<img>`. Delete John Doe (`_democlean.php`) + the scratch `_demo*.php` after.
   The logo lockup is reproduced from `ApplicationLogo.vue` (newspaper mark) +
-  "NewsFlow™" + the Spantaran-font "by moon whale media, llc" signature.
+  "NewsroomFlow™" + the Spantaran-font "by moon whale media, llc" signature.
 
 ---
 

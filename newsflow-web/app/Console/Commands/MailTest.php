@@ -24,10 +24,10 @@ class MailTest extends Command
 
         try {
             Mail::raw(
-                "This is a NewsFlow SMTP test. If you received this, outbound email is working.\n\n"
+                "This is a NewsroomFlow SMTP test. If you received this, outbound email is working.\n\n"
                 .'Sent '.now()->toDayDateTimeString().' from '.config('app.name').'.',
                 function ($message) use ($to) {
-                    $message->to($to)->subject('NewsFlow — SMTP test ✅');
+                    $message->to($to)->subject('NewsroomFlow — SMTP test ✅');
                 }
             );
 

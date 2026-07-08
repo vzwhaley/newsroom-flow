@@ -7,7 +7,7 @@ return [
     | Google AdSense — website ads (Free tier + public marketing pages)
     |--------------------------------------------------------------------------
     |
-    | The NewsFlow website uses AdSense (the mobile apps use AdMob — see
+    | The NewsroomFlow website uses AdSense (the mobile apps use AdMob — see
     | config/admob.php). The publisher client + slot IDs are public, so they're
     | injected into the SPA via Inertia shared props (HandleInertiaRequests).
     |

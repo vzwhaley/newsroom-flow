@@ -26,7 +26,7 @@ Schedule::command('newsflow:refresh --due')
     ->hourly()
     ->withoutOverlapping()
     ->runInBackground()
-    ->description('Hourly NewsFlow refresh for users due this hour.');
+    ->description('Hourly NewsroomFlow refresh for users due this hour.');
 
 /*
 |--------------------------------------------------------------------------
@@ -55,7 +55,7 @@ Schedule::command('newsflow:digest --due')
     ->hourlyAt(5)
     ->withoutOverlapping()
     ->runInBackground()
-    ->description('Hourly "Your NewsFlow is ready" digest for due, opted-in users.');
+    ->description('Hourly "Your NewsroomFlow is ready" digest for due, opted-in users.');
 
 /*
 | Daily push notification — runs a few minutes after the refresh, alongside the
@@ -65,7 +65,7 @@ Schedule::command('newsflow:push --due')
     ->hourlyAt(7)
     ->withoutOverlapping()
     ->runInBackground()
-    ->description('Hourly "Your NewsFlow is ready" push for due, opted-in users.');
+    ->description('Hourly "Your NewsroomFlow is ready" push for due, opted-in users.');
 
 /*
 |--------------------------------------------------------------------------

@@ -67,7 +67,7 @@ class PushNotificationTest extends TestCase
         $this->artisan('newsflow:push --user='.$user->id)->assertSuccessful();
 
         $this->assertCount(1, $fake->sent);
-        $this->assertSame('Your NewsFlow is ready', $fake->sent[0]['message']->title);
+        $this->assertSame('Your NewsroomFlow is ready', $fake->sent[0]['message']->title);
         $this->assertSame('2 new stories across your topics.', $fake->sent[0]['message']->body);
         $this->assertNotNull($user->fresh()->push_sent_at);
     }

@@ -4,19 +4,19 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ $card->streak }}-Day Reading Streak — NewsFlow™</title>
+        <title>{{ $card->streak }}-Day Reading Streak — NewsroomFlow™</title>
 
         <meta name="robots" content="noindex">
-        <meta name="description" content="{{ $card->name }} is on a {{ $card->streak }}-day reading streak on NewsFlow — build your own newsroom.">
+        <meta name="description" content="{{ $card->name }} is on a {{ $card->streak }}-day reading streak on NewsroomFlow — build your own newsroom.">
 
         <meta property="og:type" content="website">
-        <meta property="og:site_name" content="NewsFlow™">
-        <meta property="og:title" content="🔥 {{ $card->streak }}-day reading streak on NewsFlow">
+        <meta property="og:site_name" content="NewsroomFlow™">
+        <meta property="og:title" content="🔥 {{ $card->streak }}-day reading streak on NewsroomFlow">
         <meta property="og:description" content="{{ $card->name }} has read the news {{ $card->streak }} days in a row ({{ number_format($card->total_reads) }} articles all-time). Build your own newsroom — free for 2 topics.">
         <meta property="og:url" content="{{ url('/streak/'.$card->code) }}">
         <meta property="og:image" content="https://newsflow.app/img/og-default.png">
         <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="🔥 {{ $card->streak }}-day reading streak on NewsFlow">
+        <meta name="twitter:title" content="🔥 {{ $card->streak }}-day reading streak on NewsroomFlow">
         <meta name="twitter:description" content="{{ $card->name }} has read the news {{ $card->streak }} days in a row. Build your own newsroom.">
         <meta name="twitter:image" content="https://newsflow.app/img/og-default.png">
 
@@ -81,13 +81,13 @@
             <div class="inner">
                 <div class="flame" aria-hidden="true">🔥</div>
                 <div class="num">{{ $card->streak }}-Day</div>
-                <p class="label">reading streak on NewsFlow™</p>
+                <p class="label">reading streak on NewsroomFlow™</p>
                 <p class="who">{{ $card->name }} · {{ number_format($card->total_reads) }} articles read all-time</p>
                 <a class="btn" href="{{ url('/') }}">Start Your Own Streak</a>
             </div>
         </main>
         <p class="cta">
-            NewsFlow is your own newsroom — follow only the topics you care about,
+            NewsroomFlow is your own newsroom — follow only the topics you care about,
             with the day's most popular stories every morning. Free for 2 topics.
         </p>
     </body>

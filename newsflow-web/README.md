@@ -1,6 +1,6 @@
-# NewsFlow
+# NewsroomFlow
 
-Build your own newsroom. NewsFlow lets users follow only the topics they care
+Build your own newsroom. NewsroomFlow lets users follow only the topics they care
 about and delivers the day's most popular headlines on each one every morning —
 a more customizable Google News.
 
@@ -71,7 +71,7 @@ fresh, popular stories and applies a "prepend new, drop oldest" rule.
   `--user=ID`
 - **Schedule:** runs hourly with `--due` so each user's feed refreshes at the
   hour they chose, in their own timezone (`routes/console.php`).
-- **Daily digest:** opted-in users get a "Your NewsFlow is ready" email
+- **Daily digest:** opted-in users get a "Your NewsroomFlow is ready" email
   (`newsflow:digest --due`, scheduled 5 min after the refresh).
 
 Configure sources in `.env` (`NEWSAPI_KEY`, `GNEWS_KEY`, `NEWSDATA_KEY`,

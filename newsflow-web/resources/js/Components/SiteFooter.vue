@@ -44,7 +44,7 @@ function openCookieSettings() {
                             <li><Link href="/how-to-use" class="text-brand-200 transition-colors hover:text-white">How It Works</Link></li>
                             <li>
                                 <Link v-if="!user" href="/register" class="text-brand-200 transition-colors hover:text-white">Create Account</Link>
-                                <Link v-else :href="route('dashboard')" class="text-brand-200 transition-colors hover:text-white">My NewsFlow™</Link>
+                                <Link v-else :href="route('dashboard')" class="text-brand-200 transition-colors hover:text-white">My NewsroomFlow™</Link>
                             </li>
                         </ul>
                     </div>

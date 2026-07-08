@@ -47,7 +47,7 @@ const tierLabel = computed(() => {
                                 :href="route('dashboard')"
                                 :active="route().current('dashboard')"
                             >
-                                My NewsFlow™
+                                My NewsroomFlow™
                             </NavLink>
                             <NavLink
                                 :href="route('search')"
@@ -144,7 +144,7 @@ const tierLabel = computed(() => {
             <div id="mobile-menu" :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }" class="sm:hidden">
                 <div class="space-y-1 pb-3 pt-2">
                     <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                        My NewsFlow™
+                        My NewsroomFlow™
                     </ResponsiveNavLink>
                     <ResponsiveNavLink :href="route('search')" :active="route().current('search')">
                         Search

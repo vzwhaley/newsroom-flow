@@ -4,22 +4,22 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ $share->headline }} — NewsFlow™</title>
+        <title>{{ $share->headline }} — NewsroomFlow™</title>
 
         {{-- Thin/duplicative content: keep share cards out of the index, but
              give every scraper rich Open Graph tags for the link preview. --}}
         <meta name="robots" content="noindex">
-        <meta name="description" content="{{ $share->description ?: 'Shared via NewsFlow — build your own newsroom.' }}">
+        <meta name="description" content="{{ $share->description ?: 'Shared via NewsroomFlow — build your own newsroom.' }}">
 
         <meta property="og:type" content="article">
-        <meta property="og:site_name" content="NewsFlow™">
+        <meta property="og:site_name" content="NewsroomFlow™">
         <meta property="og:title" content="{{ $share->headline }}">
-        <meta property="og:description" content="{{ $share->description ?: 'Shared via NewsFlow — build your own newsroom.' }}">
+        <meta property="og:description" content="{{ $share->description ?: 'Shared via NewsroomFlow — build your own newsroom.' }}">
         <meta property="og:url" content="{{ url('/s/'.$share->code) }}">
         <meta property="og:image" content="{{ $share->image_url ?: 'https://newsflow.app/img/og-default.png' }}">
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="{{ $share->headline }}">
-        <meta name="twitter:description" content="{{ $share->description ?: 'Shared via NewsFlow — build your own newsroom.' }}">
+        <meta name="twitter:description" content="{{ $share->description ?: 'Shared via NewsroomFlow — build your own newsroom.' }}">
         <meta name="twitter:image" content="{{ $share->image_url ?: 'https://newsflow.app/img/og-default.png' }}">
 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -111,9 +111,9 @@
             </div>
         </main>
         <p class="cta">
-            Shared from <span class="brand">NewsFlow™</span> — build your own newsroom.
+            Shared from <span class="brand">NewsroomFlow™</span> — build your own newsroom.
             Follow only the topics you care about, free for 2 topics.
-            <a href="{{ url('/') }}">Try NewsFlow</a>
+            <a href="{{ url('/') }}">Try NewsroomFlow</a>
         </p>
     </body>
 </html>

@@ -14,14 +14,14 @@ import { useCookieConsent } from '@/composables/useCookieConsent';
  * payload for Pro users, so a tampered client literally can't load anything.
  *
  * Mirrors the AdSlot pattern from the sibling apps (FileFlow / My Emergency
- * Screen), adapted to NewsFlow's brand.
+ * Screen), adapted to NewsroomFlow's brand.
  */
 
 const props = defineProps({
     /** Slot key under config/adsense.php → slots[] (e.g. 'home_top'). */
     slot: { type: String, required: true },
     /** AdSense ad format. Default 'horizontal' = fixed 728 × 90 leaderboard
-     *  (the standard placement across NewsFlow and the sibling sites). */
+     *  (the standard placement across NewsroomFlow and the sibling sites). */
     format: { type: String, default: 'horizontal' },
 });
 

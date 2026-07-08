@@ -29,7 +29,7 @@ class DailyDigest extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->newOnly ? 'What’s new on NewsFlow 📰' : 'Your NewsFlow is ready 📰',
+            subject: $this->newOnly ? 'What’s new on NewsroomFlow 📰' : 'Your NewsroomFlow is ready 📰',
         );
     }
 

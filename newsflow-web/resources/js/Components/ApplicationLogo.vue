@@ -1,6 +1,6 @@
 <template>
     <!--
-        NewsFlow icon — a newspaper. Stroke uses currentColor so it tints with
+        NewsroomFlow icon — a newspaper. Stroke uses currentColor so it tints with
         the surrounding text color (brand blue on light headers, light on the
         dark footer). Size with a height utility, e.g. class="h-11 w-auto".
     -->

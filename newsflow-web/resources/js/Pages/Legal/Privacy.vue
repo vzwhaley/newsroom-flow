@@ -8,7 +8,7 @@ const updated = 'June 16, 2026';
 <template>
     <SeoHead
         title="Privacy Policy"
-        description="NewsFlow's privacy policy — what we collect, how news content and advertising work, the service providers we use, and your choices."
+        description="NewsroomFlow's privacy policy — what we collect, how news content and advertising work, the service providers we use, and your choices."
         path="/privacy"
     />
 
@@ -18,7 +18,7 @@ const updated = 'June 16, 2026';
             <p class="text-sm text-gray-500">Last updated {{ updated }}</p>
 
             <p class="mt-6 text-gray-700">
-                NewsFlow™ (“we”, “us”), a Moon Whale Media product, respects your
+                NewsroomFlow™ (“we”, “us”), a Moon Whale Media product, respects your
                 privacy. This policy explains what we collect, why, and your
                 choices. We do not sell your personal information.
             </p>
@@ -33,7 +33,7 @@ const updated = 'June 16, 2026';
 
             <h2 class="mt-8 font-serif text-2xl font-semibold text-ink">How News Content Works</h2>
             <p class="mt-3 text-gray-700">
-                NewsFlow™ aggregates publicly available headlines, short
+                NewsroomFlow™ aggregates publicly available headlines, short
                 descriptions, and links from third-party news APIs and public
                 engagement sources. We link out to the original publisher for the
                 full article — we do not republish full article text. Article

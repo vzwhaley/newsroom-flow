@@ -19,7 +19,7 @@ const dark = computed(() => props.variant === 'dark');
 
 <template>
     <div class="flex items-center gap-3">
-        <Link :href="href" aria-label="NewsFlow home" class="no-hover-underline shrink-0">
+        <Link :href="href" aria-label="NewsroomFlow home" class="no-hover-underline shrink-0">
             <ApplicationLogo :class="[iconClass, dark ? 'text-brand-300' : 'text-brand-600']" />
         </Link>
         <span class="flex flex-col leading-tight">
@@ -28,7 +28,7 @@ const dark = computed(() => props.variant === 'dark');
                 class="font-serif text-3xl font-bold tracking-tight"
                 :class="dark ? 'text-white' : 'text-ink'"
             >
-                News<span class="text-brand-600" :class="{ '!text-brand-400': dark }">Flow</span><span class="align-super text-sm">™</span>
+                Newsroom<span class="text-brand-600" :class="{ '!text-brand-400': dark }">Flow</span><span class="align-super text-sm">™</span>
             </Link>
             <span v-if="tagline" class="text-sm" :class="dark ? 'text-brand-200' : 'text-gray-500'">
                 by

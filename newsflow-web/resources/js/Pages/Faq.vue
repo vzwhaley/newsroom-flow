@@ -16,11 +16,11 @@ function toggle(i) {
 
 const faqs = computed(() => [
     {
-        q: 'What is NewsFlow™?',
-        a: 'NewsFlow™ is a personalized news reader. You choose the topics you care about, and each morning we gather the day’s most popular articles on each one — like a more customizable Google News that only shows what you asked for.',
+        q: 'What is NewsroomFlow™?',
+        a: 'NewsroomFlow™ is a personalized news reader. You choose the topics you care about, and each morning we gather the day’s most popular articles on each one — like a more customizable Google News that only shows what you asked for.',
     },
     {
-        q: 'How does NewsFlow™ decide what’s “most popular”?',
+        q: 'How does NewsroomFlow™ decide what’s “most popular”?',
         a: 'True page-view counts are private to publishers, so we approximate popularity by blending news coverage with public engagement signals (like Hacker News). It’s a strong proxy for what people are actually reading, not literal readership numbers.',
     },
     {
@@ -45,7 +45,7 @@ const faqs = computed(() => [
     },
     {
         q: 'What does Pro Lifetime include?',
-        a: 'A one-time payment unlocks every Pro feature in the current major version of NewsFlow™ with no recurring billing. A future major version may be a separate purchase, with a loyalty discount for Lifetime owners.',
+        a: 'A one-time payment unlocks every Pro feature in the current major version of NewsroomFlow™ with no recurring billing. A future major version may be a separate purchase, with a loyalty discount for Lifetime owners.',
     },
     {
         q: 'Can I cancel anytime?',
@@ -53,7 +53,7 @@ const faqs = computed(() => [
     },
     {
         q: 'Is there a mobile app?',
-        a: 'Native iOS and Android apps are coming soon and will sync with your web account. For now, NewsFlow™ works great in any mobile browser.',
+        a: 'Native iOS and Android apps are coming soon and will sync with your web account. For now, NewsroomFlow™ works great in any mobile browser.',
     },
     {
         q: 'How do you handle my data?',
@@ -76,7 +76,7 @@ const seoJsonLd = computed(() => ({
 <template>
     <SeoHead
         title="FAQ"
-        description="Answers to common questions about NewsFlow — how we find stories, topic limits, refresh timing, Pro plans, billing, and how we handle your data."
+        description="Answers to common questions about NewsroomFlow — how we find stories, topic limits, refresh timing, Pro plans, billing, and how we handle your data."
         path="/faq"
         :json-ld="seoJsonLd"
     />
@@ -91,7 +91,7 @@ const seoJsonLd = computed(() => ({
                     Frequently Asked Questions
                 </h1>
                 <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600">
-                    Everything you need to know about NewsFlow.
+                    Everything you need to know about NewsroomFlow.
                 </p>
             </div>
 

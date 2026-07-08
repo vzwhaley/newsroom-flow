@@ -1,6 +1,6 @@
-# NewsFlow for iOS
+# NewsroomFlow for iOS
 
-Native SwiftUI client for NewsFlow, mirroring the Android app
+Native SwiftUI client for NewsroomFlow, mirroring the Android app
 ([`../newsflow-android`](../newsflow-android)) feature-for-feature against the
 same Sanctum-authenticated JSON API exposed by the web app
 ([`../newsflow-web/routes/api.php`](../newsflow-web/routes/api.php)).
@@ -13,9 +13,9 @@ same Sanctum-authenticated JSON API exposed by the web app
 
 ## Requirements
 
-- **macOS with Xcode 16 or newer.** The committed `NewsFlow.xcodeproj` uses
+- **macOS with Xcode 16 or newer.** The committed `NewsroomFlow.xcodeproj` uses
   file-system-synchronized groups (an Xcode 16 feature), so every `.swift`
-  file under `NewsFlow/` is compiled automatically — no need to register files
+  file under `NewsroomFlow/` is compiled automatically — no need to register files
   in the project. On **Xcode 15**, regenerate the project with XcodeGen
   instead (see below).
 
@@ -26,14 +26,14 @@ same Sanctum-authenticated JSON API exposed by the web app
 ## Open & run
 
 ```bash
-open NewsFlow.xcodeproj
+open NewsroomFlow.xcodeproj
 ```
 
 Pick an iOS Simulator (e.g. iPhone 16) and press **⌘R**.
 
 ### Pointing at the API
 
-[`NewsFlow/Config/AppConfig.swift`](NewsFlow/Config/AppConfig.swift) selects the
+[`NewsroomFlow/Config/AppConfig.swift`](NewsroomFlow/Config/AppConfig.swift) selects the
 base URL by build configuration:
 
 | Build   | Base URL                  | Notes                                                            |
@@ -56,19 +56,19 @@ php artisan serve --host=0.0.0.0 --port=8000
 
 ```bash
 brew install xcodegen
-xcodegen generate      # reads project.yml, writes NewsFlow.xcodeproj
+xcodegen generate      # reads project.yml, writes NewsroomFlow.xcodeproj
 ```
 
 ## Project layout
 
 ```
-NewsFlow/
-  NewsFlowApp.swift          @main entry point
+NewsroomFlow/
+  NewsroomFlowApp.swift          @main entry point
   Config/AppConfig.swift     API base URL per build config
   Theme/Theme.swift          Brand palette + Color(hex:)
   Data/
     Models.swift             Codable request/response types (mirror Models.kt)
-    NewsFlowAPI.swift         URLSession API client (mirror Api.kt/Retrofit)
+    NewsroomFlowAPI.swift         URLSession API client (mirror Api.kt/Retrofit)
     AuthStore.swift          Keychain token storage (mirror Storage.kt)
     ServiceLocator.swift     Manual DI singleton
   Views/
@@ -108,7 +108,7 @@ to `POST /api/device-tokens`; the Account screen has a "Push notifications"
 toggle. To actually deliver pushes you need an Apple Developer account:
 
 1. Enable the **Push Notifications** capability for the `com.newsflow.ios` App
-   ID. `NewsFlow.entitlements` already declares `aps-environment`.
+   ID. `NewsroomFlow.entitlements` already declares `aps-environment`.
 2. Create an **APNs Auth Key (.p8)** and configure the backend (`APNS_KEY_ID`,
    `APNS_TEAM_ID`, `APNS_BUNDLE_ID`, `APNS_KEY_PATH`) — see the web README.
 
@@ -116,7 +116,7 @@ A real device is required to obtain an APNs token (the simulator can't).
 
 ## Tests
 
-A `NewsFlowTests` unit-test target (wired into the project + scheme) covers the
+A `NewsroomFlowTests` unit-test target (wired into the project + scheme) covers the
 highest-risk area for code authored without a compiler in the loop — the
 `Codable` layer:
 
@@ -130,7 +130,7 @@ highest-risk area for code authored without a compiler in the loop — the
 Run with **⌘U** in Xcode, or:
 
 ```bash
-xcodebuild test -scheme NewsFlow -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -scheme NewsroomFlow -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
 ## Ads (AdMob — Free tier; Pro removes them)
@@ -143,7 +143,7 @@ real ads on a Mac:
 
 1. **File → Add Package Dependencies** →
    `https://github.com/googleads/swift-package-manager-google-mobile-ads.git`,
-   add the `GoogleMobileAds` product to the NewsFlow target.
+   add the `GoogleMobileAds` product to the NewsroomFlow target.
 2. `Info.plist` already has `GADApplicationIdentifier` (Google's TEST app ID —
    replace with the real `ca-app-pub-…~…` for the App Store).
 3. Configure the backend: `ADMOB_APP_ID_IOS` + `ADMOB_UNIT_FEED_TAB`.

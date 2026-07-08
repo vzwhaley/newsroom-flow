@@ -1,6 +1,6 @@
-# NewsFlow for Android
+# NewsroomFlow for Android
 
-Native Android client for NewsFlow — Kotlin + Jetpack Compose, talking to the
+Native Android client for NewsroomFlow — Kotlin + Jetpack Compose, talking to the
 `newsflow-web` JSON API with Sanctum bearer tokens. Mirrors the FileFlow
 Android architecture.
 
@@ -16,7 +16,7 @@ Android architecture.
 
 ```
 com.newsflow.android/
-├── NewsFlowApplication.kt     # ServiceLocator.init()
+├── NewsroomFlowApplication.kt     # ServiceLocator.init()
 ├── MainActivity.kt            # Compose host → AppRoot
 ├── data/
 │   ├── Models.kt              # @Serializable API models
@@ -25,7 +25,7 @@ com.newsflow.android/
 │   └── ServiceLocator.kt      # singletons
 └── ui/
     ├── AppRoot.kt             # AuthViewModel: Loading / NeedsLogin / SignedIn
-    ├── theme/Theme.kt         # NewsFlow brand colors (Material 3)
+    ├── theme/Theme.kt         # NewsroomFlow brand colors (Material 3)
     └── screens/
         ├── LoginScreen.kt
         ├── RegisterScreen.kt
@@ -64,7 +64,7 @@ The debug APK lands in `app/build/outputs/apk/debug/`.
 
 Bottom-nav shell with three tabs:
 
-- **My NewsFlow** — the feed: top-level topics + nested subtopics with their
+- **My NewsroomFlow** — the feed: top-level topics + nested subtopics with their
   articles; add a topic (free 2-topic cap enforced by the server), refresh,
   remove; tap to open in the browser (marks read); **Save** (bookmark) and
   **TL;DR this** (Pro AI summary) on each card; Pro keyword watchlist on top.

@@ -106,7 +106,7 @@ class SendPushNotifications extends Command
         $count = $newArticles->count();
 
         return new PushMessage(
-            title: 'Your NewsFlow is ready',
+            title: 'Your NewsroomFlow is ready',
             body: $count === 1
                 ? '1 new story across your topics.'
                 : "{$count} new stories across your topics.",
