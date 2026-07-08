@@ -1,8 +1,8 @@
 # NewsroomFlow™ — Session Handoff
 
-**Last updated:** 2026-07-05
+**Last updated:** 2026-07-07
 **Repo:** `vzwhaley/news-flow` (GitHub) · local: `C:\Users\vzwhaley\Herd\MOON_WHALE_MEDIA\NewsFlow`
-**Branch:** `main` (in sync with `origin/main` at commit `de0ba08`) — **working tree CLEAN, nothing uncommitted**
+**Branch:** `main` (in sync with `origin/main` at commit `8ab534c`) — **working tree CLEAN, nothing uncommitted**
 
 > Paste this whole file as your first message in a new Claude Code session,
 > or just say "read SESSION_HANDOFF.md". The memory notes auto-load already;
@@ -27,10 +27,15 @@ refreshed daily at the user's chosen hour. Three clients, one backend:
   token store. Feature parity with Android. **Cannot compile on this Windows
   machine — needs a Mac + Xcode**; sources are complete but build-unverified.
 
-Article engine: `ArticleProvider` contract — `HybridArticleProvider`
-(TheNewsAPI/GNews/NewsData + Reddit/HN popularity signals + optional Claude
-TL;DR) with `StubArticleProvider` fallback when no API keys are set. Everything
-is env-gated: the app runs fully on placeholder data today.
+Article engine: `ArticleProvider` contract — `HybridArticleProvider` blends a
+FREE, keyless **Google News RSS** baseline (real, live articles for any topic
+and any locality — ON by default, `NEWSFLOW_GOOGLE_NEWS`) with optional paid
+APIs (TheNewsAPI/GNews/NewsData) + the keyless HN popularity signal + optional
+Claude summaries. `StubArticleProvider` now only kicks in when EVERY source is
+disabled (e.g. the test suite). So the app serves **real articles out of the
+box, no keys required**. Cross-source dedupe merges the same story across
+sources (prefers direct publisher URLs, fills in images). A **daily 4 AM ET
+global refresh** keeps every feed fresh, alongside the per-user hourly refresh.
 
 ---
 
@@ -38,9 +43,29 @@ is env-gated: the app runs fully on placeholder data today.
 
 **v1 is feature-complete on all three platforms, with full mobile↔web Pro
 parity, push-notification plumbing, ads plumbing, SEO, and a completed
-3-platform audit/fix round (2026-07-02).** Web suite: **211 passing**.
+3-platform audit/fix round (2026-07-02).** Web suite: **218 passing**. The
+**2026-07-07 session** was a big WEB polish pass + the brand rename (see below);
+the mobile apps were NOT touched this session.
 
-### Recent work (this session, newest first)
+### Recent work — 2026-07-07 session (web, newest first)
+
+| Commit(s) | What landed |
+|---|---|
+| `8ab534c` | **Brand rename NewsFlow → NewsroomFlow** — visible web text, logo wordmark ("Newsroom" ink + "Flow" blue + ™), email logo PNG, mail templates, SEO, `APP_NAME`, docs. **Kept on the old name deliberately** (infrastructure, not brand): `newsflow-web` dir, `config('newsflow.*')` keys, `newsflow:*` commands, `NEWSFLOW_*` env, `data-newsflow-adsense`, repo `news-flow`, domains `newsflow.test`/`newsflow.app`. **Mobile apps NOT renamed** (strings still say NewsFlow; `com.newsflow.*` bundle IDs must stay). |
+| `cbedd30` `0a8eb03` | Dashboard header: logo links to public `/` even when logged in; date shows weekday + year ("Tuesday, July 7, 2026"). |
+| `39e8b9d` | **Streak fix** — any article OPEN records the day now (not only unread→read), so re-reading keeps the streak alive. `ReadingDay::bump` on every open; `read_at` still set only on first open. |
+| `d476e49` `8e2405d` | Sidebar Local News: ONE blue "active" highlight across topics + cities (via `activeArea`, mutually exclusive with `selected`); state name toggles collapse (no scroll); cities scroll to their area. |
+| `7570644`…`be9d0af` | Daily Briefing card: Add-Topic form moved above it; heading is one line "Your Daily Briefing — Today Across Your Newsroom" (text-2xl, vertically centered, Preview pill removed). |
+| `88c2282` | Unread-Only pill moved into each topic header beside **Mark All Read** (renamed from "Mark Read"); ™ added to visible brand mentions; "Unlimited Topics"; scroll-to-area after adding a local area. |
+| `c6faf69` `f515489` `5f19fe7` `1caf29e` | **Sidebar overhaul** — dark full-length slate panel (w-72); topics **alphabetical** (parents+children) while the middle column keeps newest-added-on-top; Local News first + areas grouped by **state** (collapsible); native HTML5 **drag-and-drop reparenting** + per-topic "Move under…" menu (`POST /topics/{topic}/move`, one-level nesting enforced); "Back to top"; dropdown z-index fix; **TL;DR buttons removed** (the `articles.summary` route stays, just unsurfaced). |
+| `0b94d9e` `dd4ab4a` | Article grids → **2 columns** (from 4). |
+| `d97cfd6` | **Daily 4 AM ET global refresh** + cross-source story merge/dedup. |
+| `a376dbc` | **Real articles via free Google News RSS**; fixed Local News vanishing after a 2nd topic; ad default **728×90**; **site-wide footer** incl. authenticated pages (`SiteFooter.vue`). |
+| `c2d4e52` | **All emails branded** — hosted logo (published `resources/views/vendor/mail/html/*`), website-matched theme, footer copyright + moonwhale.media link. |
+| `85b0c63` `6c1c34d` | Text links blue + hover-only underline; buttons hover brand blue; **show/hide password** toggle on every password field (`PasswordInput.vue`). |
+| `1ccd1da` | Docs: locked the API email-verification decision (§6). |
+
+### Earlier work (pre-2026-07-07, newest first)
 
 | Commit | What landed |
 |---|---|
@@ -79,19 +104,29 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
 
 **Nothing is pending or uncommitted.** Open items, in rough priority:
 
-1. **iOS build verification** — everything since the last Mac build (audit fixes,
+1. **Mobile brand rename (NewsFlow → NewsroomFlow).** The web is fully renamed;
+   the Android/iOS apps still show "NewsFlow" in their visible strings. Rename
+   those strings only — the `com.newsflow.*` bundle/package IDs MUST stay. Best
+   done on a Mac session (iOS can't build here).
+2. **iOS build verification** — everything since the last Mac build (audit fixes,
    dark-mode palette, banners, local-area feature) compiles on paper only. Needs one Xcode build.
-2. **Mobile Reading-Stats screens** — the web `/stats` heatmap shipped and
+3. **Mobile Reading-Stats screens** — the web `/stats` heatmap shipped and
    `GET /api/stats` is live and ready, but the Android/iOS stats screens aren't
-   built yet. Small parity follow-up (mirror the streak/heatmap UI).
-3. v1.1 backlog (parked): offline reading, RSS/OPML export, widgets, audio digest.
+   built yet. Small parity follow-up (mirror the streak/heatmap UI). Note the
+   streak-recording change (any open counts) is web/API only — apps get it free
+   via the shared API.
+4. v1.1 backlog (parked): offline reading, RSS/OPML export, widgets, audio digest.
 
 ---
 
 ## 4. What's LEFT to SHIP v1 — operational (needs YOU / credentials)
 
-1. **News API key** — `THENEWSAPI_KEY` or `NEWSDATA_KEY` in `newsflow-web/.env`
-   (site currently runs on the stub provider).
+1. **News API key — OPTIONAL now.** The site already serves REAL articles for
+   free via Google News RSS. A paid key is an UPGRADE (direct publisher URLs +
+   article thumbnails): `NEWSDATA_KEY` (free-commercial tier) or `THENEWSAPI_KEY`
+   in `newsflow-web/.env` — it auto-blends with the free source, no code change.
+   `ANTHROPIC_API_KEY` turns on AI briefings / TL;DR / one-line summaries /
+   local-source discovery (all degrade cleanly without it).
 2. **Stripe** — live keys + create the 3 products/prices (Monthly $4.99, Yearly
    $49.99, Lifetime $149.99) + webhook secret.
 3. **Ads** — AdSense: `ADSENSE_CLIENT` + slot IDs (+ certified CMP before
@@ -112,8 +147,13 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
 ## 5. How to work in this repo (build/test/git rules)
 
 - **PHP/Composer/Herd only work via the PowerShell tool** — WSL bash can't see them.
-- **Web:** `cd newsflow-web; php artisan test` (211 green). After editing
+- **Web:** `cd newsflow-web; php artisan test` (218 green). After editing
   `resources/js|css` run `npm run build`. PHP-only edits need no build.
+- **Preview + browser verify:** `mcp__Claude_Preview__preview_start` (serves the
+  app on `http://127.0.0.1:8137`). `behavior:'smooth'` scrolls are a no-op in the
+  headless preview but work in real browsers — verify scroll TARGETS, not the
+  animation. Test users: create via a throwaway `php artisan tinker --execute`,
+  log in through the form, then DELETE the user after.
 - **`php artisan tinker` hangs with multiline `--execute`** — use a seeder or a
   one-liner instead.
 - **Android:** `$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"`
@@ -123,8 +163,8 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
   is available, needs `@OptIn(ExperimentalMaterial3Api::class)`).
 - **iOS:** edit sources freely; validate hand-edits to `project.pbxproj` with
   `python build-tools/validate-pbxproj.py`; actual builds need a Mac.
-- **Git:** monorepo root is `NewsroomFlow/` (not newsflow-web). **Push to
-  `origin/main` after every commit.** Commit messages containing double-quotes
+- **Git:** monorepo root folder is still `NewsFlow/` (the rename was brand-only;
+  the directory was NOT renamed). **Push to `origin/main` after every commit.** Commit messages containing double-quotes
   break PS 5.1 arg-passing — write the message to a scratch file and
   `git commit -F <file>`. Commit style: `Web:|Android:|iOS:|Apps:` prefix.
 - **Cross-platform parity:** any Android UX change gets the iOS equivalent in
@@ -182,6 +222,34 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
   if abuse from unverified accounts shows up post-launch; then build real in-app
   verification screens FIRST, then add `verified` to the API routes. Do not
   soft-gate. Don't re-raise without that trigger.
+- **Brand name = NewsroomFlow (renamed 2026-07-07, was NewsFlow).** Rename is
+  visible web text + logo wordmark + emails + docs ONLY. Internal identifiers
+  stay on the old name on purpose — `newsflow-web` dir, `config('newsflow.*')`
+  keys, `newsflow:*` commands, `NEWSFLOW_*` env, `data-newsflow-adsense`, GitHub
+  `news-flow`, and the domains `newsflow.test`/`newsflow.app`. A matching domain
+  (`newsroomflow.app`) is optional/operational — register + update `APP_URL` +
+  Herd link if wanted. Mobile apps still say NewsFlow (follow-up; `com.newsflow.*`
+  IDs stay). ™ stays: "NewsroomFlow™".
+- **Article sourcing (2026-07-07):** free, keyless **Google News RSS** is the
+  default baseline (real articles, zero config, on via `NEWSFLOW_GOOGLE_NEWS`).
+  Paid APIs are OPTIONAL upgrades (direct URLs + images) and layer on via env
+  keys. Evaluated & REJECTED as extra free sources: Bing News RSS
+  (deprecated/dead) and GDELT (rate-limited 1 req/5s) — don't re-add. Cross-source
+  dedupe prefers direct publisher URLs. A **daily 4 AM ET global refresh** runs
+  alongside the per-user hourly one (both still need `schedule:run` in prod).
+- **Reading streak (2026-07-07):** ANY article open records the day (keeps the
+  streak alive even when re-reading — feeds aren't always fresh); `read_at` still
+  set only on first open; `total_reads` counts opens. Streak needs the user to
+  open ≥1 article/day. (Streaks are engagement + the `/streak/{code}` share-card
+  marketing loop; user OK'd keeping them.)
+- **Dashboard/sidebar UX (2026-07-07):** sidebar is a dark, full-length slate
+  panel; topics listed **alphabetically** (parents+children) while the MIDDLE
+  column keeps newest-added-on-top (intentionally different orders); Local News
+  is the first sidebar item and groups areas by **state** (collapsible, sorted);
+  drag-and-drop reparenting + "Move under…" menu (one-level nesting); exactly one
+  blue "active" highlight at a time. Ad default is **728×90** (`format="horizontal"`
+  is the AdSlot default). **TL;DR per-article buttons removed** — needs an
+  Anthropic key; `articles.summary` route is intact but unsurfaced.
 
 ---
 
@@ -210,11 +278,22 @@ parity, push-notification plumbing, ads plumbing, SEO, and a completed
   `php artisan serve --port=8011` instead (both work).
 - Verification emails DO send on app signup (`Registered` event) — Gmail SMTP
   creds are already configured and proven.
-- The scheduler runs `newsflow:refresh --due` hourly, `newsflow:digest --due`
-  hourly at :05, `newsflow:push --due` hourly at :07, and
+- The scheduler runs `newsflow:refresh --due` hourly PLUS a **daily 4 AM ET
+  global `newsflow:refresh`** (every topic + area, all users), `newsflow:digest
+  --due` hourly at :05, `newsflow:push --due` hourly at :07, and
   `newsflow:discover-sources --reverify --queue --limit=50` daily at 03:20 —
   production needs a real cron entry for `schedule:run` **and a queue worker**
-  (`php artisan queue:work`) for the discovery jobs.
+  (`php artisan queue:work`) for the discovery jobs. None of these fire on this
+  dev box (no cron); run `php artisan newsflow:refresh` manually to refresh feeds.
+- **Email logo & `APP_URL`:** the branded emails load the logo from
+  `{APP_URL}/img/email-logo.png` (now the NewsroomFlow lockup). Dev `APP_URL` is
+  `https://newsflow.test` (local-only) so the logo won't render in an external
+  inbox — set `APP_URL=https://newsflow.app` in prod. (The review emails already
+  sent to vincent@teamnormandy.com used the "[Review]" copies with the logo
+  embedded inline so it showed.)
+- **Test data:** `vincent@teamnormandy.com` (Vincent Z. Whaley) was granted
+  **Pro Lifetime** in the dev DB for testing. His reading streak is genuine
+  (one reading day so far).
 - **Media Kit** (`NewsroomFlow_Media_Kit.docx`/`.pdf` at repo root, **gitignored**):
   regenerable, not in git. Generation pipeline lives in the *session scratchpad*
   (does NOT survive into a new session — recreate it if you need to rebuild):
@@ -240,6 +319,10 @@ Pick based on what you want to do:
 
 - **Go live:** "Here are my keys: <news API / Stripe / AdSense / AdMob> — wire
   them into .env and walk me through the launch checklist."
+- **Better articles:** "Here's my NewsData.io / TheNewsAPI key and my Anthropic
+  key — wire them in so we get direct URLs, thumbnails, and AI briefings."
+- **Finish the rename:** "Rename the NewsFlow strings in the Android/iOS apps to
+  NewsroomFlow (leave the com.newsflow.* IDs)."
 - **Deploy:** "Set up production deployment for newsflow.app on <host details>."
 - **iOS build day (on the Mac):** "I'm on the Mac — walk me through the Xcode
   build, the GoogleMobileAds package add, and fixing anything that doesn't compile."
