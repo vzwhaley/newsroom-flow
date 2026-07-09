@@ -1,7 +1,7 @@
 # NewsroomFlow for Android
 
 Native Android client for NewsroomFlow — Kotlin + Jetpack Compose, talking to the
-`newspaper-flow-web` JSON API with Sanctum bearer tokens. Mirrors the FileFlow
+`newsroom-flow-web` JSON API with Sanctum bearer tokens. Mirrors the FileFlow
 Android architecture.
 
 ## Stack
@@ -39,13 +39,13 @@ The app reads `BuildConfig.DEFAULT_API_BASE_URL`:
 - **Debug:** `http://10.0.2.2:8000` — the Android emulator's loopback to the
   host machine. Run the web app with:
   ```
-  cd ../newspaper-flow-web && php artisan serve
+  cd ../newsroom-flow-web && php artisan serve
   ```
   (Cleartext to `10.0.2.2` is allowed via `network_security_config.xml`; a
   physical device needs the host's LAN IP instead.)
-- **Release:** `https://newspaperflow.app` (set to the production domain).
+- **Release:** `https://newsroomflow.app` (set to the production domain).
 
-The API it consumes lives in `newspaper-flow-web/routes/api.php`
+The API it consumes lives in `newsroom-flow-web/routes/api.php`
 (`/api/auth/*`, `/api/me`, `/api/feed`, `/api/topics`, `/api/articles/*`).
 
 ## Build
