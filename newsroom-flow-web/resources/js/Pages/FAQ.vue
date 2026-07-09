@@ -99,11 +99,10 @@ const seoJsonLd = computed(() => ({
                 <div v-for="(f, i) in faqs" :key="i">
                     <button
                         @click="toggle(i)"
-                        class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors"
-                        :class="open === i ? 'bg-brand-50' : 'bg-gray-50 hover:bg-gray-100'"
+                        class="flex w-full items-center justify-between gap-4 bg-brand-50 px-6 py-5 text-left transition-colors hover:bg-brand-100"
                     >
-                        <span class="font-semibold" :class="open === i ? 'text-brand-700' : 'text-ink'">{{ f.q }}</span>
-                        <svg class="h-5 w-5 shrink-0 transition-transform" :class="[open === i ? 'rotate-180 text-brand-500' : 'text-gray-400']" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                        <span class="font-semibold text-brand-700">{{ f.q }}</span>
+                        <svg class="h-5 w-5 shrink-0 text-brand-500 transition-transform" :class="{ 'rotate-180': open === i }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
                     </button>
                     <div v-show="open === i" class="px-6 pb-5 text-gray-600">
                         {{ f.a }}
