@@ -56,13 +56,12 @@ const cards = [
             </g>
             <!-- wordmark + tagline -->
             <text x="58" y="70" font-family="Georgia, serif" font-size="16" font-weight="700" fill="#0f172a">Newsroom<tspan fill="#2563eb">Flow</tspan><tspan font-size="9" dy="-6">™</tspan></text>
-            <text x="59" y="85" font-family="Georgia, serif" font-style="italic" font-size="8" fill="#6b7280">by moon whale media, llc</text>
+            <text x="59" y="85" font-family="Figtree, sans-serif" font-size="9" fill="#6b7280">by <tspan font-family="Spantaran, cursive" font-size="10.5" fill="#1e3a8a">moon whale media, llc</tspan></text>
             <!-- nav links (clear of the lockup) -->
-            <text x="234" y="72" font-family="sans-serif" font-size="11" fill="#2563eb" font-weight="600">My NewsroomFlow™</text>
-            <text x="356" y="72" font-family="sans-serif" font-size="11" fill="#64748b">Search</text>
-            <text x="408" y="72" font-family="sans-serif" font-size="11" fill="#64748b">Saved</text>
-            <text x="456" y="72" font-family="sans-serif" font-size="11" fill="#64748b">Archive</text>
-            <text x="512" y="72" font-family="sans-serif" font-size="11" fill="#64748b">Billing</text>
+            <text x="234" y="72" font-family="sans-serif" font-size="11" fill="#64748b">Search</text>
+            <text x="290" y="72" font-family="sans-serif" font-size="11" fill="#64748b">Saved</text>
+            <text x="338" y="72" font-family="sans-serif" font-size="11" fill="#64748b">Archive</text>
+            <text x="394" y="72" font-family="sans-serif" font-size="11" fill="#64748b">Billing</text>
             <rect x="694" y="58" width="90" height="20" rx="10" fill="#eff6ff" />
             <text x="706" y="72" font-family="sans-serif" font-size="10" fill="#1d4ed8" font-weight="600">Pro · Lifetime</text>
 
