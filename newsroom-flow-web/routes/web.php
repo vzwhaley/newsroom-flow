@@ -33,7 +33,7 @@ Route::get('/pricing', fn () => Inertia::render('Pricing'))->name('pricing');
 Route::get('/world-news', [WorldNewsController::class, 'show'])->name('world-news');
 
 Route::get('/how-to-use', fn () => Inertia::render('HowToUse'))->name('how-to-use');
-Route::get('/faq', fn () => Inertia::render('Faq'))->name('faq');
+Route::get('/faq', fn () => Inertia::render('FAQ'))->name('faq');
 Route::get('/about', fn () => Inertia::render('About'))->name('about');
 
 Route::get('/privacy', fn () => Inertia::render('Legal/Privacy'))->name('privacy');
