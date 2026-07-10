@@ -1,4 +1,4 @@
-# ===== NewsFlow monorepo .gitignore =====
+# ===== NewsroomFlow monorepo .gitignore =====
 # Covers: Laravel/PHP (newsroom-flow-web), Node/Vite, and future Android/iOS apps.
 
 # ---- Secrets & local data (NEVER commit) ----
@@ -63,8 +63,8 @@ dist-ssr/
 *.local
 
 # ---- Generated deliverables (regenerable documents — keep out of git) ----
-/NewsFlow_Media_Kit.docx
-/NewsFlow_Media_Kit.pdf
+/NewsroomFlow_Media_Kit.docx
+/NewsroomFlow_Media_Kit.pdf
 
 # ---- Android (future newsflow-android) ----
 newsflow-android/.gradle/

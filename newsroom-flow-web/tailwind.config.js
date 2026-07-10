@@ -20,7 +20,7 @@ export default {
                 brand: ['Spantaran', 'Figtree', ...defaultTheme.fontFamily.sans],
             },
             colors: {
-                // NewsFlow brand — deep ink + a confident blue accent.
+                // NewsroomFlow brand — deep ink + a confident blue accent.
                 ink: {
                     DEFAULT: '#0f172a',
                     soft: '#1e293b',
