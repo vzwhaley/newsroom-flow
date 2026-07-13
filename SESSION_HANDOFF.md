@@ -26,7 +26,7 @@ refreshed daily at the user's chosen hour. Three clients, one backend:
 - **newsroom-flow-web/** — Laravel 13 + Inertia 2 (Vue 3, **no SSR**) + Tailwind 3 +
   Cashier 16 (Stripe) + Sanctum + Breeze. The backend API, billing, marketing
   site, and web dashboard. **Source of truth for auth, tiers, feeds, ads config.**
-  Served by Herd at **https://newsroomflow.test** (SQLite dev DB). Production domain:
+  Served by Herd at **https://newsroom.test** (SQLite dev DB). Production domain:
   **https://newsroomflow.app** (SEO/canonical URLs already point there).
 - **newsroom-flow-android/** — Kotlin 2.2 + Compose Material3, Retrofit +
   kotlinx.serialization, EncryptedSharedPreferences token store. Builds locally.
@@ -244,10 +244,10 @@ the mobile apps were NOT touched this session.
   - Config file/keys `config/newsflow.php` / `config('newsflow.*')` → **`newsroomflow`**.
   - Env prefix `NEWSFLOW_*` → **`NEWSROOMFLOW_*`**.
   - Artisan commands `newsflow:*` → **`newsroomflow:*`** (refresh/digest/push/discover-sources/mail-test).
-  - Dev/prod domains `newsflow.test` / `newsflow.app` → **`newsroomflow.test` / `newsroomflow.app`**
+  - Dev/prod domains `newsflow.test` / `newsflow.app` → **`newsroom.test` / `newsroomflow.app`**
     (`newsroomflow.app` is not registered yet — operational TODO; canonical/SEO URLs now point there).
   - AdSense DOM marker `data-newsflow-adsense` → **`data-newsroomflow-adsense`**.
-  - Herd dev site `newsflow` → **`newsroomflow`** — WORKING at **`https://newsroomflow.test`**
+  - Herd dev site `newsflow` → **`newsroomflow`** — WORKING at **`https://newsroom.test`**
     (HTTP 200, trusted TLS). Serviced by a directory JUNCTION, not a Herd symlink
     (`herd link` self-elevates into `System32` and links the wrong folder; junction
     fix + gotcha recorded in the `project-slug-rename` memory).
@@ -306,7 +306,7 @@ the mobile apps were NOT touched this session.
   on paper (patterns already proven in the codebase) but needs one real build.
 - **`newsroom-flow-web/.claude/launch.json`** is gitignored local tooling (preview
   server on port 8011) — leave it untracked.
-- Herd serves https://newsroomflow.test; the Claude preview config uses
+- Herd serves https://newsroom.test; the Claude preview config uses
   `php artisan serve --port=8011` instead (both work).
 - Verification emails DO send on app signup (`Registered` event) — Gmail SMTP
   creds are already configured and proven.
@@ -319,7 +319,7 @@ the mobile apps were NOT touched this session.
   dev box (no cron); run `php artisan newsroomflow:refresh` manually to refresh feeds.
 - **Email logo & `APP_URL`:** the branded emails load the logo from
   `{APP_URL}/img/email-logo.png` (now the NewsroomFlow lockup). Dev `APP_URL` is
-  `https://newsroomflow.test` (local-only) so the logo won't render in an external
+  `https://newsroom.test` (local-only) so the logo won't render in an external
   inbox — set `APP_URL=https://newsroomflow.app` in prod. (The review emails already
   sent to vincent@teamnormandy.com used the "[Review]" copies with the logo
   embedded inline so it showed.)
@@ -333,7 +333,7 @@ the mobile apps were NOT touched this session.
   (topics + subtopic, a Springfield-IL area, reading_days for the streak/heatmap,
   saved + archived articles) — **use only fake data, never the user's**;
   (2) a Node script (`puppeteer-core` driving installed Chrome against
-  `https://newsroomflow.test`) logs in as John Doe, dismisses the cookie banner,
+  `https://newsroom.test`) logs in as John Doe, dismisses the cookie banner,
   full-page-screenshots all 17 pages, then slices each tall PNG into
   page-height bands (`pngjs`) encoded as JPEG (`jpeg-js`, q84, 1.5×) so images
   flow across doc pages without clipping; (3) an extended
