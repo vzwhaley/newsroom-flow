@@ -16,7 +16,7 @@ Part of **Moon Whale Media**. Stack and conventions mirror the sibling apps
 - **Breeze** (Vue/Inertia auth scaffolding)
 - SQLite by default (swap `DB_CONNECTION` for production)
 
-Served locally by Herd at **https://newsroom.test**.
+Served locally by Herd at **https://newsroomflow.test**.
 
 ## Subscription tiers
 
@@ -87,8 +87,8 @@ npm install && npm run build       # or: npm run dev
 ```
 
 Demo logins (password `password`):
-- `free@newsroom.test` — Free (2 topics)
-- `pro@newsroom.test` — Pro Lifetime (unlimited)
+- `free@newsroomflow.test` — Free (2 topics)
+- `pro@newsroomflow.test` — Pro Lifetime (unlimited)
 
 ### Daily refresh (production)
 

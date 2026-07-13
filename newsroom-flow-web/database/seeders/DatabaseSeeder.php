@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         // --- Free demo user (2-topic cap) ---
         $free = User::factory()->create([
             'name'              => 'Demo Free',
-            'email'             => 'free@newsroom.test',
+            'email'             => 'free@newsroomflow.test',
             'password'          => Hash::make('password'),
             'email_verified_at' => Carbon::now(),
         ]);
@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
         // --- Pro (Lifetime) demo user (unlimited) ---
         $pro = User::factory()->create([
             'name'                  => 'Demo Pro',
-            'email'                 => 'pro@newsroom.test',
+            'email'                 => 'pro@newsroomflow.test',
             'password'              => Hash::make('password'),
             'email_verified_at'     => Carbon::now(),
             'lifetime_purchased_at' => Carbon::now(),
@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Seeded demo users: free@newsroom.test / pro@newsroom.test (password: "password").');
+        $this->command->info('Seeded demo users: free@newsroomflow.test / pro@newsroomflow.test (password: "password").');
     }
 
     private function seedTopics(User $user, array $names, TopicRefresher $refresher): void
