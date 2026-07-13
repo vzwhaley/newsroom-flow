@@ -108,6 +108,7 @@ const updatePassword = () => {
                 >
                     <p
                         v-if="form.recentlySuccessful"
+                        role="status"
                         class="text-sm text-gray-600"
                     >
                         Saved.

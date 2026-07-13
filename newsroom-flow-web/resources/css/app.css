@@ -11,6 +11,29 @@
     }
 }
 
+@layer base {
+    /* WCAG 1.4.3: default Tailwind placeholder (gray-400 ≈ 2.85:1 on white)
+       fails AA; gray-500 (#6b7280 ≈ 4.8:1) passes while still reading as a hint. */
+    input::placeholder,
+    textarea::placeholder {
+        color: #6b7280;
+    }
+}
+
+/* WCAG 2.3.3: honor the user's reduced-motion preference — collapse CSS
+   animations/transitions to imperceptible durations. (JS-initiated smooth
+   scrolling is gated separately where scrollIntoView/scrollTo is called.) */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 /* NewsroomFlow brand font — used for the "by moon whale media, llc" tagline. */
 @font-face {
     font-family: 'Spantaran';

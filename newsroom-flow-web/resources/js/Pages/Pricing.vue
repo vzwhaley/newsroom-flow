@@ -2,7 +2,7 @@
 import AdSlot from '@/Components/AdSlot.vue';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import SeoHead from '@/Components/SeoHead.vue';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const page = usePage();
@@ -51,6 +51,7 @@ const proFeatures = [
                 </p>
             </div>
 
+            <h2 class="sr-only">Plans</h2>
             <div class="mt-14 grid gap-6 lg:grid-cols-4">
                 <!-- FREE -->
                 <div class="flex flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">

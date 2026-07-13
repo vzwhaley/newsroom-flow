@@ -124,13 +124,13 @@ function submit() {
                 <div>
                     <InputLabel value="Blocked Publishers" />
                     <p class="mb-2 text-xs text-gray-500">Hide articles from these publishers everywhere. Match by name or domain (e.g. “tabloid.com”).</p>
-                    <TagInput v-model="form.blocked_sources" placeholder="e.g. Daily Tabloid" />
+                    <TagInput v-model="form.blocked_sources" label="Add a blocked publisher" placeholder="e.g. Daily Tabloid" />
                 </div>
 
                 <div>
                     <InputLabel value="Watch Keywords" />
                     <p class="mb-2 text-xs text-gray-500">Stories across any topic that mention these words get pinned to a “Watchlist” at the top of your feed.</p>
-                    <TagInput v-model="form.watch_keywords" placeholder="e.g. recall, merger" />
+                    <TagInput v-model="form.watch_keywords" label="Add a watch keyword" placeholder="e.g. recall, merger" />
                 </div>
 
                 <label class="flex items-start gap-3 border-t border-gray-100 pt-4">
@@ -151,7 +151,7 @@ function submit() {
             <div class="flex items-center gap-4">
                 <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
                 <Transition enter-active-class="transition ease-in-out" enter-from-class="opacity-0" leave-active-class="transition ease-in-out" leave-to-class="opacity-0">
-                    <p v-if="form.recentlySuccessful" class="text-sm text-gray-600">Saved.</p>
+                    <p v-if="form.recentlySuccessful" role="status" class="text-sm text-gray-600">Saved.</p>
                 </Transition>
             </div>
         </form>

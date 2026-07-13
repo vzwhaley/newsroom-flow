@@ -16,5 +16,7 @@ Disallow: /billing
 Disallow: /profile
 Disallow: /login
 Disallow: /register
+Disallow: /stats
+Disallow: /briefing
 
 Sitemap: https://newsroomflow.app/sitemap.xml

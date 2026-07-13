@@ -69,9 +69,11 @@ function submit() {
                     v-model="form.city"
                     type="text"
                     :placeholder="isUs ? 'e.g. Cleveland' : 'e.g. Manchester'"
+                    :aria-invalid="form.errors.city ? 'true' : undefined"
+                    :aria-describedby="`area-city-error-${area?.id ?? 'new'}`"
                     class="mt-1 block w-full rounded-md border-gray-300 text-sm focus:border-brand-500 focus:ring-brand-500"
                 />
-                <InputError class="mt-1" :message="form.errors.city" />
+                <InputError :id="`area-city-error-${area?.id ?? 'new'}`" class="mt-1" :message="form.errors.city" />
             </div>
 
             <template v-if="isUs">

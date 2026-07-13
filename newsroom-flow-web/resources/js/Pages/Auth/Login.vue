@@ -51,9 +51,11 @@ const submit = () => {
                     required
                     autofocus
                     autocomplete="username"
+                    :aria-invalid="form.errors.email ? 'true' : undefined"
+                    aria-describedby="email-error"
                 />
 
-                <InputError class="mt-2" :message="form.errors.email" />
+                <InputError id="email-error" class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
@@ -65,9 +67,11 @@ const submit = () => {
                     v-model="form.password"
                     required
                     autocomplete="current-password"
+                    :aria-invalid="form.errors.password ? 'true' : undefined"
+                    aria-describedby="password-error"
                 />
 
-                <InputError class="mt-2" :message="form.errors.password" />
+                <InputError id="password-error" class="mt-2" :message="form.errors.password" />
             </div>
 
             <div class="mt-4 block">

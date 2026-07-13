@@ -4,6 +4,8 @@ import { ref } from 'vue';
 const props = defineProps({
     modelValue: { type: Array, default: () => [] },
     placeholder: { type: String, default: 'Add…' },
+    // Accessible name for the text input (there is no visible <label> tied to it).
+    label: { type: String, default: 'Add an item' },
 });
 const emit = defineEmits(['update:modelValue']);
 
@@ -35,6 +37,7 @@ function remove(tag) {
                 @keydown.enter.prevent="add"
                 type="text"
                 :placeholder="placeholder"
+                :aria-label="label"
                 class="flex-1 rounded-md border-gray-300 text-sm focus:border-brand-500 focus:ring-brand-500"
             />
             <button type="button" @click="add" class="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-100">Add</button>

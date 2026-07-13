@@ -80,10 +80,14 @@ function flatIds() {
     return props.topics.flatMap((t) => [t.id, ...(t.children || []).map((c) => c.id)]);
 }
 
+// WCAG 2.3.3: only animate programmatic scrolls when the user allows motion.
+const scrollBehavior = () =>
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+
 function select(id) {
     selected.value = id;
     activeArea.value = null; // selecting a topic clears the active local-news city
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: scrollBehavior() });
 }
 
 // The active local-news city (mutually exclusive with a selected topic).
@@ -99,16 +103,16 @@ function scrollToLocal() {
     const el = localRef.value;
     if (!el) return;
     const y = el.getBoundingClientRect().top + window.scrollY - 100; // offset for the sticky header
-    window.scrollTo({ top: y, behavior: 'smooth' });
+    window.scrollTo({ top: y, behavior: scrollBehavior() });
 }
 function scrollToArea(id) {
     const el = document.getElementById(`area-${id}`);
     if (!el) return scrollToLocal();
     const y = el.getBoundingClientRect().top + window.scrollY - 100;
-    window.scrollTo({ top: y, behavior: 'smooth' });
+    window.scrollTo({ top: y, behavior: scrollBehavior() });
 }
 function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: scrollBehavior() });
 }
 
 // Sidebar shows topics ALPHABETICALLY (parents + children). The middle column
@@ -290,7 +294,7 @@ onMounted(async () => {
                         <span aria-hidden="true">🔥</span>
                         {{ reading.streak }}-day streak
                     </Link>
-                    <span class="text-sm text-gray-400">
+                    <span class="text-sm text-gray-500">
                         {{ new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) }}
                     </span>
                 </div>
@@ -308,7 +312,7 @@ onMounted(async () => {
                         <!-- Local News — first, with its areas grouped by state -->
                         <button
                             @click="scrollToLocal"
-                            class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-semibold text-slate-100 hover:bg-white/10"
+                            class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-semibold text-slate-100 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
                         >
                             <span aria-hidden="true">📍</span>
                             <span class="truncate">Local News</span>
@@ -320,7 +324,7 @@ onMounted(async () => {
                             <div class="flex items-center">
                                 <button
                                     @click="toggleState(grp.key)"
-                                    class="rounded p-1 text-slate-400 hover:bg-white/10 hover:text-white"
+                                    class="rounded p-1 text-slate-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
                                     :aria-expanded="!stateCollapsed[grp.key]"
                                     :title="stateCollapsed[grp.key] ? 'Expand' : 'Collapse'"
                                 >
@@ -329,7 +333,7 @@ onMounted(async () => {
                                 <button
                                     @click="toggleState(grp.key)"
                                     :aria-expanded="!stateCollapsed[grp.key]"
-                                    class="flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-slate-300 hover:bg-white/10"
+                                    class="flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-slate-300 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
                                 >
                                     <span class="truncate">{{ grp.name }}</span>
                                     <span class="ml-auto text-xs text-slate-400">{{ grp.areas.length }}</span>
@@ -340,7 +344,7 @@ onMounted(async () => {
                                     v-for="a in grp.areas"
                                     :key="a.id"
                                     @click="selectArea(a.id)"
-                                    class="flex w-full items-center gap-2 rounded-md py-1.5 pl-11 pr-3 text-left text-sm"
+                                    class="flex w-full items-center gap-2 rounded-md py-1.5 pl-11 pr-3 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
                                     :class="activeArea === a.id ? 'bg-brand-600 font-semibold text-white' : 'text-slate-400 hover:bg-white/10'"
                                 >
                                     <span class="truncate">{{ a.locality || a.name }}</span>
@@ -356,7 +360,7 @@ onMounted(async () => {
                             @dragover="onDragOverTop"
                             @drop="onDropTop"
                             @dragleave="dropTargetId === 'toplevel' ? (dropTargetId = null) : null"
-                            class="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm font-semibold transition"
+                            class="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
                             :class="[
                                 selected === 'all' && !activeArea ? 'bg-brand-600 text-white' : 'text-slate-300 hover:bg-white/10',
                                 dropTargetId === 'toplevel' ? 'ring-2 ring-brand-400' : '',
@@ -389,7 +393,7 @@ onMounted(async () => {
                                 <button
                                     v-if="t.children && t.children.length"
                                     @click="toggle(t.id)"
-                                    class="rounded p-1 text-slate-400 hover:bg-white/10 hover:text-white"
+                                    class="rounded p-1 text-slate-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
                                     :aria-expanded="!isCollapsed(t.id)"
                                     :aria-label="`${isCollapsed(t.id) ? 'Expand' : 'Collapse'} ${t.name} subtopics`"
                                     :title="isCollapsed(t.id) ? 'Expand' : 'Collapse'"
@@ -400,7 +404,7 @@ onMounted(async () => {
 
                                 <button
                                     @click="select(t.id)"
-                                    class="flex flex-1 items-center gap-2 rounded-md px-2 py-2 text-left text-sm"
+                                    class="flex flex-1 items-center gap-2 rounded-md px-2 py-2 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
                                     :class="selected === t.id && !activeArea ? 'bg-brand-600 font-semibold text-white' : 'text-slate-300 hover:bg-white/10'"
                                 >
                                     <span class="truncate">{{ t.name }}</span>
@@ -409,11 +413,13 @@ onMounted(async () => {
 
                                 <!-- Options menu (add subtopic + move under…) -->
                                 <Dropdown align="left" width="48">
-                                    <template #trigger>
+                                    <template #trigger="{ open: menuOpen }">
                                         <button
                                             title="Topic options"
                                             aria-label="Topic options"
-                                            class="rounded p-1 text-slate-400 opacity-0 hover:bg-white/10 hover:text-white focus:opacity-100 group-hover:opacity-100"
+                                            aria-haspopup="menu"
+                                            :aria-expanded="menuOpen"
+                                            class="rounded p-1 text-slate-400 opacity-0 hover:bg-white/10 hover:text-white focus:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 group-hover:opacity-100"
                                         >
                                             <svg class="h-4 w-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>
                                         </button>
@@ -448,17 +454,19 @@ onMounted(async () => {
                                     </span>
                                     <button
                                         @click="select(c.id)"
-                                        class="flex flex-1 items-center gap-2 rounded-md py-1.5 pl-1 pr-2 text-left text-sm"
+                                        class="flex flex-1 items-center gap-2 rounded-md py-1.5 pl-1 pr-2 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
                                         :class="selected === c.id && !activeArea ? 'bg-brand-600 font-semibold text-white' : 'text-slate-400 hover:bg-white/10'"
                                     >
                                         <span class="truncate">{{ c.name }}</span>
                                     </button>
                                     <Dropdown align="left" width="48">
-                                        <template #trigger>
+                                        <template #trigger="{ open: menuOpen }">
                                             <button
                                                 title="Move subtopic"
                                                 aria-label="Move subtopic"
-                                                class="rounded p-1 text-slate-400 opacity-0 hover:bg-white/10 hover:text-white focus:opacity-100 group-hover:opacity-100"
+                                                aria-haspopup="menu"
+                                                :aria-expanded="menuOpen"
+                                                class="rounded p-1 text-slate-400 opacity-0 hover:bg-white/10 hover:text-white focus:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 group-hover:opacity-100"
                                             >
                                                 <svg class="h-4 w-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>
                                             </button>
@@ -497,10 +505,12 @@ onMounted(async () => {
                                     v-model="form.name"
                                     type="text"
                                     :disabled="atLimit"
+                                    :aria-invalid="form.errors.name ? 'true' : undefined"
+                                    aria-describedby="topic-error"
                                     placeholder="Add a topic — e.g. World News, Information Technology, your team…"
                                     class="w-full rounded-lg border-gray-300 text-sm focus:border-brand-500 focus:ring-brand-500 disabled:bg-gray-100"
                                 />
-                                <InputError :message="form.errors.name" class="mt-1" />
+                                <InputError id="topic-error" :message="form.errors.name" class="mt-1" />
                             </div>
                             <select
                                 v-if="topics.length"
@@ -524,7 +534,7 @@ onMounted(async () => {
 
                         <!-- Suggestions -->
                         <div v-if="!atLimit" class="mt-3 flex flex-wrap items-center gap-2">
-                            <span class="text-xs text-gray-400">Try:</span>
+                            <span class="text-xs text-gray-500">Try:</span>
                             <button
                                 v-for="s in suggestions"
                                 :key="s"

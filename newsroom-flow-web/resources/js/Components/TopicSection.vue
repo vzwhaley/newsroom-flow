@@ -113,18 +113,18 @@ function saveMutes() {
                     {{ topic.name }}
                     <span v-if="unreadCount" class="align-middle text-sm font-semibold text-brand-600">· {{ unreadCount }} unread</span>
                 </h2>
-                <p class="text-xs text-gray-400">{{ lastRefreshed }}</p>
+                <p class="text-xs text-gray-500">{{ lastRefreshed }}</p>
             </div>
             <div class="flex items-center gap-1">
                 <!-- Reorder -->
                 <button v-if="canMoveUp" @click="emit('move', { id: topic.id, dir: -1 })" title="Move up"
                     :aria-label="`Move ${topic.name} up`"
-                    class="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-ink">
+                    class="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-ink">
                     <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
                 </button>
                 <button v-if="canMoveDown" @click="emit('move', { id: topic.id, dir: 1 })" title="Move down"
                     :aria-label="`Move ${topic.name} down`"
-                    class="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-ink">
+                    class="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-ink">
                     <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
 
@@ -161,7 +161,7 @@ function saveMutes() {
                 </button>
                 <button @click="remove" :disabled="removing" title="Stop following"
                     :aria-label="`Stop following ${topic.name}`"
-                    class="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-50">
+                    class="rounded-md p-1.5 text-gray-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-50">
                     <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>

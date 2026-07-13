@@ -57,7 +57,8 @@ function onAreaCreated() {
         const target = el || document.querySelector('[id^="area-"]');
         if (!target) return;
         const y = target.getBoundingClientRect().top + window.scrollY - 100;
-        window.scrollTo({ top: y, behavior: 'smooth' });
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
     });
 }
 
@@ -155,6 +156,7 @@ function subtitle(area) {
                     v-for="(a, i) in area.articles"
                     :key="a.id"
                     :article="a"
+                    heading-level="h4"
                     :rank="i + 1"
                     :topic-name="subtitle(area)"
                     :is-pro="isPro"

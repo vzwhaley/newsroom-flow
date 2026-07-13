@@ -3,7 +3,7 @@ import AdSlot from '@/Components/AdSlot.vue';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import SeoHead from '@/Components/SeoHead.vue';
 import AppMockup from '@/Components/AppMockup.vue';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const page = usePage();

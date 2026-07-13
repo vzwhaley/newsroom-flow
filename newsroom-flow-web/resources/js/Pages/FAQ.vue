@@ -99,12 +99,15 @@ const seoJsonLd = computed(() => ({
                 <div v-for="(f, i) in faqs" :key="i">
                     <button
                         @click="toggle(i)"
+                        :id="`faq-btn-${i}`"
+                        :aria-expanded="open === i"
+                        :aria-controls="`faq-panel-${i}`"
                         class="flex w-full items-center justify-between gap-4 bg-brand-50 px-6 py-5 text-left transition-colors hover:bg-brand-100"
                     >
                         <span class="font-semibold text-brand-700">{{ f.q }}</span>
-                        <svg class="h-5 w-5 shrink-0 text-brand-500 transition-transform" :class="{ 'rotate-180': open === i }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                        <svg class="h-5 w-5 shrink-0 text-brand-500 transition-transform" :class="{ 'rotate-180': open === i }" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
                     </button>
-                    <div v-show="open === i" class="px-6 pb-5 text-gray-600">
+                    <div v-show="open === i" :id="`faq-panel-${i}`" role="region" :aria-labelledby="`faq-btn-${i}`" class="px-6 pb-5 pt-4 text-gray-600">
                         {{ f.a }}
                     </div>
                 </div>

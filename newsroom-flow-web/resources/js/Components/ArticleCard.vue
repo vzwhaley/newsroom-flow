@@ -10,6 +10,9 @@ const props = defineProps({
     canSave: { type: Boolean, default: false }, // Pro
     isSaved: { type: Boolean, default: false },
     isRead: { type: Boolean, default: false },
+    // Heading level for the headline, so cards keep the outline hierarchy of
+    // whatever section they sit in (h2 topic → h3 card; h3 area → h4 card).
+    headingLevel: { type: String, default: 'h3' },
 });
 
 const emit = defineEmits(['mark-read', 'toggle-read']);
@@ -85,7 +88,7 @@ async function share() {
         <!-- Accent bar revealed on hover -->
         <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 via-indigo-500 to-violet-500 opacity-0 transition duration-200 group-hover:opacity-100"></div>
 
-        <div class="mb-2.5 flex items-center gap-2 text-xs text-gray-400">
+        <div class="mb-2.5 flex items-center gap-2 text-xs text-gray-500">
             <span
                 v-if="rank !== null"
                 class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-brand-600 to-indigo-600 text-[11px] font-bold text-white shadow-sm"
@@ -96,7 +99,7 @@ async function share() {
                 <span class="h-1.5 w-1.5 rounded-full bg-gradient-to-br from-brand-500 to-indigo-500"></span>
                 {{ article.source || host }}
             </span>
-            <span v-if="when" class="text-gray-400">· {{ when }}</span>
+            <span v-if="when" class="text-gray-500">· {{ when }}</span>
 
             <span class="ml-auto flex items-center gap-1">
                 <!-- Share (branded link) -->
@@ -156,9 +159,9 @@ async function share() {
             </span>
         </div>
 
-        <h4 class="font-serif text-lg font-semibold leading-snug transition-colors" :class="isRead ? 'text-gray-400' : 'text-ink group-hover:text-brand-700'">
+        <component :is="headingLevel" class="font-serif text-lg font-semibold leading-snug transition-colors" :class="isRead ? 'text-gray-500' : 'text-ink group-hover:text-brand-700'">
             {{ article.headline }}
-        </h4>
+        </component>
 
         <p class="mt-2 line-clamp-3 flex-1 text-sm text-gray-600">
             {{ article.description }}

@@ -45,7 +45,7 @@ const cards = [
             <circle cx="38" cy="20" r="5" fill="#fbbf24" />
             <circle cx="56" cy="20" r="5" fill="#34d399" />
             <rect x="84" y="11" width="360" height="18" rx="9" fill="#f1f5f9" />
-            <text x="98" y="24" font-family="sans-serif" font-size="11" fill="#94a3b8">newsroomflow.test/dashboard</text>
+            <text x="98" y="24" font-family="sans-serif" font-size="11" fill="#94a3b8">newsroomflow.app/dashboard</text>
 
             <!-- ===================== APP NAV (logo lockup + links) ===================== -->
             <rect x="0" y="40" width="800" height="56" fill="#ffffff" />

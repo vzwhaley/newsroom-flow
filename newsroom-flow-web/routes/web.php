@@ -49,7 +49,7 @@ Route::get('/sitemap.xml', function () {
     $paths = ['/', '/pricing', '/world-news', '/how-to-use', '/faq', '/about', '/privacy', '/terms'];
 
     // Bump when the public pages meaningfully change (helps crawl budget).
-    $lastmod = '2026-07-03';
+    $lastmod = '2026-07-10'; // NewsroomFlow rename + public-page copy refresh
 
     $urls = collect($paths)
         ->map(fn ($p) => '  <url><loc>'.e(url($p)).'</loc><lastmod>'.$lastmod.'</lastmod></url>')
