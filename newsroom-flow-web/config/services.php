@@ -76,7 +76,7 @@ return [
     'apns' => [
         'key_id'     => env('APNS_KEY_ID'),
         'team_id'    => env('APNS_TEAM_ID'),
-        'bundle_id'  => env('APNS_BUNDLE_ID', 'com.newsflow.ios'),
+        'bundle_id'  => env('APNS_BUNDLE_ID', 'com.newsroomflow.ios'),
         'key_path'   => env('APNS_KEY_PATH'),    // path to AuthKey_XXXX.p8
         'production' => env('APNS_PRODUCTION', false),
     ],

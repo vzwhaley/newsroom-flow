@@ -69,7 +69,7 @@ class AppServiceProvider extends ServiceProvider
             return new ApnsPushSender(
                 $keyId,
                 $teamId,
-                config('services.apns.bundle_id', 'com.newsflow.ios'),
+                config('services.apns.bundle_id', 'com.newsroomflow.ios'),
                 (string) file_get_contents($keyPath),
                 (bool) config('services.apns.production', false),
             );

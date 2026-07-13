@@ -1,0 +1,45 @@
+# XcodeGen spec — an alternative to the committed NewsroomFlow.xcodeproj for
+# anyone on Xcode 15 (which predates file-system-synchronized groups) or who
+# prefers to regenerate the project. Install with `brew install xcodegen`,
+# then run `xcodegen generate` in this folder to (re)create NewsroomFlow.xcodeproj.
+name: NewsroomFlow
+options:
+  bundleIdPrefix: com.newsroomflow
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+targets:
+  NewsroomFlow:
+    type: application
+    platform: iOS
+    sources:
+      - NewsroomFlow
+    info:
+      path: Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.newsroomflow.ios
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Info.plist
+        CODE_SIGN_ENTITLEMENTS: NewsroomFlow.entitlements
+        ENABLE_PREVIEWS: YES
+  NewsroomFlowTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - NewsroomFlowTests
+    dependencies:
+      - target: NewsroomFlow
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.newsroomflow.ios.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/NewsroomFlow.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NewsroomFlow"
+        BUNDLE_LOADER: "$(TEST_HOST)"

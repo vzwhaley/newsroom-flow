@@ -66,18 +66,18 @@ dist-ssr/
 /NewsroomFlow_Media_Kit.docx
 /NewsroomFlow_Media_Kit.pdf
 
-# ---- Android (future newsflow-android) ----
-newsflow-android/.gradle/
-newsflow-android/.kotlin/
-newsflow-android/build/
-newsflow-android/**/build/
-newsflow-android/local.properties
-newsflow-android/.cxx/
-newsflow-android/captures/
+# ---- Android (future newsroom-flow-android) ----
+newsroom-flow-android/.gradle/
+newsroom-flow-android/.kotlin/
+newsroom-flow-android/build/
+newsroom-flow-android/**/build/
+newsroom-flow-android/local.properties
+newsroom-flow-android/.cxx/
+newsroom-flow-android/captures/
 *.apk
 *.aab
 
-# ---- Xcode / Swift (future newsflow-ios) ----
+# ---- Xcode / Swift (future newsroom-flow-ios) ----
 DerivedData/
 *.xcuserstate
 xcuserdata/

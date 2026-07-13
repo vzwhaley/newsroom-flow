@@ -1,7 +1,0 @@
-<resources>
-    <style name="Theme.NewsFlow" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowBackground">@color/nf_white</item>
-        <item name="android:statusBarColor">@color/nf_brand</item>
-        <item name="android:windowLightStatusBar">false</item>
-    </style>
-</resources>

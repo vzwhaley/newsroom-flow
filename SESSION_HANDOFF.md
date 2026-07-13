@@ -28,9 +28,9 @@ refreshed daily at the user's chosen hour. Three clients, one backend:
   site, and web dashboard. **Source of truth for auth, tiers, feeds, ads config.**
   Served by Herd at **https://newsroomflow.test** (SQLite dev DB). Production domain:
   **https://newsroomflow.app** (SEO/canonical URLs already point there).
-- **newsflow-android/** — Kotlin 2.2 + Compose Material3, Retrofit +
+- **newsroom-flow-android/** — Kotlin 2.2 + Compose Material3, Retrofit +
   kotlinx.serialization, EncryptedSharedPreferences token store. Builds locally.
-- **newsflow-ios/** — SwiftUI (iOS 16+), MVVM, URLSession async/await, Keychain
+- **newsroom-flow-ios/** — SwiftUI (iOS 16+), MVVM, URLSession async/await, Keychain
   token store. Feature parity with Android. **Cannot compile on this Windows
   machine — needs a Mac + Xcode**; sources are complete but build-unverified.
 
@@ -58,7 +58,7 @@ the mobile apps were NOT touched this session.
 
 | Commit(s) | What landed |
 |---|---|
-| `8ab534c` | **Brand rename NewsFlow → NewsroomFlow** — visible web text, logo wordmark ("Newsroom" ink + "Flow" blue + ™), email logo PNG, mail templates, SEO, `APP_NAME`, docs. **Kept on the old name deliberately** (infrastructure, not brand): `newsflow-web` dir, `config('newsflow.*')` keys, `newsflow:*` commands, `NEWSFLOW_*` env, `data-newsflow-adsense`, repo `news-flow`, domains `newsflow.test`/`newsflow.app`. **Mobile apps NOT renamed** (strings still say NewsFlow; `com.newsflow.*` bundle IDs must stay). _(NOTE: these `newsflow` internal ids were later renamed to `newsroom-flow`/`newsroomflow` on 2026-07-07 — see §6 "Project slug rename".)_ |
+| `8ab534c` | **Brand rename NewsFlow → NewsroomFlow** — visible web text, logo wordmark ("Newsroom" ink + "Flow" blue + ™), email logo PNG, mail templates, SEO, `APP_NAME`, docs. **Kept on the old name deliberately** (infrastructure, not brand): `newsroom-flow-web` dir, `config('newsflow.*')` keys, `newsflow:*` commands, `NEWSFLOW_*` env, `data-newsflow-adsense`, repo `news-flow`, domains `newsflow.test`/`newsflow.app`. **Mobile apps NOT renamed** (strings still say NewsFlow; `com.newsroomflow.*` bundle IDs must stay). _(NOTE: these `newsflow` internal ids were later renamed to `newsroom-flow`/`newsroomflow` on 2026-07-07 — see §6 "Project slug rename".)_ |
 | `cbedd30` `0a8eb03` | Dashboard header: logo links to public `/` even when logged in; date shows weekday + year ("Tuesday, July 7, 2026"). |
 | `39e8b9d` | **Streak fix** — any article OPEN records the day now (not only unread→read), so re-reading keeps the streak alive. `ReadingDay::bump` on every open; `read_at` still set only on first open. |
 | `d476e49` `8e2405d` | Sidebar Local News: ONE blue "active" highlight across topics + cities (via `activeArea`, mutually exclusive with `selected`); state name toggles collapse (no scroll); cities scroll to their area. |
@@ -111,12 +111,18 @@ the mobile apps were NOT touched this session.
 
 **Nothing is pending or uncommitted.** Open items, in rough priority:
 
-1. **Mobile brand rename (NewsFlow → NewsroomFlow).** The web is fully renamed;
-   the Android/iOS apps still show "NewsFlow" in their visible strings. Rename
-   those strings only — the `com.newsflow.*` bundle/package IDs MUST stay. Best
-   done on a Mac session (iOS can't build here).
+1. ~~**Mobile brand rename (NewsFlow → NewsroomFlow).**~~ **DONE 2026-07-13.** Full
+   rename across the board (per user: "all references of NewsFlow → NewsroomFlow"):
+   folders → `newsroom-flow-android`/`newsroom-flow-ios`; Android package →
+   `com.newsroomflow.android` (java dir moved, classes `NewsroomFlow*`); iOS bundle
+   → `com.newsroomflow.ios`, Xcode project/target/scheme/entitlements → `NewsroomFlow*`;
+   web APNS default updated to match. Android **compiles** (`gradlew :app:compileDebugKotlin`
+   BUILD SUCCESSFUL); iOS `validate-pbxproj.py` passes but **needs a Mac build to confirm**.
+   Only `newsflow` left anywhere is a historical migration filename (must stay).
 2. **iOS build verification** — everything since the last Mac build (audit fixes,
-   dark-mode palette, banners, local-area feature) compiles on paper only. Needs one Xcode build.
+   dark-mode palette, banners, local-area feature, AND the 2026-07-13 rename)
+   compiles on paper only. Needs one Xcode build; regenerate with `xcodegen generate`
+   (project.yml is authoritative) if the hand-updated pbxproj misbehaves.
 3. **Mobile Reading-Stats screens** — the web `/stats` heatmap shipped and
    `GET /api/stats` is live and ready, but the Android/iOS stats screens aren't
    built yet. Small parity follow-up (mirror the streak/heatmap UI). Note the
@@ -164,7 +170,7 @@ the mobile apps were NOT touched this session.
 - **`php artisan tinker` hangs with multiline `--execute`** — use a seeder or a
   one-liner instead.
 - **Android:** `$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"`
-  then `cd newsflow-android; .\gradlew.bat :app:compileDebugKotlin` (or
+  then `cd newsroom-flow-android; .\gradlew.bat :app:compileDebugKotlin` (or
   `:app:assembleDebug`). No `java` on PATH otherwise; SDK path is in
   `local.properties`. Compose BOM 2024.12.01 → Material3 1.3 (PullToRefreshBox
   is available, needs `@OptIn(ExperimentalMaterial3Api::class)`).
@@ -234,7 +240,7 @@ the mobile apps were NOT touched this session.
   below did NOT touch the brand. `APP_NAME=NewsroomFlow` stays.
 - **Project slug rename `newsflow` → `newsroom-flow` (2026-07-07, REVERSES the
   old "keep internal ids" decision).** The technical slug was renamed everywhere:
-  - Web subdir `newsflow-web` → **`newsroom-flow-web`**.
+  - Web subdir `newsroom-flow-web` → **`newsroom-flow-web`**.
   - Config file/keys `config/newsflow.php` / `config('newsflow.*')` → **`newsroomflow`**.
   - Env prefix `NEWSFLOW_*` → **`NEWSROOMFLOW_*`**.
   - Artisan commands `newsflow:*` → **`newsroomflow:*`** (refresh/digest/push/discover-sources/mail-test).
@@ -252,8 +258,8 @@ the mobile apps were NOT touched this session.
   - **Convention:** hyphenated slug (`newsroom-flow`) for folder/subdir/repo; collapsed
     token (`newsroomflow`) for config/env/commands/domains where hyphens are illegal/ugly.
   - **NOT renamed (deliberate, pending the mobile brand rename):** the mobile apps'
-    `com.newsflow.*` bundle IDs, the `NewsFlow*` Kotlin/Swift class names, the
-    `NewsFlow` Xcode target/folder, and the `newsflow-android` / `newsflow-ios`
+    `com.newsroomflow.*` bundle IDs, the `NewsFlow*` Kotlin/Swift class names, the
+    `NewsFlow` Xcode target/folder, and the `newsroom-flow-android` / `newsroom-flow-ios`
     folders. Only the mobile **domain/base-URL** references were updated. Do these
     together with the mobile NewsFlow→NewsroomFlow string rename (item #1 in §3).
 - **Article sourcing (2026-07-07):** free, keyless **Google News RSS** is the
@@ -284,7 +290,7 @@ the mobile apps were NOT touched this session.
 - `~/.claude/projects/...NewsroomFlow/memory/MEMORY.md` → `newsflow-project.md`
   (auto-loads — full history incl. env gotchas).
 - `newsroom-flow-web/README.md` — feature split, launch checklist.
-- `newsflow-android/README.md`, `newsflow-ios/README.md` — per-app setup incl.
+- `newsroom-flow-android/README.md`, `newsroom-flow-ios/README.md` — per-app setup incl.
   push/ads credential steps.
 - `build-tools/README.md` — asset generators + pbxproj validator.
 - `newsroom-flow-web/routes/api.php` — the mobile API contract (both apps mirror it
@@ -348,7 +354,7 @@ Pick based on what you want to do:
 - **Better articles:** "Here's my NewsData.io / TheNewsAPI key and my Anthropic
   key — wire them in so we get direct URLs, thumbnails, and AI briefings."
 - **Finish the rename:** "Rename the NewsFlow strings in the Android/iOS apps to
-  NewsroomFlow (leave the com.newsflow.* IDs)."
+  NewsroomFlow (leave the com.newsroomflow.* IDs)."
 - **Deploy:** "Set up production deployment for newsroomflow.app on <host details>."
 - **iOS build day (on the Mac):** "I'm on the Mac — walk me through the Xcode
   build, the GoogleMobileAds package add, and fixing anything that doesn't compile."

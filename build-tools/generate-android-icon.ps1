@@ -13,7 +13,7 @@
     Re-run if the icon design changes. Windows only (System.Drawing).
 #>
 param(
-    [string]$Out = (Join-Path $PSScriptRoot "..\newsflow-ios\NewsFlow\Assets.xcassets\AppIcon.appiconset\icon-1024.png")
+    [string]$Out = (Join-Path $PSScriptRoot "..\newsroom-flow-ios\NewsroomFlow\Assets.xcassets\AppIcon.appiconset\icon-1024.png")
 )
 
 Add-Type -AssemblyName System.Drawing

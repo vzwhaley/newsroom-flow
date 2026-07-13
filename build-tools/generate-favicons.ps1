@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Generates the NewsFlow website favicon set from a single source SVG.
+    Generates the NewsroomFlow website favicon set from a single source SVG.
 
 .DESCRIPTION
     Renders newsroom-flow-web/public/favicon.svg to PNGs (180 / 96 / 32) using

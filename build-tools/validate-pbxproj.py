@@ -22,7 +22,7 @@ import sys
 
 DEFAULT = os.path.join(
     os.path.dirname(__file__),
-    "..", "newsflow-ios", "NewsFlow.xcodeproj", "project.pbxproj",
+    "..", "newsroom-flow-ios", "NewsroomFlow.xcodeproj", "project.pbxproj",
 )
 
 

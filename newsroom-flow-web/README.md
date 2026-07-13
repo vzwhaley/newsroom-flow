@@ -138,7 +138,7 @@ Everything is covered by the test suite (`php artisan test`, 100+ tests).
 
 ## Future apps
 
-The backend is API-first so `newsflow-android` and `newsflow-ios` can become
+The backend is API-first so `newsroom-flow-android` and `newsroom-flow-ios` can become
 additional Sanctum-authenticated clients of the same API, mirroring the
 FileFlow multi-platform layout. Deferred to v1.1 / mobile: push/breaking-news
 alerts, RSS export, audio briefings.
